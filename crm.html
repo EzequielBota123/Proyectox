@@ -733,14 +733,17 @@ async function refreshFromSupabase() {
 
         setVendedores((vData||[]).map(v => v.nombre));
         setClientesCargados((cData||[]).map(mapClienteFromDB));
-        setClientesAsignados((aData||[]).filter(a => a.clientes).map(a => ({
-            ...mapClienteFromDB(a.clientes),
-            vendedorId: a.vendedor_nombre,
-            estado: a.estado || 'Sin contactar',
-            notas: a.notas || '',
-            fechaAsignacion: a.fecha_asignacion ? new Date(a.fecha_asignacion).toLocaleDateString('es-AR') : '',
-            fecha_contacto: a.fecha_contacto || null
-        })));
+        setClientesAsignados((aData||[]).filter(a => a.clientes).map(a => {
+            const { fecha, texto } = fcExtraer(a.notas || '');
+            return {
+                ...mapClienteFromDB(a.clientes),
+                vendedorId: a.vendedor_nombre,
+                estado: a.estado || 'Sin contactar',
+                notas: texto,
+                fechaAsignacion: a.fecha_asignacion ? new Date(a.fecha_asignacion).toLocaleDateString('es-AR') : '',
+                fecha_contacto: fecha
+            };
+        }));
 
         rerenderAll();
         console.log(`[CRM] refresh OK — V:${(vData||[]).length} C:${(cData||[]).length} A:${(aData||[]).length}`);
@@ -1359,25 +1362,17 @@ function mostrarDetalleCRM() {
             ${ESTADOS.map(e=>`<button class="est-btn ${e.cls} ${c.estado===e.key?'on':''}" onclick="cambiarEstadoCRM('${e.key}')">${e.icon} ${e.key}</button>`).join('')}
         </div>
 
-        <div class="form-group">
-            <label>Notas del contacto</label>
-            <textarea id="notas-crm" style="min-height:100px;" placeholder="Registrá aquí las observaciones...">${c.notas||''}</textarea>
-        </div>
-        <button class="btn btn-blue" style="width:100%;margin-bottom:14px;" onclick="guardarNotaCRM()">💾 Guardar Nota</button>
-
-        <div style="border-top:1px solid #f0f0f0;padding-top:14px;">
-            <div class="est-section-title">📅 Registro de contacto</div>
-            ${c.fecha_contacto
-                ? `<div style="font-size:12px;color:#0066cc;font-weight:700;background:#e0f2fe;padding:7px 10px;border-radius:7px;margin-bottom:10px;">
-                       🕐 Último contacto: ${new Date(c.fecha_contacto).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}
-                   </div>`
-                : `<div style="font-size:11px;color:#aaa;margin-bottom:10px;">Sin fecha de contacto registrada aún.</div>`
-            }
+        <div style="border-top:1px solid #f0f0f0;padding-top:14px;margin-top:4px;">
             <div class="form-group">
-                <label>Editar fecha y hora</label>
-                <input type="datetime-local" id="fecha-contacto-crm" value="${c.fecha_contacto ? toLocalDatetimeInput(c.fecha_contacto) : ''}">
+                <label>Notas del contacto</label>
+                <textarea id="notas-crm" style="min-height:90px;" placeholder="Registrá aquí las observaciones...">${c.notas||''}</textarea>
             </div>
-            <button class="btn btn-gray" style="width:100%;" onclick="guardarFechaContacto()">🕐 Guardar fecha de contacto</button>
+            <div class="form-group">
+                <label>📅 Fecha y hora del contacto</label>
+                <input type="datetime-local" id="fecha-contacto-crm" value="${c.fecha_contacto ? toLocalDatetimeInput(c.fecha_contacto) : ''}">
+                <div style="font-size:10px;color:#aaa;margin-top:3px;">Se registra automáticamente al cambiar el estado. También podés editarla.</div>
+            </div>
+            <button class="btn btn-green" style="width:100%;padding:13px;font-size:14px;" onclick="guardarTodo()">💾 Guardar todo</button>
         </div>
     </div>`;
 }
@@ -1390,13 +1385,14 @@ async function cambiarEstadoCRM(estado) {
         // Auto-registrar fecha de contacto al pasar a cualquier estado activo (si no tenía fecha)
         const updates = { estado };
         if (estado !== 'Sin contactar' && !crmClienteSel.fecha_contacto) {
-            updates.fecha_contacto = new Date().toISOString();
+            const fc = new Date().toISOString();
+            updates.notas = fcSerializar(fc, crmClienteSel.notas || '');
         }
         const { error } = await db.from('asignaciones').update(updates).eq('cliente_id', id);
         if (error) throw new Error(error.message);
         await refreshFromSupabase();
         mostrarToast(`Estado → ${estado}`);
-        console.log('[CRM] estado cambiado:', id, '→', estado, updates.fecha_contacto ? '| fecha_contacto auto-set' : '');
+        console.log('[CRM] estado cambiado:', id, '→', estado);
     } catch (err) {
         mostrarToast(`❌ ${err.message}`, '#dc2626');
         console.error('[CRM] cambiarEstadoCRM:', err);
@@ -1406,7 +1402,8 @@ async function cambiarEstadoCRM(estado) {
 async function guardarNotaCRM() {
     if (!crmClienteSel) return;
     const id = crmClienteSel.id;
-    const nota = document.getElementById('notas-crm')?.value || '';
+    const texto = document.getElementById('notas-crm')?.value || '';
+    const nota  = fcSerializar(crmClienteSel.fecha_contacto || null, texto);
     try {
         if (!sbDisponible) throw new Error('Sin conexión con Supabase');
         const { error } = await db.from('asignaciones').update({ notas: nota }).eq('cliente_id', id);
@@ -2153,23 +2150,65 @@ function irAClienteCRM(id) {
     seleccionarClienteCRM(id);
 }
 
-// Guarda la fecha de contacto manual desde el detalle del cliente
+// Un solo botón: guarda nota + fecha en una llamada
+async function guardarTodo() {
+    if (!crmClienteSel) return;
+    const id    = crmClienteSel.id;
+    const texto = document.getElementById('notas-crm')?.value || '';
+    const dtInput = document.getElementById('fecha-contacto-crm');
+    const fc    = dtInput?.value ? new Date(dtInput.value).toISOString() : (crmClienteSel.fecha_contacto || null);
+    const notas = fcSerializar(fc, texto);
+    try {
+        if (!sbDisponible) throw new Error('Sin conexión con Supabase');
+        const { error } = await db.from('asignaciones').update({ notas }).eq('cliente_id', id);
+        if (error) throw new Error(error.message);
+        await refreshFromSupabase();
+        mostrarToast('💾 Guardado correctamente');
+        console.log('[CRM] guardarTodo OK:', id, '→ fc:', fc);
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] guardarTodo:', err);
+    }
+}
+
+// Guarda la fecha de contacto (vía notas codificadas — sin cambio de esquema DB)
 async function guardarFechaContacto() {
     if (!crmClienteSel) return;
     const input = document.getElementById('fecha-contacto-crm');
     if (!input) return;
-    const fecha_contacto = input.value ? new Date(input.value).toISOString() : null;
+    const fc    = input.value ? new Date(input.value).toISOString() : null;
+    const notas = fcSerializar(fc, crmClienteSel.notas || '');
     try {
         if (!sbDisponible) throw new Error('Sin conexión con Supabase');
-        const { error } = await db.from('asignaciones').update({ fecha_contacto }).eq('cliente_id', crmClienteSel.id);
+        const { error } = await db.from('asignaciones').update({ notas }).eq('cliente_id', crmClienteSel.id);
         if (error) throw new Error(error.message);
         await refreshFromSupabase();
         mostrarToast('📅 Fecha de contacto guardada');
-        console.log('[CRM] fecha_contacto guardada:', crmClienteSel.id, '→', fecha_contacto);
+        console.log('[CRM] fecha_contacto guardada en notas:', crmClienteSel.id, '→', fc);
     } catch (err) {
         mostrarToast(`❌ ${err.message}`, '#dc2626');
         console.error('[CRM] guardarFechaContacto:', err);
     }
+}
+
+// ============================================================
+// CODIFICACIÓN fecha_contacto dentro del campo notas
+// (no requiere cambios en el schema de Supabase)
+// Formato: {"_fc":"ISO-date","_n":"texto visible"} | o texto plano si sin fecha
+// ============================================================
+function fcExtraer(raw) {
+    if (!raw) return { fecha: null, texto: '' };
+    try {
+        if (raw.startsWith('{"_fc":')) {
+            const obj = JSON.parse(raw);
+            return { fecha: obj._fc || null, texto: obj._n || '' };
+        }
+    } catch(e) {}
+    return { fecha: null, texto: raw };
+}
+function fcSerializar(fecha, texto) {
+    if (fecha) return JSON.stringify({ _fc: fecha, _n: texto || '' });
+    return texto || '';
 }
 
 // ============================================================
