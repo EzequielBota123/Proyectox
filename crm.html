@@ -345,11 +345,12 @@
                 <div class="seccion-tipo">
                     <div class="tipo-header-cred">🟢 CREDIFIN — <span id="count-cred">0</span> clientes</div>
                     <div class="filtros">
-                        <input type="text" placeholder="Nombre" id="f-cred-nombre" onkeyup="filtrarCredifin()" autocomplete="off">
-                        <input type="text" placeholder="CUIT"   id="f-cred-cuit"   onkeyup="filtrarCredifin()" autocomplete="off">
+                        <input type="text" placeholder="Nombre"    id="f-cred-nombre"    onkeyup="filtrarCredifin()" autocomplete="off">
+                        <input type="text" placeholder="CUIT"      id="f-cred-cuit"      onkeyup="filtrarCredifin()" autocomplete="off">
+                        <input type="text" placeholder="Teléfono"  id="f-cred-telefono"  onkeyup="filtrarCredifin()" autocomplete="off">
                         <select id="f-cred-prov" onchange="filtrarCredifin()"><option value="">Todas las provincias</option></select>
-                        <input type="text" placeholder="Ciudad" id="f-cred-ciudad" onkeyup="filtrarCredifin()" autocomplete="off">
-                        <input type="text" placeholder="Rubro"  id="f-cred-rubro"  onkeyup="filtrarCredifin()" autocomplete="off">
+                        <input type="text" placeholder="Ciudad"    id="f-cred-ciudad"    onkeyup="filtrarCredifin()" autocomplete="off">
+                        <input type="text" placeholder="Rubro"     id="f-cred-rubro"     onkeyup="filtrarCredifin()" autocomplete="off">
                     </div>
                     <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
                         <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;">
@@ -372,11 +373,12 @@
                 <div class="seccion-tipo">
                     <div class="tipo-header-sin">🟡 SIN CREDIFIN — <span id="count-sin">0</span> clientes</div>
                     <div class="filtros">
-                        <input type="text" placeholder="Nombre" id="f-sin-nombre" onkeyup="filtrarSin()" autocomplete="off">
-                        <input type="text" placeholder="CUIT"   id="f-sin-cuit"   onkeyup="filtrarSin()" autocomplete="off">
+                        <input type="text" placeholder="Nombre"    id="f-sin-nombre"    onkeyup="filtrarSin()" autocomplete="off">
+                        <input type="text" placeholder="CUIT"      id="f-sin-cuit"      onkeyup="filtrarSin()" autocomplete="off">
+                        <input type="text" placeholder="Teléfono"  id="f-sin-telefono"  onkeyup="filtrarSin()" autocomplete="off">
                         <select id="f-sin-prov" onchange="filtrarSin()"><option value="">Todas las provincias</option></select>
-                        <input type="text" placeholder="Ciudad" id="f-sin-ciudad" onkeyup="filtrarSin()" autocomplete="off">
-                        <input type="text" placeholder="Rubro"  id="f-sin-rubro"  onkeyup="filtrarSin()" autocomplete="off">
+                        <input type="text" placeholder="Ciudad"    id="f-sin-ciudad"    onkeyup="filtrarSin()" autocomplete="off">
+                        <input type="text" placeholder="Rubro"     id="f-sin-rubro"     onkeyup="filtrarSin()" autocomplete="off">
                     </div>
                     <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
                         <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;">
@@ -399,11 +401,12 @@
                 <div class="seccion-tipo">
                     <div class="tipo-header-retail">🟣 RETAIL — <span id="count-retail">0</span> clientes</div>
                     <div class="filtros">
-                        <input type="text" placeholder="Nombre" id="f-retail-nombre" onkeyup="filtrarRetail()" autocomplete="off">
-                        <input type="text" placeholder="CUIT"   id="f-retail-cuit"   onkeyup="filtrarRetail()" autocomplete="off">
+                        <input type="text" placeholder="Nombre"    id="f-retail-nombre"    onkeyup="filtrarRetail()" autocomplete="off">
+                        <input type="text" placeholder="CUIT"      id="f-retail-cuit"      onkeyup="filtrarRetail()" autocomplete="off">
+                        <input type="text" placeholder="Teléfono"  id="f-retail-telefono"  onkeyup="filtrarRetail()" autocomplete="off">
                         <select id="f-retail-prov" onchange="filtrarRetail()"><option value="">Todas las provincias</option></select>
-                        <input type="text" placeholder="Ciudad" id="f-retail-ciudad" onkeyup="filtrarRetail()" autocomplete="off">
-                        <input type="text" placeholder="Rubro"  id="f-retail-rubro"  onkeyup="filtrarRetail()" autocomplete="off">
+                        <input type="text" placeholder="Ciudad"    id="f-retail-ciudad"    onkeyup="filtrarRetail()" autocomplete="off">
+                        <input type="text" placeholder="Rubro"     id="f-retail-rubro"     onkeyup="filtrarRetail()" autocomplete="off">
                     </div>
                     <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
                         <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;">
@@ -1092,17 +1095,19 @@ function renderTabla(tbodyId, cargados, asignados, tipo) {
 function _filtrarPorTipo(tipo, prefijo, tbodyId, countId) {
     const todos     = getClientesCargados().filter(c => c.tipo === tipo);
     const asignados = getClientesAsignados();
-    const nombre = (document.getElementById(`f-${prefijo}-nombre`)||{}).value||'';
-    const cuit   = (document.getElementById(`f-${prefijo}-cuit`)  ||{}).value||'';
-    const prov   = (document.getElementById(`f-${prefijo}-prov`)  ||{}).value||'';
-    const ciudad = (document.getElementById(`f-${prefijo}-ciudad`)||{}).value||'';
-    const rubro  = (document.getElementById(`f-${prefijo}-rubro`) ||{}).value||'';
+    const nombre   = (document.getElementById(`f-${prefijo}-nombre`)  ||{}).value||'';
+    const cuit     = (document.getElementById(`f-${prefijo}-cuit`)    ||{}).value||'';
+    const telefono = (document.getElementById(`f-${prefijo}-telefono`)||{}).value||'';
+    const prov     = (document.getElementById(`f-${prefijo}-prov`)    ||{}).value||'';
+    const ciudad   = (document.getElementById(`f-${prefijo}-ciudad`)  ||{}).value||'';
+    const rubro    = (document.getElementById(`f-${prefijo}-rubro`)   ||{}).value||'';
     const filtrados = todos.filter(c =>
-        (!nombre || c.nombre.toLowerCase().includes(nombre.toLowerCase())) &&
-        (!cuit   || (c.cuit||'').toLowerCase().includes(cuit.toLowerCase())) &&
-        (!prov   || c.provincia===prov) &&
-        (!ciudad || (c.ciudad||'').toLowerCase().includes(ciudad.toLowerCase())) &&
-        (!rubro  || (c.rubro||'').toLowerCase().includes(rubro.toLowerCase()))
+        (!nombre   || c.nombre.toLowerCase().includes(nombre.toLowerCase())) &&
+        (!cuit     || (c.cuit||'').toLowerCase().includes(cuit.toLowerCase())) &&
+        (!telefono || (c.telefono||'').includes(telefono) || (c.telefono2||'').includes(telefono)) &&
+        (!prov     || c.provincia===prov) &&
+        (!ciudad   || (c.ciudad||'').toLowerCase().includes(ciudad.toLowerCase())) &&
+        (!rubro    || (c.rubro||'').toLowerCase().includes(rubro.toLowerCase()))
     );
     const el = document.getElementById(countId); if(el) el.textContent = todos.length;
     renderTabla(tbodyId, filtrados, asignados, tipo);
