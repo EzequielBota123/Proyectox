@@ -195,6 +195,43 @@
         #loading-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(255,255,255,0.92); align-items:center; justify-content:center; z-index:9999; flex-direction:column; gap:12px; }
         #loading-overlay .spin { font-size:40px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===================== CALENDARIO ===================== */
+        .cal-layout { display: grid; grid-template-columns: 1fr 330px; gap: 16px; align-items: start; }
+        @media(max-width:950px) { .cal-layout { grid-template-columns: 1fr; } }
+        .cal-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+        .cal-nav-titulo { font-size: 17px; font-weight: 800; color: #1a1a2e; min-width: 190px; text-align: center; }
+        .cal-nav .btn-nav { background: #0066cc; color: white; border: none; border-radius: 8px; padding: 8px 14px; cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.2s; }
+        .cal-nav .btn-nav:hover { background: #0052a3; }
+        .cal-nav .btn-hoy { background: #16a34a; }
+        .cal-nav .btn-hoy:hover { background: #15803d; }
+        .cal-dias-semana { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 2px; }
+        .cal-dia-nombre { text-align: center; font-size: 10px; font-weight: 800; color: #888; text-transform: uppercase; padding: 5px 0; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+        .cal-dia { background: white; border: 1.5px solid #e8e8e8; border-radius: 8px; min-height: 68px; padding: 5px 6px; cursor: pointer; transition: all 0.15s; }
+        .cal-dia:hover { border-color: #0066cc; background: #f0f7ff; }
+        .cal-dia.cal-sel { border-color: #0066cc; background: #eff6ff; box-shadow: 0 0 0 2px rgba(0,102,204,0.2); }
+        .cal-dia.cal-hoy { border-color: #e94560; }
+        .cal-dia.cal-hoy .cal-dia-num { background: #e94560; color: white; border-radius: 50%; }
+        .cal-dia.cal-otro { opacity: 0.3; pointer-events: none; }
+        .cal-dia-num { font-size: 12px; font-weight: 700; color: #1a1a2e; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; margin-bottom: 3px; }
+        .cal-dots { display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 2px; }
+        .cal-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+        .cal-dot-sin  { background: #991b1b; } .cal-dot-cont { background: #1d4ed8; }
+        .cal-dot-neg  { background: #c2410c; } .cal-dot-dud  { background: #7c3aed; }
+        .cal-dot-int  { background: #d97706; } .cal-dot-cerr { background: #15803d; }
+        .cal-dot-noi  { background: #9ca3af; }
+        .cal-dia-count { font-size: 9px; font-weight: 800; color: #0066cc; }
+        .cal-panel { background: white; border-radius: 10px; border: 1px solid #e0e0e0; padding: 16px; position: sticky; top: 16px; max-height: 78vh; overflow-y: auto; }
+        .cal-panel-vacio { text-align: center; color: #bbb; padding: 30px 10px; font-size: 13px; }
+        .cal-panel h4 { font-size: 13px; font-weight: 800; margin-bottom: 12px; color: #1a1a2e; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; }
+        .cal-cli { padding: 9px 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e0e0e0; margin-bottom: 6px; cursor: pointer; transition: all 0.15s; }
+        .cal-cli:hover { border-color: #0066cc; background: #eff6ff; }
+        .cal-cli-nombre { font-weight: 700; font-size: 12px; color: #1a1a2e; margin-bottom: 2px; }
+        .cal-cli-hora   { font-size: 11px; color: #0066cc; font-weight: 600; }
+        .cal-cli-vend   { font-size: 10px; color: #888; margin-top: 2px; }
+        .cal-leyenda { display: flex; gap: 10px; flex-wrap: wrap; font-size: 10px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; }
+        .cal-leyenda span { display: flex; align-items: center; gap: 4px; color: #555; }
     </style>
 </head>
 <body>
@@ -231,6 +268,7 @@
         <button class="tab-btn" onclick="cambiarTab('crm',this)">📊 CRM</button>
         <button class="tab-btn" onclick="cambiarTab('exportar',this)">📥 Exportar</button>
         <button class="tab-btn" onclick="cambiarTab('cargar',this)">📁 Cargar Excel</button>
+        <button class="tab-btn" onclick="cambiarTab('calendario',this)">📅 Calendario</button>
         <button class="tab-btn admin-only" onclick="cambiarTab('usuarios',this)" style="display:none;">👥 Usuarios</button>
     </div>
 
@@ -510,6 +548,57 @@
     </div>
 </div>
 
+    <!-- ===== CALENDARIO ===== -->
+    <div id="tab-calendario" class="tab-content">
+        <div class="card">
+            <!-- Navegación -->
+            <div class="cal-nav">
+                <button class="btn-nav" onclick="prevMes()">◀ Anterior</button>
+                <span class="cal-nav-titulo" id="cal-titulo">—</span>
+                <button class="btn-nav" onclick="nextMes()">Siguiente ▶</button>
+                <button class="btn-nav btn-hoy" onclick="irAHoy()">📅 Hoy</button>
+                <select id="cal-filtro-vendedor" onchange="renderCalendario()" style="max-width:200px;font-weight:700;flex:1;">
+                    <option value="">Todos los vendedores</option>
+                </select>
+            </div>
+
+            <div class="cal-layout">
+                <!-- Grilla del mes -->
+                <div>
+                    <div class="cal-dias-semana">
+                        <div class="cal-dia-nombre">Lun</div>
+                        <div class="cal-dia-nombre">Mar</div>
+                        <div class="cal-dia-nombre">Mié</div>
+                        <div class="cal-dia-nombre">Jue</div>
+                        <div class="cal-dia-nombre">Vie</div>
+                        <div class="cal-dia-nombre">Sáb</div>
+                        <div class="cal-dia-nombre">Dom</div>
+                    </div>
+                    <div class="cal-grid" id="cal-grid"></div>
+
+                    <!-- Leyenda de colores -->
+                    <div class="cal-leyenda">
+                        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#1d4ed8;"></span>Contactado</span>
+                        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#c2410c;"></span>En negociación</span>
+                        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#7c3aed;"></span>Dudas</span>
+                        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#d97706;"></span>Interesado</span>
+                        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#15803d;"></span>Cerrado</span>
+                        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#9ca3af;"></span>No interesado</span>
+                    </div>
+                </div>
+
+                <!-- Panel lateral del día seleccionado -->
+                <div class="cal-panel" id="cal-panel">
+                    <div class="cal-panel-vacio">📅 Hacé clic en un día<br>para ver los contactos</div>
+                </div>
+            </div>
+
+            <div style="margin-top:14px;background:#eff6ff;border:1px solid #93c5fd;border-radius:8px;padding:10px 14px;font-size:12px;color:#1d4ed8;">
+                <strong>💡 Cómo funciona:</strong> Cuando cambiás el estado de un cliente en el CRM, se registra automáticamente la fecha y hora del contacto. También podés editarla manualmente desde el detalle de cada cliente.
+            </div>
+        </div>
+    </div>
+
 <!-- Modal editar script -->
 <div class="modal" id="modal-script">
     <div class="modal-box">
@@ -620,7 +709,8 @@ async function refreshFromSupabase() {
             vendedorId: a.vendedor_nombre,
             estado: a.estado || 'Sin contactar',
             notas: a.notas || '',
-            fechaAsignacion: a.fecha_asignacion ? new Date(a.fecha_asignacion).toLocaleDateString('es-AR') : ''
+            fechaAsignacion: a.fecha_asignacion ? new Date(a.fecha_asignacion).toLocaleDateString('es-AR') : '',
+            fecha_contacto: a.fecha_contacto || null
         })));
 
         rerenderAll();
@@ -643,6 +733,10 @@ function rerenderAll() {
         const fresh = getClientesAsignados().find(c => String(c.id) === String(crmClienteSel.id));
         crmClienteSel = fresh || null;
         if (crmClienteSel) mostrarDetalleCRM();
+    }
+    // Actualizar calendario si está abierto
+    if (document.getElementById('tab-calendario')?.classList.contains('active')) {
+        renderCalendario();
     }
 }
 
@@ -828,6 +922,13 @@ function renderVendedores() {
         if (vendedorActivo && vendedores.includes(vendedorActivo)) el.value = vendedorActivo;
         else if (prev && vendedores.includes(prev)) el.value = prev;
     });
+    // Sincronizar selector del calendario
+    const calSel = document.getElementById('cal-filtro-vendedor');
+    if (calSel) {
+        const prev = calSel.value;
+        calSel.innerHTML = '<option value="">Todos los vendedores</option>' + vendedores.map(n=>`<option value="${n}">${n}</option>`).join('');
+        if (prev && vendedores.includes(prev)) calSel.value = prev;
+    }
 }
 
 async function agregarVendedor() {
@@ -1154,10 +1255,13 @@ function renderCRM() {
         const badge = c.tipo==='Credifin' ? '<span class="badge-cred">CRE</span>'
                    : c.tipo==='Retail'    ? '<span class="badge-retail">RET</span>'
                                           : '<span class="badge-sin">SIN</span>';
+        const fechaTag = c.fecha_contacto
+            ? `<span style="font-size:9px;color:#0066cc;font-weight:700;background:#e0f2fe;padding:1px 6px;border-radius:4px;margin-left:4px;">📅 ${formatFechaContacto(c.fecha_contacto)}</span>`
+            : '';
         return `<div class="crm-item ${sel}" data-id="${c.id}" onclick="seleccionarClienteCRM(this.dataset.id)">
             <div class="crm-nombre">${badge} ${c.nombre}</div>
             <div class="crm-datos">${c.ciudad||''}${c.provincia?' — '+c.provincia:''} · ${c.telefono||'—'}</div>
-            <span class="eb ${est.eb}">${est.icon} ${est.key}</span>
+            <div style="margin-top:3px;"><span class="eb ${est.eb}">${est.icon} ${est.key}</span>${fechaTag}</div>
         </div>`;
     }).join('') || `<div style="padding:30px;text-align:center;color:#aaa;font-size:13px;">Sin clientes${crmFiltroEstado!=='todos'?' con estado "'+crmFiltroEstado+'"':''}</div>`;
 }
@@ -1205,9 +1309,24 @@ function mostrarDetalleCRM() {
 
         <div class="form-group">
             <label>Notas del contacto</label>
-            <textarea id="notas-crm" style="min-height:110px;" placeholder="Registrá aquí las observaciones...">${c.notas||''}</textarea>
+            <textarea id="notas-crm" style="min-height:100px;" placeholder="Registrá aquí las observaciones...">${c.notas||''}</textarea>
         </div>
-        <button class="btn btn-blue" style="width:100%;" onclick="guardarNotaCRM()">💾 Guardar Nota</button>
+        <button class="btn btn-blue" style="width:100%;margin-bottom:14px;" onclick="guardarNotaCRM()">💾 Guardar Nota</button>
+
+        <div style="border-top:1px solid #f0f0f0;padding-top:14px;">
+            <div class="est-section-title">📅 Registro de contacto</div>
+            ${c.fecha_contacto
+                ? `<div style="font-size:12px;color:#0066cc;font-weight:700;background:#e0f2fe;padding:7px 10px;border-radius:7px;margin-bottom:10px;">
+                       🕐 Último contacto: ${new Date(c.fecha_contacto).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}
+                   </div>`
+                : `<div style="font-size:11px;color:#aaa;margin-bottom:10px;">Sin fecha de contacto registrada aún.</div>`
+            }
+            <div class="form-group">
+                <label>Editar fecha y hora</label>
+                <input type="datetime-local" id="fecha-contacto-crm" value="${c.fecha_contacto ? toLocalDatetimeInput(c.fecha_contacto) : ''}">
+            </div>
+            <button class="btn btn-gray" style="width:100%;" onclick="guardarFechaContacto()">🕐 Guardar fecha de contacto</button>
+        </div>
     </div>`;
 }
 
@@ -1216,11 +1335,16 @@ async function cambiarEstadoCRM(estado) {
     const id = crmClienteSel.id;
     try {
         if (!sbDisponible) throw new Error('Sin conexión con Supabase');
-        const { error } = await db.from('asignaciones').update({ estado }).eq('cliente_id', id);
+        // Auto-registrar fecha de contacto al pasar a cualquier estado activo (si no tenía fecha)
+        const updates = { estado };
+        if (estado !== 'Sin contactar' && !crmClienteSel.fecha_contacto) {
+            updates.fecha_contacto = new Date().toISOString();
+        }
+        const { error } = await db.from('asignaciones').update(updates).eq('cliente_id', id);
         if (error) throw new Error(error.message);
         await refreshFromSupabase();
         mostrarToast(`Estado → ${estado}`);
-        console.log('[CRM] estado cambiado:', id, '→', estado);
+        console.log('[CRM] estado cambiado:', id, '→', estado, updates.fecha_contacto ? '| fecha_contacto auto-set' : '');
     } catch (err) {
         mostrarToast(`❌ ${err.message}`, '#dc2626');
         console.error('[CRM] cambiarEstadoCRM:', err);
@@ -1279,9 +1403,10 @@ function cambiarTab(id, btn) {
             if ((b.getAttribute('onclick')||'').indexOf("'"+id+"'")!==-1) b.classList.add('active');
         });
     }
-    if (id==='crm')      { renderCRM(); }
-    if (id==='asignar')  { renderVendedores(); filtrarCredifin(); filtrarSin(); filtrarRetail(); actualizarDebug(); }
-    if (id==='usuarios') { cargarListaUsuarios(); }
+    if (id==='crm')        { renderCRM(); }
+    if (id==='asignar')    { renderVendedores(); filtrarCredifin(); filtrarSin(); filtrarRetail(); actualizarDebug(); }
+    if (id==='usuarios')   { cargarListaUsuarios(); }
+    if (id==='calendario') { renderCalendario(); }
 }
 
 function actualizarDebug() {
@@ -1667,6 +1792,199 @@ async function cambiarMiPassword() {
     } catch (err) {
         mostrarToast(`❌ ${err.message}`, '#dc2626');
         console.error('[CRM] cambiarMiPassword:', err);
+    }
+}
+
+// ============================================================
+// CALENDARIO
+// ============================================================
+let calMes  = new Date().getMonth();
+let calAnio = new Date().getFullYear();
+let calDiaSel = null;
+
+const CAL_MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const CAL_DIAS_LARGO = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const CAL_MESES_CORTO = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+// Formatea una fecha ISO para mostrar en el listado del CRM: "hoy 14:30", "ayer", "26/05"
+function formatFechaContacto(iso) {
+    if (!iso) return '';
+    const d  = new Date(iso);
+    const hoy  = new Date();
+    const ayer = new Date(hoy); ayer.setDate(ayer.getDate() - 1);
+    if (d.toDateString() === hoy.toDateString())
+        return 'hoy ' + d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+    if (d.toDateString() === ayer.toDateString()) return 'ayer';
+    return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
+}
+
+// Convierte ISO → valor del input datetime-local (hora local)
+function toLocalDatetimeInput(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function renderCalendario() {
+    const grid = document.getElementById('cal-grid');
+    if (!grid) return;
+
+    const asignados    = getClientesAsignados();
+    const filVendedor  = document.getElementById('cal-filtro-vendedor')?.value || '';
+    const contactados  = asignados.filter(c => c.fecha_contacto && (!filVendedor || c.vendedorId === filVendedor));
+
+    // Agrupar clientes por día (clave: "YYYY-M-D" en hora local)
+    const porDia = {};
+    contactados.forEach(c => {
+        const d = new Date(c.fecha_contacto);
+        const k = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        if (!porDia[k]) porDia[k] = [];
+        porDia[k].push(c);
+    });
+
+    // Título del mes
+    const tituloEl = document.getElementById('cal-titulo');
+    if (tituloEl) tituloEl.textContent = `${CAL_MESES[calMes]} ${calAnio}`;
+
+    const hoy       = new Date();
+    const primerDia = new Date(calAnio, calMes, 1);
+    const ultimoDia = new Date(calAnio, calMes + 1, 0);
+
+    // Columna de inicio (semana lunes=0 ... domingo=6)
+    let iniCol = primerDia.getDay(); // 0=Dom
+    if (iniCol === 0) iniCol = 6; else iniCol--;
+
+    const dias = [];
+    // Días del mes anterior
+    for (let i = iniCol; i > 0; i--) {
+        dias.push({ fecha: new Date(calAnio, calMes, 1 - i), otro: true });
+    }
+    // Días del mes actual
+    for (let i = 1; i <= ultimoDia.getDate(); i++) {
+        dias.push({ fecha: new Date(calAnio, calMes, i), otro: false });
+    }
+    // Completar con días del mes siguiente
+    const resto = (7 - (dias.length % 7)) % 7;
+    for (let i = 1; i <= resto; i++) {
+        dias.push({ fecha: new Date(calAnio, calMes + 1, i), otro: true });
+    }
+
+    grid.innerHTML = dias.map(({ fecha, otro }) => {
+        const k       = `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDate()}`;
+        const clis    = porDia[k] || [];
+        const esHoy   = fecha.toDateString() === hoy.toDateString();
+        const esSel   = calDiaSel && fecha.toDateString() === new Date(calDiaSel).toDateString();
+        const cls     = `cal-dia${otro?' cal-otro':''}${esHoy?' cal-hoy':''}${esSel?' cal-sel':''}`;
+
+        const dots = clis.slice(0, 10).map(c => {
+            const dotCls = getEst(c.estado).cls.replace('e-', 'cal-dot-');
+            return `<span class="cal-dot ${dotCls}" title="${c.nombre}"></span>`;
+        }).join('');
+
+        const count = clis.length ? `<div class="cal-dia-count">${clis.length} contacto${clis.length>1?'s':''}</div>` : '';
+
+        return `<div class="${cls}" onclick="seleccionarDiaCal('${fecha.toISOString()}')">
+            <div class="cal-dia-num">${fecha.getDate()}</div>
+            <div class="cal-dots">${dots}</div>
+            ${count}
+        </div>`;
+    }).join('');
+
+    // Renderizar panel lateral
+    renderCalPanel(porDia);
+}
+
+function renderCalPanel(porDia) {
+    const panel = document.getElementById('cal-panel');
+    if (!panel) return;
+
+    if (!calDiaSel) {
+        panel.innerHTML = '<div class="cal-panel-vacio">📅 Hacé clic en un día<br>para ver los contactos</div>';
+        return;
+    }
+
+    const d  = new Date(calDiaSel);
+    const k  = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    const clis = porDia[k] || [];
+    const titulo = `${CAL_DIAS_LARGO[d.getDay()]} ${d.getDate()} de ${CAL_MESES_CORTO[d.getMonth()]}`;
+
+    if (!clis.length) {
+        panel.innerHTML = `<h4>📅 ${titulo}</h4><div class="cal-panel-vacio" style="padding:16px;">Sin contactos este día</div>`;
+        return;
+    }
+
+    const sorted = [...clis].sort((a, b) => new Date(a.fecha_contacto) - new Date(b.fecha_contacto));
+    const est_total = clis.length;
+
+    panel.innerHTML = `<h4>📅 ${titulo} — ${est_total} contacto${est_total>1?'s':''}</h4>` +
+        sorted.map(c => {
+            const est  = getEst(c.estado);
+            const hora = new Date(c.fecha_contacto).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+            const badge = c.tipo==='Credifin' ? '<span class="badge-cred">CRE</span>'
+                       : c.tipo==='Retail'    ? '<span class="badge-retail">RET</span>'
+                                              : '<span class="badge-sin">SIN</span>';
+            return `<div class="cal-cli" onclick="irAClienteCRM('${c.id}')">
+                <div class="cal-cli-nombre">${badge} ${c.nombre}</div>
+                <div class="cal-cli-hora">🕐 ${hora}</div>
+                <div class="cal-cli-vend">👤 ${c.vendedorId} · <span class="eb ${est.eb}" style="font-size:9px;">${est.icon} ${est.key}</span></div>
+            </div>`;
+        }).join('');
+}
+
+function seleccionarDiaCal(iso) {
+    calDiaSel = iso;
+    renderCalendario();
+}
+
+function prevMes() {
+    calMes--; if (calMes < 0) { calMes = 11; calAnio--; }
+    calDiaSel = null; renderCalendario();
+}
+function nextMes() {
+    calMes++; if (calMes > 11) { calMes = 0; calAnio++; }
+    calDiaSel = null; renderCalendario();
+}
+function irAHoy() {
+    const hoy = new Date();
+    calMes = hoy.getMonth(); calAnio = hoy.getFullYear();
+    calDiaSel = hoy.toISOString(); renderCalendario();
+}
+
+// Desde el calendario → ir al detalle del cliente en el tab CRM
+function irAClienteCRM(id) {
+    const cliente = getClientesAsignados().find(c => String(c.id) === String(id));
+    if (!cliente) return;
+    // Activar tab CRM
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-crm').classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        if ((b.getAttribute('onclick')||'').includes("'crm'")) b.classList.add('active');
+    });
+    // Seleccionar vendedor y cliente
+    vendedorActivo = cliente.vendedorId;
+    crmFiltroEstado = 'todos';
+    renderCRM();
+    seleccionarClienteCRM(id);
+}
+
+// Guarda la fecha de contacto manual desde el detalle del cliente
+async function guardarFechaContacto() {
+    if (!crmClienteSel) return;
+    const input = document.getElementById('fecha-contacto-crm');
+    if (!input) return;
+    const fecha_contacto = input.value ? new Date(input.value).toISOString() : null;
+    try {
+        if (!sbDisponible) throw new Error('Sin conexión con Supabase');
+        const { error } = await db.from('asignaciones').update({ fecha_contacto }).eq('cliente_id', crmClienteSel.id);
+        if (error) throw new Error(error.message);
+        await refreshFromSupabase();
+        mostrarToast('📅 Fecha de contacto guardada');
+        console.log('[CRM] fecha_contacto guardada:', crmClienteSel.id, '→', fecha_contacto);
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] guardarFechaContacto:', err);
     }
 }
 

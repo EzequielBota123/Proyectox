@@ -35,7 +35,7 @@ BEGIN
     ALTER TABLE clientes ADD CONSTRAINT clientes_tipo_check CHECK (tipo IN ('Credifin', 'Sin Credifin', 'Retail'));
 END $$;
 
--- 3. Asignaciones (cliente → vendedor, con estado y notas)
+-- 3. Asignaciones (cliente → vendedor, con estado, notas y fecha de contacto)
 CREATE TABLE IF NOT EXISTS asignaciones (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     cliente_id uuid NOT NULL REFERENCES clientes(id) ON DELETE CASCADE,
@@ -52,8 +52,12 @@ CREATE TABLE IF NOT EXISTS asignaciones (
         )),
     notas text DEFAULT '',
     fecha_asignacion timestamptz DEFAULT now(),
+    fecha_contacto timestamptz,           -- fecha/hora del último contacto con el cliente
     UNIQUE(cliente_id)
 );
+
+-- 3b. Migración: agregar fecha_contacto si la tabla ya existe sin esa columna
+ALTER TABLE asignaciones ADD COLUMN IF NOT EXISTS fecha_contacto timestamptz;
 
 -- 4. Usuarios del CRM (login multi-empleado con roles)
 CREATE TABLE IF NOT EXISTS usuarios (
