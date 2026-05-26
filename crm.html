@@ -232,6 +232,31 @@
         .cal-cli-vend   { font-size: 10px; color: #888; margin-top: 2px; }
         .cal-leyenda { display: flex; gap: 10px; flex-wrap: wrap; font-size: 10px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; }
         .cal-leyenda span { display: flex; align-items: center; gap: 4px; color: #555; }
+
+        /* ===================== MINI-CAL CRM ===================== */
+        .mcrm-wrap { background: white; border-radius: 10px; border: 1.5px solid #bfdbfe; padding: 14px 16px; margin-bottom: 14px; animation: slideDown .2s ease; }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+        .mcrm-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+        .mcrm-titulo { font-size: 14px; font-weight: 800; color: #1a1a2e; flex: 1; text-align: center; white-space: nowrap; }
+        .mcrm-btn { background: none; border: 1.5px solid #dbeafe; border-radius: 6px; padding: 4px 11px; cursor: pointer; font-size: 12px; font-weight: 700; color: #1d4ed8; transition: all .15s; }
+        .mcrm-btn:hover { border-color: #0066cc; background: #eff6ff; }
+        .mcrm-btn-cerrar { border-color: #fca5a5; color: #dc2626; }
+        .mcrm-btn-cerrar:hover { border-color: #dc2626; background: #fef2f2; }
+        .mcrm-sem { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 2px; }
+        .mcrm-sem-lbl { text-align: center; font-size: 9px; font-weight: 800; color: #aaa; text-transform: uppercase; padding: 3px 0; }
+        .mcrm-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+        .mcrm-dia { background: #f9fafb; border: 1.5px solid #f0f0f0; border-radius: 6px; min-height: 52px; padding: 4px 5px; cursor: pointer; transition: all .15s; }
+        .mcrm-dia:hover { border-color: #0066cc; background: #f0f7ff; }
+        .mcrm-dia.mcd-sel { border-color: #0066cc; background: #dbeafe; box-shadow: 0 0 0 2px rgba(0,102,204,.18); }
+        .mcrm-dia.mcd-hoy { border-color: #e94560 !important; }
+        .mcrm-dia.mcd-hoy .mcd-num { background: #e94560; color: white; border-radius: 50%; }
+        .mcrm-dia.mcd-otro { opacity: .3; pointer-events: none; }
+        .mcd-num { font-size: 11px; font-weight: 700; color: #1a1a2e; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 2px; }
+        .mcd-dots { display: flex; flex-wrap: wrap; gap: 2px; }
+        .mcd-dot { width: 6px; height: 6px; border-radius: 50%; }
+        .mcd-count { font-size: 8px; font-weight: 800; color: #0066cc; margin-top: 1px; }
+        .pill-fecha { background: #0066cc !important; color: white !important; border-color: #0066cc !important; }
+        .pill-fecha:hover { opacity: .85; }
     </style>
 </head>
 <body>
@@ -422,7 +447,11 @@
                 <option value="">— Elegí un vendedor —</option>
             </select>
             <input type="text" id="f-crm" placeholder="🔍 Buscar cliente, ciudad, tel..." style="max-width:240px;" onkeyup="renderCRM()">
+            <button id="btn-toggle-mcrm" class="btn btn-blue" style="font-size:12px;padding:8px 14px;white-space:nowrap;" onclick="toggleMiniCal()">📅 Por fecha</button>
         </div>
+
+        <!-- Mini Calendario embebido en el CRM -->
+        <div id="crm-mini-cal" style="display:none;"></div>
 
         <!-- Pills de estado -->
         <div class="pills-bar" id="pills-bar"></div>
@@ -870,6 +899,10 @@ function setClientesAsignados(c){ localStorage.setItem(LS.a, JSON.stringify(c));
 let vendedorActivo = null;
 let crmFiltroEstado = 'todos';
 let crmClienteSel = null;
+let crmFiltroFecha = null;   // ISO date | null
+let miniCalVisible = false;
+let miniCalMes  = new Date().getMonth();
+let miniCalAnio = new Date().getFullYear();
 
 // ============================================================
 // HEADER
@@ -1194,7 +1227,11 @@ async function asignarClientes() {
 function seleccionarVendedorCRM(nombre) {
     vendedorActivo = nombre || null;
     crmFiltroEstado = 'todos';
-    crmClienteSel = null;
+    crmFiltroFecha  = null;
+    crmClienteSel   = null;
+    const hoy = new Date();
+    miniCalMes  = hoy.getMonth();
+    miniCalAnio = hoy.getFullYear();
     renderCRM();
 }
 
@@ -1222,14 +1259,24 @@ function renderCRM() {
     const todos  = getClientesAsignados().filter(c => c.vendedorId === vendedorActivo);
     const busq   = (document.getElementById('f-crm')?.value||'').toLowerCase();
     const filtrados = todos.filter(c => {
-        const okEst  = crmFiltroEstado === 'todos' || c.estado === crmFiltroEstado;
-        const okBusq = !busq || c.nombre.toLowerCase().includes(busq) || (c.telefono||'').includes(busq) || (c.ciudad||'').toLowerCase().includes(busq);
-        return okEst && okBusq;
+        const okEst   = crmFiltroEstado === 'todos' || c.estado === crmFiltroEstado;
+        const okBusq  = !busq || c.nombre.toLowerCase().includes(busq) || (c.telefono||'').includes(busq) || (c.ciudad||'').toLowerCase().includes(busq);
+        const okFecha = !crmFiltroFecha || (c.fecha_contacto && mismodia(c.fecha_contacto, crmFiltroFecha));
+        return okEst && okBusq && okFecha;
     });
+
+    // Refrescar mini-cal si está abierto
+    if (miniCalVisible) renderMiniCal();
 
     // Pills
     const pillsBar = document.getElementById('pills-bar');
-    pillsBar.innerHTML = `<span class="pill p-todos ${crmFiltroEstado==='todos'?'on':''}" onclick="crmFiltroEstado='todos';renderCRM()">Todos <strong>${todos.length}</strong></span>` +
+    const pilFecha = crmFiltroFecha
+        ? `<span class="pill pill-fecha" onclick="limpiarFiltroFecha()" title="Click para quitar el filtro de fecha">
+               📅 ${new Date(crmFiltroFecha).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})} ✕
+           </span>`
+        : '';
+    pillsBar.innerHTML = pilFecha +
+        `<span class="pill p-todos ${crmFiltroEstado==='todos'?'on':''}" onclick="crmFiltroEstado='todos';renderCRM()">Todos <strong>${todos.length}</strong></span>` +
         ESTADOS.map(e => {
             const n = todos.filter(c=>c.estado===e.key).length;
             return `<span class="pill ${e.pill} ${crmFiltroEstado===e.key?'on':''}" onclick="crmFiltroEstado='${e.key}';renderCRM()">${e.icon} ${e.key} <strong>${n}</strong></span>`;
@@ -1246,7 +1293,12 @@ function renderCRM() {
     ].map(s=>`<div class="stat-box"><h3 style="color:${s.color}">${s.val}</h3><p>${s.label}</p></div>`).join('');
 
     // Label
-    document.getElementById('crm-count-label').textContent = `${filtrados.length} cliente${filtrados.length!==1?'s':''} ${crmFiltroEstado!=='todos'?'con estado "'+crmFiltroEstado+'"':'en total'}`;
+    let lblExtra = '';
+    if (crmFiltroFecha) {
+        const fd = new Date(crmFiltroFecha);
+        lblExtra = ` — ${CAL_DIAS_LARGO[fd.getDay()]} ${fd.getDate()} de ${CAL_MESES_CORTO[fd.getMonth()]}`;
+    }
+    document.getElementById('crm-count-label').textContent = `${filtrados.length} cliente${filtrados.length!==1?'s':''} ${crmFiltroEstado!=='todos'?'con estado "'+crmFiltroEstado+'"':'en total'}${lblExtra}`;
 
     // Lista
     document.getElementById('crm-list').innerHTML = filtrados.map(c => {
@@ -1793,6 +1845,138 @@ async function cambiarMiPassword() {
         mostrarToast(`❌ ${err.message}`, '#dc2626');
         console.error('[CRM] cambiarMiPassword:', err);
     }
+}
+
+// ============================================================
+// MINI-CALENDARIO EMBEBIDO EN EL CRM
+// ============================================================
+
+// Compara si dos fechas ISO caen el mismo día (en hora local)
+function mismodia(isoA, isoB) {
+    const a = new Date(isoA), b = new Date(isoB);
+    return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+}
+
+function toggleMiniCal() {
+    miniCalVisible = !miniCalVisible;
+    const wrap = document.getElementById('crm-mini-cal');
+    const btn  = document.getElementById('btn-toggle-mcrm');
+    if (!wrap) return;
+    if (miniCalVisible) {
+        wrap.style.display = 'block';
+        if (btn) { btn.style.background = '#1d4ed8'; btn.textContent = '📅 Cerrar calendario'; }
+        renderMiniCal();
+    } else {
+        wrap.style.display = 'none';
+        if (btn) { btn.style.background = ''; btn.textContent = '📅 Por fecha'; }
+        // Limpiar filtro de fecha al cerrar
+        if (crmFiltroFecha) { crmFiltroFecha = null; renderCRM(); }
+    }
+}
+
+function limpiarFiltroFecha() {
+    crmFiltroFecha = null;
+    renderCRM(); // re-render con filtro limpio (también re-renderiza mini-cal)
+}
+
+function renderMiniCal() {
+    const contenedor = document.getElementById('crm-mini-cal');
+    if (!contenedor) return;
+
+    const asignados   = getClientesAsignados();
+    const delVendedor = vendedorActivo
+        ? asignados.filter(c => c.vendedorId === vendedorActivo && c.fecha_contacto)
+        : asignados.filter(c => c.fecha_contacto);
+
+    // Agrupar por día
+    const porDia = {};
+    delVendedor.forEach(c => {
+        const d = new Date(c.fecha_contacto);
+        const k = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        if (!porDia[k]) porDia[k] = [];
+        porDia[k].push(c);
+    });
+
+    const hoy       = new Date();
+    const primerDia = new Date(miniCalAnio, miniCalMes, 1);
+    const ultimoDia = new Date(miniCalAnio, miniCalMes + 1, 0);
+    let iniCol = primerDia.getDay(); if (iniCol===0) iniCol=6; else iniCol--;
+
+    const dias = [];
+    for (let i = iniCol; i > 0; i--)  dias.push({ fecha: new Date(miniCalAnio, miniCalMes, 1-i),       otro: true });
+    for (let i = 1; i <= ultimoDia.getDate(); i++) dias.push({ fecha: new Date(miniCalAnio, miniCalMes, i), otro: false });
+    const resto = (7 - (dias.length % 7)) % 7;
+    for (let i = 1; i <= resto; i++)   dias.push({ fecha: new Date(miniCalAnio, miniCalMes+1, i),       otro: true });
+
+    const gridHTML = dias.map(({ fecha, otro }) => {
+        const k     = `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDate()}`;
+        const clis  = porDia[k] || [];
+        const esHoy = fecha.toDateString() === hoy.toDateString();
+        const esSel = crmFiltroFecha && mismodia(fecha.toISOString(), crmFiltroFecha);
+        const cls   = `mcrm-dia${otro?' mcd-otro':''}${esHoy?' mcd-hoy':''}${esSel?' mcd-sel':''}`;
+        const dots  = clis.slice(0,8).map(c => {
+            const dc = getEst(c.estado).cls.replace('e-','cal-dot-');
+            return `<span class="mcd-dot ${dc}" title="${c.nombre}"></span>`;
+        }).join('');
+        const cnt = clis.length ? `<div class="mcd-count">${clis.length}</div>` : '';
+        return `<div class="${cls}" onclick="seleccionarDiaMiniCal('${fecha.toISOString()}')">
+            <div class="mcd-num">${fecha.getDate()}</div>
+            <div class="mcd-dots">${dots}</div>${cnt}
+        </div>`;
+    }).join('');
+
+    // Total de contactos del mes
+    const totalMes = Object.values(porDia).filter(clis => {
+        const d = new Date(clis[0].fecha_contacto);
+        return d.getFullYear()===miniCalAnio && d.getMonth()===miniCalMes;
+    }).reduce((s, a) => s + a.length, 0);
+
+    contenedor.innerHTML = `<div class="mcrm-wrap">
+        <div class="mcrm-nav">
+            <button class="mcrm-btn" onclick="prevMiniMes()">◀</button>
+            <span class="mcrm-titulo">${CAL_MESES[miniCalMes]} ${miniCalAnio}
+                ${totalMes ? `<span style="font-size:11px;color:#0066cc;font-weight:600;margin-left:6px;">(${totalMes} contacto${totalMes>1?'s':''})</span>` : ''}
+            </span>
+            <button class="mcrm-btn" onclick="nextMiniMes()">▶</button>
+            <button class="mcrm-btn" onclick="irAHoyMiniCal()">Hoy</button>
+            ${crmFiltroFecha ? `<button class="mcrm-btn mcrm-btn-cerrar" onclick="limpiarFiltroFecha()">✕ Limpiar</button>` : ''}
+        </div>
+        <div class="mcrm-sem">
+            ${['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d=>`<div class="mcrm-sem-lbl">${d}</div>`).join('')}
+        </div>
+        <div class="mcrm-grid">${gridHTML}</div>
+        <div style="margin-top:8px;font-size:10px;color:#aaa;display:flex;gap:10px;flex-wrap:wrap;">
+            ${ESTADOS.filter(e=>e.key!=='Sin contactar').map(e=>{
+                const dc=e.cls.replace('e-','cal-dot-');
+                return `<span style="display:flex;align-items:center;gap:3px;"><span class="mcd-dot ${dc}" style="display:inline-block;"></span>${e.key}</span>`;
+            }).join('')}
+        </div>
+    </div>`;
+}
+
+function seleccionarDiaMiniCal(iso) {
+    // Si es el mismo día ya seleccionado → deseleccionar
+    if (crmFiltroFecha && mismodia(iso, crmFiltroFecha)) {
+        crmFiltroFecha = null;
+    } else {
+        crmFiltroFecha = iso;
+    }
+    renderCRM(); // aplica filtro + re-renderiza mini-cal
+}
+
+function prevMiniMes() {
+    miniCalMes--; if (miniCalMes < 0) { miniCalMes = 11; miniCalAnio--; }
+    renderMiniCal();
+}
+function nextMiniMes() {
+    miniCalMes++; if (miniCalMes > 11) { miniCalMes = 0; miniCalAnio++; }
+    renderMiniCal();
+}
+function irAHoyMiniCal() {
+    const hoy = new Date();
+    miniCalMes = hoy.getMonth(); miniCalAnio = hoy.getFullYear();
+    crmFiltroFecha = hoy.toISOString();
+    renderCRM();
 }
 
 // ============================================================
