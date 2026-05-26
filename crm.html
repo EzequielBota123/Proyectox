@@ -257,6 +257,16 @@
         .mcd-count { font-size: 8px; font-weight: 800; color: #0066cc; margin-top: 1px; }
         .pill-fecha { background: #0066cc !important; color: white !important; border-color: #0066cc !important; }
         .pill-fecha:hover { opacity: .85; }
+
+        /* Botones de acción en tablas de asignar */
+        .btn-accion { border: none; border-radius: 5px; padding: 3px 7px; cursor: pointer; font-size: 11px; font-weight: 700; transition: all .15s; }
+        .btn-accion-edit { background: #dbeafe; color: #1d4ed8; }
+        .btn-accion-edit:hover { background: #bfdbfe; }
+        .btn-accion-del  { background: #fee2e2; color: #dc2626; margin-left: 3px; }
+        .btn-accion-del:hover  { background: #fecaca; }
+        .tipo-header-cred, .tipo-header-sin, .tipo-header-retail { display: flex; justify-content: space-between; align-items: center; }
+        .btn-add-tipo { background: rgba(255,255,255,0.25); border: 1.5px solid rgba(255,255,255,0.5); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 11px; font-weight: 800; color: white; transition: all .15s; }
+        .btn-add-tipo:hover { background: rgba(255,255,255,0.4); }
     </style>
 </head>
 <body>
@@ -343,7 +353,7 @@
             <div>
                 <!-- CREDIFIN -->
                 <div class="seccion-tipo">
-                    <div class="tipo-header-cred">🟢 CREDIFIN — <span id="count-cred">0</span> clientes</div>
+                    <div class="tipo-header-cred"><span>🟢 CREDIFIN — <span id="count-cred">0</span> clientes</span><button class="btn-add-tipo" onclick="abrirModalClienteTipo('Credifin')">➕ Agregar</button></div>
                     <div class="filtros">
                         <input type="text" placeholder="Nombre"    id="f-cred-nombre"    onkeyup="filtrarCredifin()" autocomplete="off">
                         <input type="text" placeholder="CUIT"      id="f-cred-cuit"      onkeyup="filtrarCredifin()" autocomplete="off">
@@ -362,7 +372,7 @@
                         <table>
                             <thead><tr>
                                 <th style="width:28px;"><input type="checkbox" id="sel-todo-cred-h" onchange="selTodoCred()" style="width:auto;"></th>
-                                <th>Nombre</th><th>CUIT</th><th>Rubro</th><th>Provincia</th><th>Ciudad</th><th>Teléfono</th>
+                                <th>Nombre</th><th>CUIT</th><th>Rubro</th><th>Provincia</th><th>Ciudad</th><th>Teléfono</th><th></th>
                             </tr></thead>
                             <tbody id="tbody-cred"></tbody>
                         </table>
@@ -371,7 +381,7 @@
 
                 <!-- SIN CREDIFIN -->
                 <div class="seccion-tipo">
-                    <div class="tipo-header-sin">🟡 SIN CREDIFIN — <span id="count-sin">0</span> clientes</div>
+                    <div class="tipo-header-sin"><span>🟡 SIN CREDIFIN — <span id="count-sin">0</span> clientes</span><button class="btn-add-tipo" onclick="abrirModalClienteTipo('Sin Credifin')">➕ Agregar</button></div>
                     <div class="filtros">
                         <input type="text" placeholder="Nombre"    id="f-sin-nombre"    onkeyup="filtrarSin()" autocomplete="off">
                         <input type="text" placeholder="CUIT"      id="f-sin-cuit"      onkeyup="filtrarSin()" autocomplete="off">
@@ -390,7 +400,7 @@
                         <table>
                             <thead><tr>
                                 <th style="width:28px;"><input type="checkbox" id="sel-todo-sin-h" onchange="selTodoSin()" style="width:auto;"></th>
-                                <th>Nombre</th><th>CUIT</th><th>Rubro</th><th>Provincia</th><th>Ciudad</th><th>Teléfono</th>
+                                <th>Nombre</th><th>CUIT</th><th>Rubro</th><th>Provincia</th><th>Ciudad</th><th>Teléfono</th><th></th>
                             </tr></thead>
                             <tbody id="tbody-sin"></tbody>
                         </table>
@@ -399,7 +409,7 @@
 
                 <!-- RETAIL -->
                 <div class="seccion-tipo">
-                    <div class="tipo-header-retail">🟣 RETAIL — <span id="count-retail">0</span> clientes</div>
+                    <div class="tipo-header-retail"><span>🟣 RETAIL — <span id="count-retail">0</span> clientes</span><button class="btn-add-tipo" onclick="abrirModalClienteTipo('Retail')">➕ Agregar</button></div>
                     <div class="filtros">
                         <input type="text" placeholder="Nombre"    id="f-retail-nombre"    onkeyup="filtrarRetail()" autocomplete="off">
                         <input type="text" placeholder="CUIT"      id="f-retail-cuit"      onkeyup="filtrarRetail()" autocomplete="off">
@@ -418,7 +428,7 @@
                         <table>
                             <thead><tr>
                                 <th style="width:28px;"><input type="checkbox" id="sel-todo-retail-h" onchange="selTodoRetail()" style="width:auto;"></th>
-                                <th>Nombre</th><th>CUIT</th><th>Rubro</th><th>Provincia</th><th>Ciudad</th><th>Teléfono</th>
+                                <th>Nombre</th><th>CUIT</th><th>Rubro</th><th>Provincia</th><th>Ciudad</th><th>Teléfono</th><th></th>
                             </tr></thead>
                             <tbody id="tbody-retail"></tbody>
                         </table>
@@ -630,6 +640,65 @@
             </div>
         </div>
     </div>
+
+<!-- Modal agregar / editar cliente -->
+<div class="modal" id="modal-cli">
+    <div class="modal-box" style="max-width:580px;">
+        <h3 style="margin-bottom:16px;font-size:16px;" id="modal-cliente-titulo">➕ Nuevo cliente</h3>
+        <input type="hidden" id="mc-id">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div class="form-group" style="grid-column:1/-1;">
+                <label>Nombre / Razón social *</label>
+                <input type="text" id="mc-nombre" placeholder="Ej: Comercio El Sol">
+            </div>
+            <div class="form-group">
+                <label>Tipo *</label>
+                <select id="mc-tipo">
+                    <option value="Credifin">🟢 Credifin</option>
+                    <option value="Sin Credifin">🟡 Sin Credifin</option>
+                    <option value="Retail">🟣 Retail</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>CUIT / CUIL</label>
+                <input type="text" id="mc-cuit" placeholder="20-12345678-9">
+            </div>
+            <div class="form-group">
+                <label>Teléfono 1</label>
+                <input type="text" id="mc-telefono" placeholder="11 1234-5678">
+            </div>
+            <div class="form-group">
+                <label>Teléfono 2</label>
+                <input type="text" id="mc-telefono2" placeholder="Alternativo">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="mc-email" placeholder="mail@ejemplo.com">
+            </div>
+            <div class="form-group">
+                <label>Ciudad</label>
+                <input type="text" id="mc-ciudad" placeholder="Córdoba">
+            </div>
+            <div class="form-group">
+                <label>Provincia</label>
+                <input type="text" id="mc-provincia" placeholder="Córdoba">
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+                <label>Dirección</label>
+                <input type="text" id="mc-direccion" placeholder="Av. Colón 123">
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+                <label>Rubro / Actividad</label>
+                <input type="text" id="mc-rubro" placeholder="Bicicletería">
+            </div>
+        </div>
+        <div id="mc-error" style="display:none;margin-top:10px;background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;padding:10px;border-radius:8px;font-size:13px;font-weight:600;"></div>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+            <button class="btn btn-green" style="flex:1;padding:12px;" id="mc-btn-guardar" onclick="guardarCliente()">💾 Guardar</button>
+            <button class="btn btn-gray"  style="flex:1;" onclick="cerrarModalCliente()">✖ Cancelar</button>
+        </div>
+    </div>
+</div>
 
 <!-- Modal editar script -->
 <div class="modal" id="modal-script">
@@ -1074,7 +1143,7 @@ function renderTabla(tbodyId, cargados, asignados, tipo) {
     const tbody = document.getElementById(tbodyId);
     if (!tbody) return;
     if (!cargados.length) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:14px;">Sin resultados — cargá un Excel en el tab 📁</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#aaa;padding:14px;">Sin resultados — cargá un Excel en el tab 📁 o agregá un cliente con ➕</td></tr>';
         return;
     }
     // Map tipo → CSS class del checkbox
@@ -1083,11 +1152,16 @@ function renderTabla(tbodyId, cargados, asignados, tipo) {
     tbody.innerHTML = cargados.map(c => {
         const a = asignados.find(x => String(x.id) === String(c.id));
         const asigInfo = a && a.vendedorId ? `<span style="font-size:9px;color:#7c3aed;font-weight:700;margin-left:4px;">→${a.vendedorId}</span>` : '';
-        const enc = encodeURIComponent(JSON.stringify({id:c.id,nombre:c.nombre,cuit:c.cuit||'',telefono:c.telefono||'',telefono2:c.telefono2||'',email:c.email||'',ciudad:c.ciudad||'',provincia:c.provincia||'',direccion:c.direccion||'',rubro:c.rubro||'',vendedor_sugerido:c.vendedor_sugerido||'',tipo:c.tipo}));
+        const enc    = encodeURIComponent(JSON.stringify({id:c.id,nombre:c.nombre,cuit:c.cuit||'',telefono:c.telefono||'',telefono2:c.telefono2||'',email:c.email||'',ciudad:c.ciudad||'',provincia:c.provincia||'',direccion:c.direccion||'',rubro:c.rubro||'',vendedor_sugerido:c.vendedor_sugerido||'',tipo:c.tipo}));
+        const escNom = c.nombre.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
         return `<tr>
             <td><input type="checkbox" class="${cls}" data-c="${enc}" style="width:auto;" onchange="actualizarContadorSel()"></td>
             <td>${c.nombre}${asigInfo}</td>
             <td>${c.cuit||'-'}</td><td>${c.rubro||'-'}</td><td>${c.provincia||'-'}</td><td>${c.ciudad||'-'}</td><td>${c.telefono||'-'}</td>
+            <td style="white-space:nowrap;">
+                <button class="btn-accion btn-accion-edit" onclick="event.stopPropagation();editarClienteAsignar('${c.id}')" title="Editar">✏️</button>
+                <button class="btn-accion btn-accion-del"  onclick="event.stopPropagation();eliminarClienteAsignar('${c.id}','${escNom}')" title="Eliminar">🗑️</button>
+            </td>
         </tr>`;
     }).join('');
 }
@@ -2193,6 +2267,106 @@ async function guardarFechaContacto() {
     } catch (err) {
         mostrarToast(`❌ ${err.message}`, '#dc2626');
         console.error('[CRM] guardarFechaContacto:', err);
+    }
+}
+
+// ============================================================
+// GESTIÓN DE CLIENTES — agregar / editar / eliminar desde Asignar
+// ============================================================
+let _clienteEditandoId = null;
+
+function abrirModalClienteTipo(tipo) {
+    abrirModalCliente(null);
+    const sel = document.getElementById('mc-tipo');
+    if (sel) sel.value = tipo;
+}
+
+function editarClienteAsignar(id) {
+    const cliente = getClientesCargados().find(c => String(c.id) === String(id));
+    if (cliente) abrirModalCliente(cliente);
+}
+
+function abrirModalCliente(cliente) {
+    _clienteEditandoId = (cliente && cliente.id) ? cliente.id : null;
+    const esNuevo = !_clienteEditandoId;
+    const titulo = document.getElementById('modal-cliente-titulo');
+    if (titulo) titulo.textContent = esNuevo ? '➕ Nuevo cliente' : '✏️ Editar cliente';
+    document.getElementById('mc-id').value        = cliente?.id        || '';
+    document.getElementById('mc-nombre').value    = cliente?.nombre    || '';
+    document.getElementById('mc-tipo').value      = cliente?.tipo      || 'Credifin';
+    document.getElementById('mc-cuit').value      = cliente?.cuit      || '';
+    document.getElementById('mc-telefono').value  = cliente?.telefono  || '';
+    document.getElementById('mc-telefono2').value = cliente?.telefono2 || '';
+    document.getElementById('mc-email').value     = cliente?.email     || '';
+    document.getElementById('mc-ciudad').value    = cliente?.ciudad    || '';
+    document.getElementById('mc-provincia').value = cliente?.provincia || '';
+    document.getElementById('mc-direccion').value = cliente?.direccion || '';
+    document.getElementById('mc-rubro').value     = cliente?.rubro     || '';
+    document.getElementById('mc-error').style.display = 'none';
+    document.getElementById('modal-cli').classList.add('open');
+    setTimeout(() => document.getElementById('mc-nombre').focus(), 80);
+}
+
+function cerrarModalCliente() {
+    document.getElementById('modal-cli').classList.remove('open');
+    _clienteEditandoId = null;
+}
+
+async function guardarCliente() {
+    const nombre = document.getElementById('mc-nombre').value.trim();
+    if (!nombre) { mostrarMCError('El nombre es obligatorio'); return; }
+    if (!sbDisponible) { mostrarMCError('Sin conexión con Supabase'); return; }
+
+    const payload = {
+        id:                _clienteEditandoId || crypto.randomUUID(),
+        nombre,
+        tipo:              document.getElementById('mc-tipo').value,
+        cuit:              document.getElementById('mc-cuit').value.trim(),
+        telefono:          document.getElementById('mc-telefono').value.trim(),
+        telefono2:         document.getElementById('mc-telefono2').value.trim(),
+        email:             document.getElementById('mc-email').value.trim(),
+        ciudad:            document.getElementById('mc-ciudad').value.trim(),
+        provincia:         document.getElementById('mc-provincia').value.trim(),
+        direccion:         document.getElementById('mc-direccion').value.trim(),
+        rubro:             document.getElementById('mc-rubro').value.trim(),
+        vendedor_sugerido: '',
+    };
+
+    const btn = document.getElementById('mc-btn-guardar');
+    if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
+
+    try {
+        const { error } = await db.from('clientes').upsert(payload, { onConflict: 'id' });
+        if (error) throw new Error(error.message);
+        cerrarModalCliente();
+        await refreshFromSupabase();
+        mostrarToast(_clienteEditandoId ? `✅ Cliente actualizado` : `✅ Cliente "${nombre}" agregado`);
+        console.log('[CRM] cliente guardado:', payload.id, payload.nombre);
+    } catch (err) {
+        mostrarMCError(err.message);
+        console.error('[CRM] guardarCliente:', err);
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '💾 Guardar'; }
+    }
+}
+
+function mostrarMCError(msg) {
+    const el = document.getElementById('mc-error');
+    if (el) { el.textContent = '⚠️ ' + msg; el.style.display = 'block'; }
+}
+
+async function eliminarClienteAsignar(id, nombre) {
+    if (!confirm(`¿Eliminar a "${nombre}"?\nSe borrará de la base de datos junto con todas sus asignaciones.`)) return;
+    if (!sbDisponible) { mostrarToast('❌ Sin conexión con Supabase', '#dc2626'); return; }
+    try {
+        const { error } = await db.from('clientes').delete().eq('id', id);
+        if (error) throw new Error(error.message);
+        await refreshFromSupabase();
+        mostrarToast(`🗑️ "${nombre}" eliminado`, '#dc2626');
+        console.log('[CRM] cliente eliminado:', id);
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] eliminarClienteAsignar:', err);
     }
 }
 
