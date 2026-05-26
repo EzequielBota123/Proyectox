@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Center Samurai & Bowie - CRM Supabase v3</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; }
+        
+        #mainApp { display: block; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
+        
+        header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 20px; }
+        .header-info { flex: 1; min-width: 200px; }
+        .header-info h1 { font-size: 24px; margin-bottom: 5px; }
+        .header-info p { font-size: 12px; opacity: 0.9; }
+        .header-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+        .stat { text-align: center; }
+        .stat-number { font-size: 24px; font-weight: bold; }
+        .stat-label { font-size: 11px; opacity: 0.8; }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #ddd; flex-wrap: wrap; }
+        .tab-btn { padding: 12px 24px; border: none; background: none; cursor: pointer; font-size: 14px; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s; }
+        .tab-btn:hover { color: #0066cc; }
+        .tab-btn.active { color: #0066cc; border-bottom-color: #0066cc; }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); border: 1px solid #e0e0e0; margin-bottom: 20px; }
+        .card h2 { font-size: 18px; margin-bottom: 15px; color: #1a1a2e; border-bottom: 2px solid #0066cc; padding-bottom: 10px; }
+        
+        .loading { text-align: center; padding: 20px; color: #999; }
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #0066cc; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .btn-primary { background: #0066cc; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-primary:hover { background: #0052a3; }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .vendedores-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        .vendedor-card { background: #f5f5f5; padding: 12px; border-radius: 6px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: all 0.3s; }
+        .vendedor-card:hover { border-color: #0066cc; background: #e8f4f8; }
+        .vendedor-card.selected { border-color: #0066cc; background: #0066cc; color: white; }
+        .vendedor-card .nombre { font-weight: bold; margin-bottom: 5px; font-size: 13px; }
+        .vendedor-card .count { font-size: 20px; font-weight: bold; margin-bottom: 8px; }
+        
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 12px; }
+        input, select, textarea { padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; width: 100%; font-family: inherit; transition: all 0.3s; }
+        input:focus, select:focus, textarea:focus { border-color: #0066cc; outline: none; box-shadow: 0 0 4px rgba(0,102,204,0.2); }
+        
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 12px; border-radius: 6px; margin-bottom: 15px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 15px; }
+        
+        .info-box { background: #e8f5e9; border-left: 4px solid #28a745; padding: 12px; border-radius: 4px; margin-bottom: 15px; font-size: 12px; color: #2e7d32; }
+        
+        @media (max-width: 768px) { .header-stats { flex-direction: column; gap: 10px; } }
+    </style>
+</head>
+<body>
+    <div id="mainApp">
+        <div class="container">
+            <header>
+                <div class="header-info">
+                    <h1>📱 Call Center Samurai & Bowie - CRM Supabase</h1>
+                    <p>Sistema en Tiempo Real - Datos en Supabase ✅</p>
+                </div>
+                <div class="header-stats">
+                    <div class="stat">
+                        <div class="stat-number" id="total-vendedores">0</div>
+                        <div class="stat-label">VENDEDORES</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="total-asignados">0</div>
+                        <div class="stat-label">CLIENTES</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <button onclick="window.location.reload();" style="background: rgba(220,53,69,0.9); color: white; border: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 13px;" onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='rgba(220,53,69,0.9)'">🔄 Recargar</button>
+                </div>
+            </header>
+            
+            <div id="error-container"></div>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="cambiarTab('vendedores')">👤 Vendedores</button>
+                <button class="tab-btn" onclick="cambiarTab('clientes')">📋 Mis Clientes</button>
+            </div>
+            
+            <div id="tab-vendedores" class="tab-content active">
+                <div class="card">
+                    <h2>👥 Gestión de Vendedores</h2>
+                    
+                    <div class="form-group">
+                        <label>➕ Agregar Nuevo Vendedor</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="nuevo-vendedor" placeholder="Nombre del vendedor" onkeypress="if(event.key==='Enter')agregarVendedor()">
+                            <button class="btn-primary" onclick="agregarVendedor()" style="width: auto;">Agregar</button>
+                        </div>
+                    </div>
+                    
+                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+                    
+                    <h3 style="margin-bottom: 15px; font-size: 16px;">Vendedores Registrados</h3>
+                    <div class="vendedores-grid" id="vendedores-list">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tab-clientes" class="tab-content">
+                <div class="info-box">
+                    💡 Selecciona un vendedor en "Vendedores" para ver y asignar clientes
+                </div>
+                
+                <div class="card">
+                    <h2 id="clientes-titulo">📋 Clientes Asignados</h2>
+                    
+                    <div id="sin-vendedor-seleccionado" style="text-align: center; padding: 40px; color: #999;">
+                        <p style="font-size: 16px;">⚠️ Selecciona un vendedor primero</p>
+                    </div>
+                    
+                    <div id="con-vendedor-seleccionado" style="display: none;">
+                        <input type="text" id="filtro-clientes" placeholder="🔍 Buscar cliente..." onkeyup="filtrarClientes()" autocomplete="off" style="margin-bottom: 15px;">
+                        
+                        <div id="clientes-list-container" style="max-height: 500px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px;">
+                            <div class="loading"><div class="spinner"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://nwlvvtcltnatkuljtlob.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53bHZ2dGNsdG5hdGt1bGp0bG9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NTU0NTQsImV4cCI6MjA5NTAzMTQ1NH0.q9XDqJ_yfqgO3A1hrkgtHTLtYax-vMUIXy-6x2NzVPw';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let vendedorActivo = null;
+        let vendedorActivoNombre = null;
+        let clientesFiltrados = [];
+        
+        async function inicializar() {
+            console.log('🔄 Iniciando aplicación...');
+            await cargarVendedores();
+            await actualizarEstadisticas();
+        }
+        
+        async function agregarVendedor() {
+            const nombre = document.getElementById('nuevo-vendedor').value.trim();
+            if (!nombre) {
+                mostrarError('Escribe el nombre del vendedor');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('vendedores')
+                    .insert([{ nombre: nombre }])
+                    .select();
+                
+                if (error) {
+                    if (error.code === '23505') {
+                        mostrarError('Ya existe un vendedor con ese nombre');
+                    } else {
+                        mostrarError('Error al agregar vendedor: ' + error.message);
+                    }
+                    return;
+                }
+                
+                document.getElementById('nuevo-vendedor').value = '';
+                mostrarExito('✓ Vendedor agregado correctamente');
+                await cargarVendedores();
+            } catch (err) {
+                mostrarError('Error: ' + err.message);
+            }
+        }
+        
+        async function cargarVendedores() {
+            try {
+                const { data: vendedores, error } = await supabase
+                    .from('vendedores')
+                    .select('*')
+                    .order('created_at', { ascending: true });
+                
+                if (error) {
+                    mostrarError('Error al cargar vendedores: ' + error.message);
+                    return;
+                }
+                
+                const { data: clientes } = await supabase
+                    .from('clientes_asignados')
+                    .select('vendedor_id');
+                
+                const html = vendedores.map(v => {
+                    const count = clientes?.filter(c => c.vendedor_id === v.nombre).length || 0;
+                    return `
+                        <div class="vendedor-card ${vendedorActivoNombre === v.nombre ? 'selected' : ''}" onclick="seleccionarVendedor('${v.nombre}')">
+                            <div class="nombre">${v.nombre}</div>
+                            <div class="count">${count}</div>
+                            <button onclick="event.stopPropagation(); eliminarVendedor(${v.id})" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; width: 100%;">🗑️ Eliminar</button>
+                        </div>
+                    `;
+                }).join('');
+                
+                document.getElementById('vendedores-list').innerHTML = html || '<p style="text-align:center;color:#999;padding:20px;">Sin vendedores creados aún</p>';
+                document.getElementById('total-vendedores').textContent = vendedores.length;
+            } catch (err) {
+                mostrarError('Error: ' + err.message);
+            }
+        }
+        
+        async function seleccionarVendedor(nombre) {
+            vendedorActivoNombre = nombre;
+            vendedorActivo = nombre;
+            
+            await cargarVendedores();
+            await cargarClientesVendedor();
+            
+            document.getElementById('sin-vendedor-seleccionado').style.display = 'none';
+            document.getElementById('con-vendedor-seleccionado').style.display = 'block';
+            document.getElementById('clientes-titulo').textContent = `📋 Clientes de ${nombre}`;
+        }
+        
+        async function eliminarVendedor(id) {
+            if (!confirm('¿Eliminar vendedor y todos sus clientes?')) return;
+            
+            try {
+                await supabase
+                    .from('clientes_asignados')
+                    .delete()
+                    .eq('vendedor_id', vendedorActivoNombre);
+                
+                const { error } = await supabase
+                    .from('vendedores')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) {
+                    mostrarError('Error al eliminar: ' + error.message);
+                    return;
+                }
+                
+                vendedorActivoNombre = null;
+                vendedorActivo = null;
+                
+                document.getElementById('sin-vendedor-seleccionado').style.display = 'block';
+                document.getElementById('con-vendedor-seleccionado').style.display = 'none';
+                
+                mostrarExito('✓ Vendedor eliminado');
+                await cargarVendedores();
+                await actualizarEstadisticas();
+            } catch (err) {
+                mostrarError('Error: ' + err.message);
+            }
+        }
+        
+        async function cargarClientesVendedor() {
+            if (!vendedorActivoNombre) return;
+            
+            try {
+                const { data: clientes, error } = await supabase
+                    .from('clientes_asignados')
+                    .select('*')
+                    .eq('vendedor_id', vendedorActivoNombre)
+                    .order('fecha_asignacion', { ascending: false });
+                
+                if (error) {
+                    mostrarError('Error al cargar clientes: ' + error.message);
+                    return;
+                }
+                
+                clientesFiltrados = clientes || [];
+                renderizarClientes(clientesFiltrados);
+            } catch (err) {
+                mostrarError('Error: ' + err.message);
+            }
+        }
+        
+        function renderizarClientes(clientes) {
+            const container = document.getElementById('clientes-list-container');
+            
+            if (clientes.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">Sin clientes asignados</div>';
+                return;
+            }
+            
+            const html = clientes.map(c => {
+                const tipoIcon = c.tipo === 'Credifin' ? '🟢' : '🟡';
+                const estadoColor = c.estado === 'Cerrado' ? '#28a745' : c.estado === 'Interesado' ? '#ffc107' : '#6c757d';
+                
+                return `
+                    <div style="padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='white'">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: bold; font-size: 12px;">${tipoIcon} ${c.nombre}</div>
+                                <div style="font-size: 11px; color: #666; margin-top: 2px;">${c.ciudad}, ${c.provincia} • ${c.telefono}</div>
+                                <div style="font-size: 10px; color: #999; margin-top: 2px;">Email: ${c.email || '-'}</div>
+                            </div>
+                            <div>
+                                <span style="font-size: 11px; font-weight: 600; color: ${estadoColor}; display: block; margin-bottom: 5px;">${c.estado}</span>
+                                <button onclick="event.stopPropagation(); eliminarCliente(${c.id})" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = html;
+        }
+
+        function filtrarClientes() {
+            const texto = document.getElementById('filtro-clientes').value.toLowerCase();
+            const filtrados = clientesFiltrados.filter(c =>
+                c.nombre.toLowerCase().includes(texto) ||
+                c.ciudad.toLowerCase().includes(texto) ||
+                (c.telefono && c.telefono.includes(texto))
+            );
+            renderizarClientes(filtrados);
+        }
+
+        async function eliminarCliente(id) {
+            if (!confirm('¿Eliminar este cliente?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('clientes_asignados')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) {
+                    mostrarError('Error al eliminar cliente: ' + error.message);
+                    return;
+                }
+
+                mostrarExito('✓ Cliente eliminado');
+                await cargarClientesVendedor();
+                await actualizarEstadisticas();
+            } catch (err) {
+                mostrarError('Error: ' + err.message);
+            }
+        }
+
+        async function actualizarEstadisticas() {
+            try {
+                const { count } = await supabase
+                    .from('clientes_asignados')
+                    .select('*', { count: 'exact', head: true });
+
+                document.getElementById('total-asignados').textContent = count || 0;
+            } catch (err) {
+                console.error('Error stats:', err);
+            }
+        }
+
+        function mostrarError(msg) {
+            const container = document.getElementById('error-container');
+            container.innerHTML = `<div class="error">${msg}</div>`;
+            setTimeout(() => container.innerHTML = '', 5000);
+        }
+
+        function mostrarExito(msg) {
+            const container = document.getElementById('error-container');
+            container.innerHTML = `<div class="success">${msg}</div>`;
+            setTimeout(() => container.innerHTML = '', 3000);
+        }
+
+        function cambiarTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        inicializar();
+    </script>
+</body>
+</html>
+                                

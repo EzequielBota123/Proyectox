@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM - Samurai & Bowie</title>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #333; }
+        .container { max-width: 1700px; margin: 0 auto; padding: 16px; }
+
+        /* Header */
+        header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 16px 24px; border-radius: 10px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        header h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        header p { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+        .header-right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .header-stat { text-align: center; background: rgba(255,255,255,0.08); padding: 8px 14px; border-radius: 8px; }
+        .header-stat strong { display: block; font-size: 20px; font-weight: 800; }
+        .header-stat span { font-size: 10px; opacity: 0.7; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 4px; margin-bottom: 16px; background: white; padding: 6px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); flex-wrap: wrap; }
+        .tab-btn { padding: 9px 18px; border: none; background: none; cursor: pointer; font-size: 13px; font-weight: 600; color: #666; border-radius: 7px; transition: all 0.2s; }
+        .tab-btn:hover { background: #f0f2f5; color: #333; }
+        .tab-btn.active { background: #0066cc; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Cards */
+        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border: 1px solid #e8e8e8; margin-bottom: 16px; }
+        .card h2 { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: #1a1a2e; }
+        .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media(max-width:900px) { .grid2 { grid-template-columns:1fr; } }
+
+        /* Buttons */
+        .btn { padding: 9px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 13px; transition: all 0.2s; }
+        .btn-blue { background: #0066cc; color: white; } .btn-blue:hover { background: #0052a3; }
+        .btn-green { background: #16a34a; color: white; } .btn-green:hover { background: #15803d; }
+        .btn-red { background: #dc3545; color: white; } .btn-red:hover { background: #b91c1c; }
+        .btn-gray { background: #6b7280; color: white; } .btn-gray:hover { background: #4b5563; }
+        .btn-yellow { background: #f59e0b; color: white; } .btn-yellow:hover { background: #d97706; }
+
+        /* Forms */
+        input, select, textarea { padding: 9px 12px; border: 1.5px solid #e0e0e0; border-radius: 8px; font-size: 13px; width: 100%; font-family: inherit; transition: border-color 0.2s; background: white; }
+        input:focus, select:focus, textarea:focus { border-color: #0066cc; outline: none; box-shadow: 0 0 0 3px rgba(0,102,204,0.12); }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-weight: 700; margin-bottom: 5px; font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 0.4px; }
+
+        /* Badges */
+        .badge-cred   { display:inline-block; padding:2px 7px; background:#0066cc; color:white; border-radius:4px; font-size:9px; font-weight:800; margin-right:4px; }
+        .badge-sin    { display:inline-block; padding:2px 7px; background:#f59e0b; color:white; border-radius:4px; font-size:9px; font-weight:800; margin-right:4px; }
+        .badge-retail { display:inline-block; padding:2px 7px; background:#7c3aed; color:white; border-radius:4px; font-size:9px; font-weight:800; margin-right:4px; }
+
+        /* ===================== VENDEDORES ===================== */
+        .vendedores-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
+        .vendedor-card { background: #f8fafc; padding: 14px 10px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid #e0e0e0; transition: all 0.2s; }
+        .vendedor-card:hover { border-color: #0066cc; background: #eff6ff; transform: translateY(-1px); }
+        .vendedor-card.selected { border-color: #0066cc; background: #0066cc; color: white; }
+        .v-nombre { font-weight: 800; font-size: 13px; margin-bottom: 4px; }
+        .v-count { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+        .v-btns { display: flex; gap: 4px; }
+        .v-btn { flex: 1; padding: 4px; border: none; border-radius: 5px; cursor: pointer; font-size: 10px; font-weight: 700; transition: all 0.2s; }
+        .v-btn-edit { background: #dbeafe; color: #1d4ed8; }
+        .v-btn-edit:hover { background: #bfdbfe; }
+        .v-btn-del  { background: #fee2e2; color: #dc2626; }
+        .v-btn-del:hover  { background: #fecaca; }
+        .vendedor-card.selected .v-btn-edit { background: rgba(255,255,255,0.25); color: white; }
+        .vendedor-card.selected .v-btn-del  { background: rgba(255,0,0,0.25); color: white; }
+        .add-vendedor-box { display: flex; gap: 8px; }
+        .add-vendedor-box input { flex: 1; }
+
+        /* ===================== ASIGNAR ===================== */
+        .seccion-tipo { background: white; border-radius: 10px; padding: 14px; border: 1px solid #e0e0e0; margin-bottom: 14px; }
+        .tipo-header-cred   { background: linear-gradient(135deg, #16a34a, #15803d); color: white; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; font-weight: 800; font-size: 14px; }
+        .tipo-header-sin    { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; font-weight: 800; font-size: 14px; }
+        .tipo-header-retail { background: linear-gradient(135deg, #7c3aed, #5b21b6); color: white; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; font-weight: 800; font-size: 14px; }
+        .filtros { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; margin-bottom: 10px; }
+        .tabla-wrap { overflow-x: auto; border: 1px solid #e0e0e0; border-radius: 8px; max-height: 320px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        thead { background: #f8fafc; position: sticky; top: 0; z-index: 5; }
+        th { padding: 8px 10px; text-align: left; font-weight: 700; border-bottom: 2px solid #0066cc; white-space: nowrap; color: #1a1a2e; }
+        td { padding: 7px 10px; border-bottom: 1px solid #f0f0f0; }
+        tr:hover td { background: #f8fafc; }
+        .asignar-box { background: #eff6ff; border: 2px solid #0066cc; border-radius: 10px; padding: 14px; margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .asignar-box label { font-size: 13px; font-weight: 800; color: #1a1a2e; white-space: nowrap; }
+        .asignar-box select { flex: 1; min-width: 180px; font-size: 14px; font-weight: 700; border: 2px solid #0066cc; }
+
+        /* ===================== CRM ===================== */
+        .crm-topbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+        .crm-topbar select { min-width: 200px; flex: 1; max-width: 320px; font-size: 14px; font-weight: 700; border: 2px solid #0066cc; }
+        .crm-topbar input  { max-width: 240px; }
+
+        /* Estado pills */
+        .pills-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+        .pill { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
+        .pill:hover { opacity: 0.8; transform: translateY(-1px); }
+        .p-todos   { background:#e0f2fe; color:#0369a1; } .p-todos.on   { background:#0369a1; color:#fff; }
+        .p-sin     { background:#fee2e2; color:#991b1b; } .p-sin.on     { background:#991b1b; color:#fff; }
+        .p-cont    { background:#dbeafe; color:#1d4ed8; } .p-cont.on    { background:#1d4ed8; color:#fff; }
+        .p-neg     { background:#ffedd5; color:#c2410c; } .p-neg.on     { background:#c2410c; color:#fff; }
+        .p-dud     { background:#ede9fe; color:#7c3aed; } .p-dud.on     { background:#7c3aed; color:#fff; }
+        .p-int     { background:#fef9c3; color:#a16207; } .p-int.on     { background:#d97706; color:#fff; }
+        .p-cerr    { background:#dcfce7; color:#15803d; } .p-cerr.on    { background:#15803d; color:#fff; }
+        .p-noi     { background:#f3f4f6; color:#6b7280; } .p-noi.on     { background:#6b7280; color:#fff; }
+
+        /* CRM grid */
+        .crm-grid { display: grid; grid-template-columns: 340px 1fr; gap: 16px; align-items: start; }
+        @media(max-width:900px) { .crm-grid { grid-template-columns: 1fr; } }
+        .crm-list-wrap { border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; background: white; max-height: 680px; overflow-y: auto; }
+        .crm-item { padding: 13px 16px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 0.15s; }
+        .crm-item:last-child { border-bottom: none; }
+        .crm-item:hover { background: #f8fafc; }
+        .crm-item.sel { background: #eff6ff; border-left: 4px solid #0066cc; }
+        .crm-nombre { font-weight: 700; font-size: 13px; margin-bottom: 3px; }
+        .crm-datos  { font-size: 11px; color: #888; margin-bottom: 5px; }
+
+        /* Estado inline badges en lista */
+        .eb { display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; }
+        .eb-sin  { background:#fee2e2; color:#991b1b; }
+        .eb-cont { background:#dbeafe; color:#1d4ed8; }
+        .eb-neg  { background:#ffedd5; color:#c2410c; }
+        .eb-dud  { background:#ede9fe; color:#7c3aed; }
+        .eb-int  { background:#fef9c3; color:#a16207; }
+        .eb-cerr { background:#dcfce7; color:#15803d; }
+        .eb-noi  { background:#f3f4f6; color:#6b7280; }
+
+        /* CRM detalle */
+        .crm-detalle-card { background: white; border-radius: 10px; border: 1px solid #e0e0e0; padding: 20px; position: sticky; top: 16px; max-height: 85vh; overflow-y: auto; }
+        .det-nombre { font-size: 20px; font-weight: 800; color: #1a1a2e; margin-bottom: 8px; }
+        .det-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8fafc; border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+        .det-field .lbl { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.4px; }
+        .det-field .val { font-size: 13px; color: #1a1a2e; font-weight: 500; margin-top: 1px; }
+        .det-field .val a { color: #0066cc; text-decoration: none; }
+        .det-field .val a:hover { text-decoration: underline; }
+
+        /* Estado buttons en detalle */
+        .est-section-title { font-size: 11px; font-weight: 800; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .est-btns { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-bottom: 18px; }
+        .est-btn { padding: 10px 8px; border: 2px solid; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; transition: all 0.2s; text-align: center; }
+        .est-btn:hover { transform: translateY(-1px); }
+        .e-sin  { border-color:#fca5a5; background:#fee2e2; color:#991b1b; } .e-sin.on  { background:#991b1b; color:#fff; border-color:#991b1b; }
+        .e-cont { border-color:#93c5fd; background:#dbeafe; color:#1d4ed8; } .e-cont.on { background:#1d4ed8; color:#fff; border-color:#1d4ed8; }
+        .e-neg  { border-color:#fdba74; background:#ffedd5; color:#c2410c; } .e-neg.on  { background:#c2410c; color:#fff; border-color:#c2410c; }
+        .e-dud  { border-color:#c4b5fd; background:#ede9fe; color:#7c3aed; } .e-dud.on  { background:#7c3aed; color:#fff; border-color:#7c3aed; }
+        .e-int  { border-color:#fde68a; background:#fef9c3; color:#a16207; } .e-int.on  { background:#d97706; color:#fff; border-color:#d97706; }
+        .e-cerr { border-color:#86efac; background:#dcfce7; color:#15803d; } .e-cerr.on { background:#15803d; color:#fff; border-color:#15803d; }
+        .e-noi  { border-color:#d1d5db; background:#f3f4f6; color:#6b7280; } .e-noi.on  { background:#6b7280; color:#fff; border-color:#6b7280; }
+
+        /* Stats */
+        .stats-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+        .stat-box { background: white; border-radius: 8px; padding: 12px 16px; flex: 1; min-width: 100px; border: 1px solid #e0e0e0; text-align: center; }
+        .stat-box h3 { font-size: 24px; font-weight: 800; color: #0066cc; }
+        .stat-box p  { font-size: 10px; color: #888; margin-top: 2px; font-weight: 600; text-transform: uppercase; }
+
+        /* Scripts */
+        .scripts-btns { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; margin-bottom: 15px; }
+        .btn-script { padding: 8px 6px; border: 1.5px solid #e0e0e0; background: white; border-radius: 7px; cursor: pointer; font-size: 11px; font-weight: 700; transition: all 0.2s; text-align: center; }
+        .btn-script:hover  { background: #f0f2f5; border-color: #0066cc; }
+        .btn-script.active { background: #0066cc; color: white; border-color: #0066cc; }
+        .script-box { background: #f8fafc; border: 1px solid #e0e0e0; border-radius: 8px; padding: 14px; font-size: 13px; line-height: 1.8; min-height: 120px; white-space: pre-wrap; word-wrap: break-word; margin-bottom: 10px; max-height: 320px; overflow-y: auto; }
+        .script-cliente { background: #fff7ed; border-left: 4px solid #f59e0b; padding: 10px 12px; border-radius: 6px; font-size: 11px; margin-bottom: 10px; font-weight: 700; display: none; }
+        .script-tips    { background: #eff6ff; border-left: 4px solid #0066cc; padding: 10px 12px; border-radius: 6px; font-size: 12px; margin-bottom: 10px; display: none; }
+
+        /* Modal */
+        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; z-index: 9999; }
+        .modal.open { display: flex; }
+        .modal-box { background: white; border-radius: 12px; padding: 24px; width: 90%; max-width: 680px; max-height: 90vh; overflow-y: auto; }
+
+        /* Excel */
+        .zonas-excel { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 16px; }
+        @media(max-width:700px) { .zonas-excel { grid-template-columns:1fr; } }
+        .file-drop { border: 2px dashed #0066cc; border-radius: 10px; padding: 24px; text-align: center; background: #eff6ff; cursor: pointer; transition: background 0.2s; }
+        .file-drop:hover { background: #dbeafe; }
+        .zona-cred .file-drop { border-color: #16a34a; background: #f0fdf4; }
+        .zona-cred .file-drop:hover { background: #dcfce7; }
+        .zona-sin  .file-drop { border-color: #f59e0b; background: #fffbeb; }
+        .zona-sin  .file-drop:hover { background: #fef9c3; }
+        .preview-small { max-height: 200px; overflow-y: auto; font-size: 12px; border: 1px solid #e0e0e0; border-radius: 8px; margin-top: 10px; }
+        .preview-small table { width: 100%; border-collapse: collapse; }
+        .preview-small th { background: #f8fafc; padding: 4px 8px; font-size: 11px; border-bottom: 1px solid #e0e0e0; }
+        .preview-small td { padding: 3px 8px; border-bottom: 1px solid #f5f5f5; }
+
+        /* Misc */
+        .info-box { background: #f0fdf4; border-left: 4px solid #16a34a; padding: 10px 14px; border-radius: 6px; font-size: 12px; color: #15803d; margin-bottom: 14px; }
+        .aviso-msg { background: #fff7ed; border: 1px solid #fde68a; border-radius: 8px; padding: 20px; text-align: center; color: #92400e; font-weight: 600; }
+        .export-btns { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+
+        /* Toast */
+        #toast-crm { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); padding:12px 24px; border-radius:10px; color:#fff; font-weight:700; font-size:14px; z-index:9999; box-shadow:0 4px 20px rgba(0,0,0,0.2); transition:opacity 0.4s; opacity:0; pointer-events:none; }
+
+        /* Loading */
+        #loading-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(255,255,255,0.92); align-items:center; justify-content:center; z-index:9999; flex-direction:column; gap:12px; }
+        #loading-overlay .spin { font-size:40px; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+<div id="loading-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.92);display:none;align-items:center;justify-content:center;z-index:9999;">
+    <div style="text-align:center;">
+        <div style="font-size:40px;margin-bottom:12px;">⏳</div>
+        <div style="font-size:16px;font-weight:700;color:#1a1a2e;">Cargando datos...</div>
+        <div style="font-size:12px;color:#888;margin-top:4px;">Conectando con Supabase</div>
+    </div>
+</div>
+<div id="toast-crm"></div>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>📞 Samurai & Bowie — CRM</h1>
+            <p><span id="sb-status"></span></p>
+        </div>
+        <div class="header-right">
+            <div class="header-stat"><strong id="hdr-clientes">0</strong><span>Clientes</span></div>
+            <div class="header-stat"><strong id="hdr-vendedores">0</strong><span>Vendedores</span></div>
+            <div class="header-stat"><strong id="hdr-asignados">0</strong><span>Asignados</span></div>
+            <div class="header-stat" style="background:rgba(233,69,96,0.15);" title="Usuario logueado">
+                <strong id="hdr-user" style="font-size:14px;">—</strong><span id="hdr-user-rol">usuario</span>
+            </div>
+            <button class="btn btn-gray" style="font-size:12px;padding:8px 14px;" onclick="recargarDatos()">🔄 Recargar</button>
+            <button class="btn btn-red" style="font-size:12px;" onclick="cerrarSesion()">🚪 Salir</button>
+        </div>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="cambiarTab('scripts',this)">📋 Scripts</button>
+        <button class="tab-btn" onclick="cambiarTab('asignar',this)">🎯 Asignar Clientes</button>
+        <button class="tab-btn" onclick="cambiarTab('crm',this)">📊 CRM</button>
+        <button class="tab-btn" onclick="cambiarTab('exportar',this)">📥 Exportar</button>
+        <button class="tab-btn" onclick="cambiarTab('cargar',this)">📁 Cargar Excel</button>
+        <button class="tab-btn admin-only" onclick="cambiarTab('usuarios',this)" style="display:none;">👥 Usuarios</button>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <div id="tab-scripts" class="tab-content active">
+        <div class="card">
+            <h2>📋 Scripts de Venta</h2>
+            <p style="font-size:11px;color:#888;margin-bottom:12px;">Seleccioná un script para verlo. Podés editarlos.</p>
+            <div class="scripts-btns" id="scripts-btns"></div>
+            <div id="script-cliente" class="script-cliente"></div>
+            <div id="script-content" class="script-box">← Seleccioná un script</div>
+            <div id="script-tips" class="script-tips"></div>
+            <div style="display:flex;gap:10px;">
+                <button class="btn btn-blue" onclick="copiarScript()">📋 Copiar</button>
+                <button class="btn btn-yellow" onclick="abrirEditorScript()">✏️ Editar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ASIGNAR CLIENTES ===== -->
+    <div id="tab-asignar" class="tab-content">
+        <div style="background:#eff6ff;border:2px solid #0066cc;border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:13px;font-weight:600;color:#1a1a2e;display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
+            <span>📌 <strong>Cómo asignar:</strong></span>
+            <span>① Hacé clic en una tarjeta de vendedor</span>
+            <span>→</span>
+            <span>② Se marcan todos los clientes automáticamente</span>
+            <span>→</span>
+            <span>③ Hacé clic en <strong>✅ Asignar</strong></span>
+        </div>
+        <div class="grid2">
+            <!-- Vendedores -->
+            <div class="card">
+                <h2>👤 Vendedores</h2>
+                <div class="vendedores-grid" id="vendedores-list"></div>
+                <hr style="margin:14px 0;border:none;border-top:1px solid #f0f0f0;">
+                <div class="form-group">
+                    <label>Agregar vendedor</label>
+                    <div class="add-vendedor-box">
+                        <input type="text" id="nuevo-vendedor" placeholder="Nombre del vendedor" onkeypress="if(event.key==='Enter')agregarVendedor()" oninput="previewVendedor(this.value)">
+                        <button class="btn btn-blue" onclick="agregarVendedor()">➕ Agregar</button>
+                    </div>
+                    <div id="preview-nuevo-vendedor" style="margin-top:8px;font-size:12px;color:#0066cc;font-weight:600;min-height:18px;"></div>
+                </div>
+            </div>
+
+            <!-- Tablas -->
+            <div>
+                <!-- CREDIFIN -->
+                <div class="seccion-tipo">
+                    <div class="tipo-header-cred">🟢 CREDIFIN — <span id="count-cred">0</span> clientes</div>
+                    <div class="filtros">
+                        <input type="text" placeholder="Nombre" id="f-cred-nombre" onkeyup="filtrarCredifin()" autocomplete="off">
+                        <input type="text" placeholder="CUIT"   id="f-cred-cuit"   onkeyup="filtrarCredifin()" autocomplete="off">
+                        <select id="f-cred-prov" onchange="filtrarCredifin()"><option value="">Todas las provincias</option></select>
+                        <input type="text" placeholder="Ciudad" id="f-cred-ciudad" onkeyup="filtrarCredifin()" autocomplete="off">
+                        <input type="text" placeholder="Rubro"  id="f-cred-rubro"  onkeyup="filtrarCredifin()" autocomplete="off">
+                    </div>
+                    <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
+                        <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;">
+                            <input type="checkbox" id="sel-todo-cred" onchange="selTodoCred()" style="width:auto;"> Sel. todo
+                        </label>
+                        <button class="btn btn-gray" style="padding:4px 10px;font-size:11px;" onclick="deselCred()">Deseleccionar</button>
+                    </div>
+                    <div class="tabla-wrap">
+                        <table>
+                            <thead><tr>
+                                <th style="width:28px;"><input type="checkbox" id="sel-todo-cred-h" onchange="selTodoCred()" style="width:auto;"></th>
+                                <th>Nombre</th><th>CUIT</th><th>Rubro</th><th>Provincia</th><th>Ciudad</th><th>Teléfono</th>
+                            </tr></thead>
+                            <tbody id="tbody-cred"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SIN CREDIFIN -->
+                <div class="seccion-tipo">
+                    <div class="tipo-header-sin">🟡 SIN CREDIFIN — <span id="count-sin">0</span> clientes</div>
+                    <div class="filtros">
+                        <input type="text" placeholder="Nombre" id="f-sin-nombre" onkeyup="filtrarSin()" autocomplete="off">
+                        <input type="text" placeholder="CUIT"   id="f-sin-cuit"   onkeyup="filtrarSin()" autocomplete="off">
+                        <select id="f-sin-prov" onchange="filtrarSin()"><option value="">Todas las provincias</option></select>
+                        <input type="text" placeholder="Ciudad" id="f-sin-ciudad" onkeyup="filtrarSin()" autocomplete="off">
+                        <input type="text" placeholder="Rubro"  id="f-sin-rubro"  onkeyup="filtrarSin()" autocomplete="off">
+                    </div>
+                    <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
+                        <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;">
+                            <input type="checkbox" id="sel-todo-sin" onchange="selTodoSin()" style="width:auto;"> Sel. todo
+                        </label>
+                        <button class="btn btn-gray" style="padding:4px 10px;font-size:11px;" onclick="deselSin()">Deseleccionar</button>
+                    </div>
+                    <div class="tabla-wrap">
+                        <table>
+                            <thead><tr>
+                                <th style="width:28px;"><input type="checkbox" id="sel-todo-sin-h" onchange="selTodoSin()" style="width:auto;"></th>
+                                <th>Nombre</th><th>CUIT</th><th>Rubro</th><th>Provincia</th><th>Ciudad</th><th>Teléfono</th>
+                            </tr></thead>
+                            <tbody id="tbody-sin"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- RETAIL -->
+                <div class="seccion-tipo">
+                    <div class="tipo-header-retail">🟣 RETAIL — <span id="count-retail">0</span> clientes</div>
+                    <div class="filtros">
+                        <input type="text" placeholder="Nombre" id="f-retail-nombre" onkeyup="filtrarRetail()" autocomplete="off">
+                        <input type="text" placeholder="CUIT"   id="f-retail-cuit"   onkeyup="filtrarRetail()" autocomplete="off">
+                        <select id="f-retail-prov" onchange="filtrarRetail()"><option value="">Todas las provincias</option></select>
+                        <input type="text" placeholder="Ciudad" id="f-retail-ciudad" onkeyup="filtrarRetail()" autocomplete="off">
+                        <input type="text" placeholder="Rubro"  id="f-retail-rubro"  onkeyup="filtrarRetail()" autocomplete="off">
+                    </div>
+                    <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
+                        <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;">
+                            <input type="checkbox" id="sel-todo-retail" onchange="selTodoRetail()" style="width:auto;"> Sel. todo
+                        </label>
+                        <button class="btn btn-gray" style="padding:4px 10px;font-size:11px;" onclick="deselRetail()">Deseleccionar</button>
+                    </div>
+                    <div class="tabla-wrap">
+                        <table>
+                            <thead><tr>
+                                <th style="width:28px;"><input type="checkbox" id="sel-todo-retail-h" onchange="selTodoRetail()" style="width:auto;"></th>
+                                <th>Nombre</th><th>CUIT</th><th>Rubro</th><th>Provincia</th><th>Ciudad</th><th>Teléfono</th>
+                            </tr></thead>
+                            <tbody id="tbody-retail"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Asignar box -->
+                <div class="asignar-box">
+                    <label>👤 Asignar seleccionados a:</label>
+                    <select id="sel-vendedor-asignar" onchange="vendedorActivo=this.value||null; filtrarCredifin(); filtrarSin(); filtrarRetail(); if(vendedorActivo) selTodosLosClientes();">
+                        <option value="">— Elegí un vendedor —</option>
+                    </select>
+                    <span id="contador-sel" style="font-size:13px;color:#555;white-space:nowrap;">0 seleccionados</span>
+                    <button class="btn btn-green" id="btn-asignar" style="padding:10px 24px;font-size:14px;" onclick="asignarClientes()">
+                        ✅ Asignar
+                    </button>
+                </div>
+                <div id="asignar-error" style="display:none;background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;padding:10px 14px;border-radius:8px;margin-top:8px;font-size:14px;font-weight:600;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CRM ===== -->
+    <div id="tab-crm" class="tab-content">
+        <!-- Top bar -->
+        <div class="crm-topbar">
+            <div style="font-size:15px;font-weight:800;color:#1a1a2e;">📊 CRM</div>
+            <select id="sel-vendedor-crm" onchange="seleccionarVendedorCRM(this.value)">
+                <option value="">— Elegí un vendedor —</option>
+            </select>
+            <input type="text" id="f-crm" placeholder="🔍 Buscar cliente, ciudad, tel..." style="max-width:240px;" onkeyup="renderCRM()">
+        </div>
+
+        <!-- Pills de estado -->
+        <div class="pills-bar" id="pills-bar"></div>
+
+        <!-- Stats -->
+        <div class="stats-row" id="crm-stats-row"></div>
+
+        <!-- Sin vendedor -->
+        <div id="crm-sin-vend" class="aviso-msg">⚠️ Elegí un vendedor del selector para ver su CRM</div>
+
+        <!-- CRM principal -->
+        <div id="crm-main" style="display:none;">
+            <div class="crm-grid">
+                <div>
+                    <div style="font-size:11px;font-weight:700;color:#888;margin-bottom:6px;" id="crm-count-label">0 clientes</div>
+                    <div class="crm-list-wrap" id="crm-list"></div>
+                </div>
+                <div id="crm-detalle"><div class="aviso-msg" style="margin:0;">← Seleccioná un cliente de la lista</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== EXPORTAR ===== -->
+    <div id="tab-exportar" class="tab-content">
+        <div class="card">
+            <h2>📥 Exportar Datos</h2>
+            <div class="export-btns">
+                <button class="btn btn-green"  onclick="exportarCRM()">📥 CRM del vendedor (Excel)</button>
+                <button class="btn btn-blue"   onclick="exportarTodos()">📥 Todos los asignados (Excel)</button>
+                <button class="btn btn-yellow" onclick="exportarVendedores()">📊 Resumen vendedores (Excel)</button>
+            </div>
+            <p style="font-size:11px;color:#888;">Los archivos se descargan directamente en tu dispositivo.</p>
+        </div>
+    </div>
+
+    <!-- ===== CARGAR EXCEL ===== -->
+    <div id="tab-cargar" class="tab-content">
+        <div class="card">
+            <h2>📁 Cargar Clientes desde Excel</h2>
+            <div class="info-box">Columnas reconocidas: <strong>nombre, telefono, ciudad, provincia, cuit, email, rubro, direccion</strong></div>
+
+            <!-- NUEVO: Excel con 2 hojas (recomendado) -->
+            <div style="background:#f3e8ff;border:2px dashed #7c3aed;border-radius:10px;padding:16px;margin-bottom:16px;">
+                <div style="font-weight:800;color:#7c3aed;margin-bottom:6px;font-size:15px;">📑 EXCEL CON 2 HOJAS — auto-detecta CREDIFIN / SIN CREDIFIN</div>
+                <p style="font-size:12px;color:#555;margin-bottom:10px;">Recomendado si tu archivo tiene <strong>una hoja con clientes Credifin y otra con Sin Credifin</strong>. El sistema lee el nombre de cada hoja: si dice "sin" o "no credifin" → Sin Credifin; si no → Credifin.</p>
+                <div class="file-drop" onclick="document.getElementById('file-completo').click()" style="border-color:#7c3aed;background:#faf5ff;">
+                    <p style="font-size:14px;font-weight:700;color:#7c3aed;">📂 Seleccionar Excel completo (2 hojas)</p>
+                    <p style="font-size:11px;color:#888;margin-top:4px;">.xlsx / .xls</p>
+                </div>
+                <input type="file" id="file-completo" accept=".xlsx,.xls" style="display:none;" onchange="cargarExcelCompleto(this)">
+                <div id="preview-completo"></div>
+            </div>
+
+            <div style="text-align:center;font-size:11px;color:#888;margin:10px 0;">— o cargá las hojas por separado —</div>
+
+            <div class="zonas-excel">
+                <div class="zona-cred">
+                    <div style="font-weight:800;color:#16a34a;margin-bottom:8px;font-size:15px;">🟢 CREDIFIN</div>
+                    <div class="file-drop" onclick="document.getElementById('file-credifin').click()">
+                        <p style="font-size:14px;font-weight:700;color:#16a34a;">📂 Seleccionar Excel CREDIFIN</p>
+                        <p style="font-size:11px;color:#888;margin-top:4px;">.xlsx / .xls</p>
+                    </div>
+                    <input type="file" id="file-credifin" accept=".xlsx,.xls" style="display:none;" onchange="cargarExcelTipo(this,'Credifin')">
+                    <div id="preview-credifin"></div>
+                </div>
+                <div class="zona-sin">
+                    <div style="font-weight:800;color:#d97706;margin-bottom:8px;font-size:15px;">🟡 SIN CREDIFIN</div>
+                    <div class="file-drop" onclick="document.getElementById('file-sincredifin').click()">
+                        <p style="font-size:14px;font-weight:700;color:#d97706;">📂 Seleccionar Excel SIN CREDIFIN</p>
+                        <p style="font-size:11px;color:#888;margin-top:4px;">.xlsx / .xls</p>
+                    </div>
+                    <input type="file" id="file-sincredifin" accept=".xlsx,.xls" style="display:none;" onchange="cargarExcelTipo(this,'Sin Credifin')">
+                    <div id="preview-sincredifin"></div>
+                </div>
+            </div>
+            <div style="text-align:center;">
+                <button class="btn btn-red" onclick="borrarTodosLosClientes()">🗑️ Borrar todos los clientes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== USUARIOS (admin-only) ===== -->
+    <div id="tab-usuarios" class="tab-content">
+        <div class="card">
+            <h2>👥 Gestión de Usuarios</h2>
+            <p style="font-size:12px;color:#888;margin-bottom:14px;">Solo administradores pueden agregar, modificar o eliminar usuarios. Cada usuario puede cambiar su propia contraseña desde acá.</p>
+
+            <div class="grid2">
+                <!-- Form: agregar usuario -->
+                <div>
+                    <h3 style="font-size:14px;margin-bottom:10px;">➕ Agregar usuario</h3>
+                    <div class="form-group"><label>Nombre completo</label><input type="text" id="nuevo-user-nombre" placeholder="Ej: María García"></div>
+                    <div class="form-group"><label>Username (sin espacios, en minúsculas)</label><input type="text" id="nuevo-user-username" placeholder="maria" autocomplete="off"></div>
+                    <div class="form-group"><label>Contraseña</label><input type="password" id="nuevo-user-password" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div>
+                    <div class="form-group">
+                        <label>Rol</label>
+                        <select id="nuevo-user-rol">
+                            <option value="user">Usuario normal</option>
+                            <option value="admin">Administrador (puede gestionar usuarios)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-blue" onclick="crearUsuario()" style="width:100%;">➕ Crear usuario</button>
+                </div>
+
+                <!-- Lista de usuarios -->
+                <div>
+                    <h3 style="font-size:14px;margin-bottom:10px;">Usuarios actuales</h3>
+                    <div id="lista-usuarios" style="display:flex;flex-direction:column;gap:8px;"></div>
+                </div>
+            </div>
+
+            <hr style="margin:24px 0;border:none;border-top:1px solid #f0f0f0;">
+
+            <h3 style="font-size:14px;margin-bottom:10px;">🔑 Cambiar mi contraseña</h3>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+                <div class="form-group" style="flex:1;min-width:200px;margin-bottom:0;">
+                    <label>Nueva contraseña</label>
+                    <input type="password" id="mi-nueva-pass" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+                </div>
+                <button class="btn btn-yellow" onclick="cambiarMiPassword()">💾 Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal editar script -->
+<div class="modal" id="modal-script">
+    <div class="modal-box">
+        <h3 style="margin-bottom:14px;font-size:16px;" id="modal-script-titulo">Editar Script</h3>
+        <div class="form-group"><label>Lo que dice el cliente</label><input type="text" id="modal-cliente" placeholder='Ej: "No me interesa"'></div>
+        <div class="form-group"><label>Tu respuesta / script</label><textarea id="modal-texto" style="min-height:180px;line-height:1.7;"></textarea></div>
+        <div class="form-group"><label>Tips</label><textarea id="modal-tips" style="min-height:70px;"></textarea></div>
+        <div style="display:flex;gap:10px;margin-top:12px;">
+            <button class="btn btn-green" style="flex:1;" onclick="guardarScript()">💾 Guardar</button>
+            <button class="btn btn-gray"  style="flex:1;" onclick="cerrarModal()">✖ Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// GUARD — sesión persistente con localStorage + expiración 30 días
+// ============================================================
+const SESSION_DAYS = 30;
+const CURRENT_USER = {
+    username: localStorage.getItem('crm_user') || '',
+    nombre:   localStorage.getItem('crm_user_nombre') || '',
+    rol:      localStorage.getItem('crm_user_rol') || 'user'
+};
+
+(function checkSession() {
+    const auth = localStorage.getItem('crm_auth');
+    const exp  = parseInt(localStorage.getItem('crm_auth_exp') || '0', 10);
+    if (!auth || !CURRENT_USER.username || Date.now() > exp) {
+        ['crm_auth','crm_auth_exp','crm_user','crm_user_nombre','crm_user_rol'].forEach(k => localStorage.removeItem(k));
+        window.location.href = 'index.html';
+        return;
+    }
+    // Renovar la sesión cada vez que entra
+    const nuevoExp = Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000;
+    localStorage.setItem('crm_auth_exp', String(nuevoExp));
+})();
+
+function hashPassword(password, salt) {
+    return CryptoJS.PBKDF2(password, salt, {
+        keySize: 8,
+        iterations: 10000,
+        hasher: CryptoJS.algo.SHA256
+    }).toString();
+}
+
+function aplicarPermisos() {
+    const esAdmin = CURRENT_USER.rol === 'admin';
+    document.querySelectorAll('.admin-only').forEach(el => {
+        el.style.display = esAdmin ? '' : 'none';
+    });
+    const hdrUser = document.getElementById('hdr-user');
+    const hdrRol  = document.getElementById('hdr-user-rol');
+    if (hdrUser) hdrUser.textContent = CURRENT_USER.nombre || CURRENT_USER.username;
+    if (hdrRol)  hdrRol.textContent  = esAdmin ? 'admin' : 'usuario';
+}
+
+// ============================================================
+// SUPABASE
+// ============================================================
+const SB_URL = 'https://nwlvvtcltnatkuljtlob.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53bHZ2dGNsdG5hdGt1bGp0bG9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NTU0NTQsImV4cCI6MjA5NTAzMTQ1NH0.q9XDqJ_yfqgO3A1hrkgtHTLtYax-vMUIXy-6x2NzVPw';
+const db = supabase.createClient(SB_URL, SB_KEY);
+let sbDisponible = false;
+
+function mostrarToast(msg, color) {
+    const t = document.getElementById('toast-crm');
+    t.style.background = color || '#16a34a';
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(t._to);
+    t._to = setTimeout(() => { t.style.opacity = '0'; }, 3200);
+}
+
+function setSbStatus(ok) {
+    const el = document.getElementById('sb-status');
+    if (el) el.innerHTML = ok ? '🟢 Sincronizado con Supabase' : '🔴 Sin conexión — usando datos locales';
+}
+
+// Mapper: cliente de Supabase → forma local
+function mapClienteFromDB(c) {
+    return {
+        id: c.id, nombre: c.nombre,
+        cuit: c.cuit||'', telefono: c.telefono||'', telefono2: c.telefono2||'',
+        email: c.email||'', ciudad: c.ciudad||'', provincia: c.provincia||'',
+        direccion: c.direccion||'', rubro: c.rubro||'',
+        vendedor_sugerido: c.vendedor_sugerido||'', tipo: c.tipo||'Credifin'
+    };
+}
+
+// Refresh: trae todo desde Supabase (fuente de verdad) y refresca cache local
+async function refreshFromSupabase() {
+    if (!sbDisponible) return;
+    try {
+        const [{ data: vData, error: vErr }, { data: cData, error: cErr }, { data: aData, error: aErr }] = await Promise.all([
+            db.from('vendedores').select('nombre').order('nombre'),
+            db.from('clientes').select('*').order('nombre'),
+            db.from('asignaciones').select('*, clientes(id,nombre,telefono,telefono2,email,ciudad,provincia,direccion,rubro,vendedor_sugerido,cuit,tipo)').order('fecha_asignacion')
+        ]);
+        if (vErr) throw vErr;
+        if (cErr) throw cErr;
+        if (aErr) throw aErr;
+
+        setVendedores((vData||[]).map(v => v.nombre));
+        setClientesCargados((cData||[]).map(mapClienteFromDB));
+        setClientesAsignados((aData||[]).filter(a => a.clientes).map(a => ({
+            ...mapClienteFromDB(a.clientes),
+            vendedorId: a.vendedor_nombre,
+            estado: a.estado || 'Sin contactar',
+            notas: a.notas || '',
+            fechaAsignacion: a.fecha_asignacion ? new Date(a.fecha_asignacion).toLocaleDateString('es-AR') : ''
+        })));
+
+        rerenderAll();
+        console.log(`[CRM] refresh OK — V:${(vData||[]).length} C:${(cData||[]).length} A:${(aData||[]).length}`);
+    } catch (err) {
+        console.error('[CRM] refreshFromSupabase:', err.message);
+    }
+}
+
+// Re-renderiza todas las vistas del CRM
+function rerenderAll() {
+    poblarFiltroProvincias();
+    filtrarCredifin();
+    filtrarSin();
+    filtrarRetail();
+    renderVendedores();
+    actualizarHeader();
+    renderCRM();
+    if (crmClienteSel) {
+        const fresh = getClientesAsignados().find(c => String(c.id) === String(crmClienteSel.id));
+        crmClienteSel = fresh || null;
+        if (crmClienteSel) mostrarDetalleCRM();
+    }
+}
+
+// Debounce de refresh para eventos Realtime rápidos seguidos
+let _refreshTimer = null;
+function scheduleRefresh() {
+    clearTimeout(_refreshTimer);
+    _refreshTimer = setTimeout(refreshFromSupabase, 300);
+}
+
+// Realtime: suscripción a cambios en las 3 tablas (sync multi-usuario)
+function subscribeRealtime() {
+    if (!sbDisponible) return;
+    db.channel('crm-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'vendedores' }, (p) => {
+            console.log('[CRM] realtime vendedores:', p.eventType);
+            scheduleRefresh();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'clientes' }, (p) => {
+            console.log('[CRM] realtime clientes:', p.eventType);
+            scheduleRefresh();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'asignaciones' }, (p) => {
+            console.log('[CRM] realtime asignaciones:', p.eventType);
+            scheduleRefresh();
+        })
+        .subscribe(status => {
+            console.log('[CRM] Realtime status:', status);
+            if (status === 'SUBSCRIBED') setSbStatus(true);
+        });
+}
+
+async function inicializarDB() {
+    document.getElementById('loading-overlay').style.display = 'flex';
+    try {
+        const { error } = await db.from('vendedores').select('id').limit(1);
+        if (error) throw error;
+        sbDisponible = true;
+        console.log('[CRM] Supabase conectado');
+        await refreshFromSupabase();
+        subscribeRealtime();
+    } catch (err) {
+        console.warn('[CRM] Supabase offline:', err.message);
+        sbDisponible = false;
+        rerenderAll();
+    }
+    setSbStatus(sbDisponible);
+    document.getElementById('loading-overlay').style.display = 'none';
+    cargarBotonesScripts();
+}
+
+// ============================================================
+// ESTADOS CRM
+// ============================================================
+const ESTADOS = [
+    { key: 'Sin contactar',  cls: 'e-sin',  pill: 'p-sin',  eb: 'eb-sin',  icon: '📵' },
+    { key: 'Contactado',     cls: 'e-cont', pill: 'p-cont', eb: 'eb-cont', icon: '📞' },
+    { key: 'En negociación', cls: 'e-neg',  pill: 'p-neg',  eb: 'eb-neg',  icon: '💬' },
+    { key: 'Dudas',          cls: 'e-dud',  pill: 'p-dud',  eb: 'eb-dud',  icon: '❓' },
+    { key: 'Interesado',     cls: 'e-int',  pill: 'p-int',  eb: 'eb-int',  icon: '⭐' },
+    { key: 'Cerrado',        cls: 'e-cerr', pill: 'p-cerr', eb: 'eb-cerr', icon: '✅' },
+    { key: 'No interesado',  cls: 'e-noi',  pill: 'p-noi',  eb: 'eb-noi',  icon: '❌' },
+];
+function getEst(key) { return ESTADOS.find(e => e.key === key) || ESTADOS[0]; }
+
+// ============================================================
+// SCRIPTS
+// ============================================================
+const SCRIPTS_DEFAULT = {
+    'presentacion': { label:'Presentación', cliente:'', texto:'Buenos días/tardes, hablo con [Nombre del comercio]? Soy [Tu nombre] de Distribuidora Samurai & Bowie. Somos distribuidores mayoristas de bicicletas de las marcas Samurai y Bowie.\n\nTe llamo porque estamos haciendo un relevamiento de negocios de la zona que puedan sumar nuestras marcas. Son marcas con muy buena rotación y trabajo con zona protegida.\n\n¿Tenés 2 minutos para que te cuente cómo trabajamos?', tips:'💡 Hablá con confianza. Si preguntan "¿de qué empresa?", respondé de inmediato con nombre completo y propósito.' },
+    'objecion-a': { label:'Obj. A — No vendo bicis', cliente:'❌ "No vendemos bicicletas / No es nuestro rubro"', texto:'Entiendo, [Nombre]. Por eso mismo te llamo. No te pido que te conviertas en una bicicletería. Lo que hacemos es sumar una categoría que ya tiene demanda en tu zona.\n\nUna o dos bicis estratégicamente ubicadas en tu local generan tráfico de clientes nuevos. Y con nuestro sistema de zona protegida, tu competencia directa no va a tener la misma marca.\n\n¿Puedo enviarte el catálogo digital para que lo veas sin compromiso?', tips:'💡 No insistas. Dejá abierta la puerta con el catálogo.' },
+    'objecion-b': { label:'Obj. B — Ya tengo stock', cliente:'❌ "Ya tengo cubierto el stock con otras marcas"', texto:'Buenísimo que estés stockeado, habla muy bien de tu negocio. Esas son marcas instaladas, pero hoy tenés un problema: te compiten directo al público en la web.\n\nLo que te propongo con Samurai y Bowie no es que dejes lo que tenés, sino que sumes una alternativa donde vos manejás el precio y tenés la zona asegurada.\n\nSi vos me comprás a mí, tu competencia no va a tener la misma bici. ¿Te mando el catálogo digital?', tips:'💡 No compitás en precio, compitá en exclusividad.' },
+    'objecion-c': { label:'Obj. C — Flete caro', cliente:'❌ "El flete al interior me mata el costo"', texto:'Olvidate de eso, ese costo corre por nuestra cuenta. Nosotros tenemos envío gratuito a casi todo el país a través de Credifin.\n\nLa bici te llega a la puerta de tu local y el renglón de flete en tu costo es cero. El precio que ves es el precio final.\n\n¿En qué zona exacta estás así te confirmo la frecuencia de entrega?', tips:'💡 Cierra la objeción logística. Reconfirma que el flete está 100% cubierto.' },
+    'objecion-d': { label:'Obj. D — Muy caro', cliente:'❌ "Está muy caro, la competencia me da más barato"', texto:'Entiendo, [Nombre]. Pero fijate bien en qué estamos comparando. Si ves un precio más bajo en la web, es porque ese proveedor le vende directo al público. Vos estás pagando mayorista.\n\nCon nosotros ganás:\n• Margen protegido: Tu competencia no tiene la misma bici.\n• Rotación rápida: La estética de Samurai se vende sola.\n• Financiación flexible: Cheques a 30, 60, 90 días.\n\nNo es "más caro", es mejor negocio. ¿Armamos un pedido pequeño para que compruebes?', tips:'💡 No bajes precio, sube valor.' },
+    'objecion-e': { label:'Obj. E — Sin tiempo', cliente:'❌ "Ahora no tengo tiempo / Llamame otro día"', texto:'Claro, [Nombre], te entiendo. No te robo más tiempo ahora. Solo una cosa rápida antes de colgar: ¿te puedo enviar el catálogo digital por WhatsApp así lo mirás cuando tengas un momento?\n\nAsí cuando hablemos ya tenés una idea y el tiempo que usamos es el tuyo. ¿Cuál es tu número de WhatsApp?', tips:'💡 No cierres sin al menos conseguir el WhatsApp.' },
+    'objecion-f': { label:'Obj. F — No hay plata', cliente:'❌ "Estamos mal económicamente / No hay plata"', texto:'Te entiendo perfectamente, [Nombre]. Por eso tenemos condiciones de financiación que se adaptan: podés arrancar con pedidos pequeños y pagar con cheques a 30, 60 o 90 días.\n\nNo necesitás invertir fuerte desde el principio. Un pedido mínimo te permite probar la rotación sin comprometer tu flujo de caja.\n\n¿Cuántas unidades necesitarías para arrancar y que no te genere presión?', tips:'💡 Ofrece la puerta chica. Pedido mínimo + financiación = barrera de entrada baja.' },
+    'cierre': { label:'Cierre', cliente:'', texto:'Perfecto, [Nombre]. Entonces quedamos así: te paso el catálogo digital con precios mayoristas y condiciones de pago. Cualquier duda me escribís directo.\n\nPara confirmar el pedido solo necesito que me digas qué modelos te interesan y en qué cantidad aproximada. Yo me encargo del resto: logística, plazos, documentación.\n\n¿Empezamos con algo chico para que veas cómo funciona?', tips:'💡 El cierre no es el fin, es el inicio de la relación.' },
+};
+let scriptActivo = null;
+
+function cargarBotonesScripts() {
+    const c = document.getElementById('scripts-btns'); c.innerHTML = '';
+    Object.entries(SCRIPTS_DEFAULT).forEach(([key, s]) => {
+        const b = document.createElement('button'); b.className='btn-script'; b.textContent=s.label; b.onclick=()=>mostrarScript(key,b); c.appendChild(b);
+    });
+}
+function getScript(key) { return { ...SCRIPTS_DEFAULT[key], ...(JSON.parse(localStorage.getItem('crm_scripts')||'{}')[key]||{}) }; }
+function mostrarScript(key, btn) {
+    scriptActivo = key;
+    document.querySelectorAll('.btn-script').forEach(b=>b.classList.remove('active')); if(btn)btn.classList.add('active');
+    const s = getScript(key);
+    const cl = document.getElementById('script-cliente'), co = document.getElementById('script-content'), ti = document.getElementById('script-tips');
+    if(s.cliente){cl.textContent=s.cliente;cl.style.display='block';}else{cl.style.display='none';}
+    co.textContent = s.texto;
+    if(s.tips){ti.textContent=s.tips;ti.style.display='block';}else{ti.style.display='none';}
+}
+function copiarScript() {
+    const t = document.getElementById('script-content').textContent;
+    if(!t||t==='← Seleccioná un script') return;
+    navigator.clipboard.writeText(t).then(()=>mostrarToast('📋 Copiado al portapapeles'));
+}
+function abrirEditorScript() {
+    if(!scriptActivo){alert('Seleccioná un script primero');return;}
+    const s = getScript(scriptActivo);
+    document.getElementById('modal-script-titulo').textContent = 'Editar: '+s.label;
+    document.getElementById('modal-cliente').value = s.cliente||'';
+    document.getElementById('modal-texto').value   = s.texto||'';
+    document.getElementById('modal-tips').value    = s.tips||'';
+    document.getElementById('modal-script').classList.add('open');
+}
+function guardarScript() {
+    if(!scriptActivo) return;
+    const g = JSON.parse(localStorage.getItem('crm_scripts')||'{}');
+    g[scriptActivo] = { label:SCRIPTS_DEFAULT[scriptActivo].label, cliente:document.getElementById('modal-cliente').value, texto:document.getElementById('modal-texto').value, tips:document.getElementById('modal-tips').value };
+    localStorage.setItem('crm_scripts', JSON.stringify(g));
+    cerrarModal(); mostrarScript(scriptActivo, document.querySelector('.btn-script.active'));
+}
+function cerrarModal() { document.getElementById('modal-script').classList.remove('open'); }
+
+// ============================================================
+// localStorage
+// ============================================================
+const LS = { v:'crm_vendedores', c:'crm_clientes_cargados', a:'crm_clientes_asignados' };
+function getVendedores()        { return JSON.parse(localStorage.getItem(LS.v)||'[]'); }
+function setVendedores(v)       { localStorage.setItem(LS.v, JSON.stringify(v)); }
+function getClientesCargados()  { return JSON.parse(localStorage.getItem(LS.c)||'[]'); }
+function setClientesCargados(c) { localStorage.setItem(LS.c, JSON.stringify(c)); }
+function getClientesAsignados() { return JSON.parse(localStorage.getItem(LS.a)||'[]'); }
+function setClientesAsignados(c){ localStorage.setItem(LS.a, JSON.stringify(c)); }
+
+let vendedorActivo = null;
+let crmFiltroEstado = 'todos';
+let crmClienteSel = null;
+
+// ============================================================
+// HEADER
+// ============================================================
+function actualizarHeader() {
+    document.getElementById('hdr-clientes').textContent   = getClientesCargados().length;
+    document.getElementById('hdr-vendedores').textContent = getVendedores().length;
+    document.getElementById('hdr-asignados').textContent  = getClientesAsignados().length;
+}
+
+// ============================================================
+// VENDEDORES
+// ============================================================
+function previewVendedor(val) {
+    const el = document.getElementById('preview-nuevo-vendedor');
+    if (!el) return;
+    el.textContent = val.trim() ? `→ Se agregará: "${val.trim()}"` : '';
+}
+
+function renderVendedores() {
+    const vendedores = getVendedores();
+    const asignados  = getClientesAsignados();
+    const container  = document.getElementById('vendedores-list');
+
+    if (vendedores.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:#aaa;font-size:12px;padding:16px;grid-column:1/-1;">Sin vendedores. Agregá uno abajo.</p>';
+    } else {
+        container.innerHTML = vendedores.map(nombre => {
+            const count = asignados.filter(c => c.vendedorId === nombre).length;
+            const sel   = vendedorActivo === nombre;
+            const esc   = nombre.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+            return `<div class="vendedor-card ${sel?'selected':''}" onclick="seleccionarVendedor('${esc}')">
+                <div class="v-nombre">${nombre}</div>
+                <div class="v-count">${count}</div>
+                <div class="v-btns">
+                    <button class="v-btn v-btn-edit" onclick="event.stopPropagation();editarVendedor('${esc}')">✏️ Editar</button>
+                    <button class="v-btn v-btn-del"  onclick="event.stopPropagation();eliminarVendedor('${esc}')">🗑️</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    // Sincronizar ambos selectores preservando selección actual
+    const opts = '<option value="">— Elegí un vendedor —</option>' +
+        vendedores.map(n=>`<option value="${n}">${n}</option>`).join('');
+    ['sel-vendedor-asignar','sel-vendedor-crm'].forEach(id => {
+        const el = document.getElementById(id); if(!el) return;
+        const prev = el.value;
+        el.innerHTML = opts;
+        if (vendedorActivo && vendedores.includes(vendedorActivo)) el.value = vendedorActivo;
+        else if (prev && vendedores.includes(prev)) el.value = prev;
+    });
+}
+
+async function agregarVendedor() {
+    const input  = document.getElementById('nuevo-vendedor');
+    const btn    = document.querySelector('button[onclick="agregarVendedor()"]');
+    const nombre = input.value.trim();
+    if (!nombre) { input.focus(); return; }
+    const vendedores = getVendedores();
+    if (vendedores.includes(nombre)) {
+        mostrarToast('⚠️ Ya existe ese vendedor', '#dc2626');
+        return;
+    }
+    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+    try {
+        if (!sbDisponible) throw new Error('Sin conexión con Supabase');
+        const { error } = await db.from('vendedores').insert({ nombre });
+        if (error) {
+            if (error.code === '23505') throw new Error('Ya existe ese vendedor');
+            throw new Error(error.message);
+        }
+        input.value = '';
+        document.getElementById('preview-nuevo-vendedor').textContent = '';
+        await refreshFromSupabase();
+        mostrarToast(`✅ Vendedor "${nombre}" agregado`);
+        console.log('[CRM] vendedor agregado OK:', nombre);
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] agregarVendedor:', err);
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '➕ Agregar'; }
+    }
+}
+
+async function editarVendedor(nombreActual) {
+    const nuevo = prompt(`Nuevo nombre para "${nombreActual}":`, nombreActual);
+    if (!nuevo || nuevo.trim() === nombreActual) return;
+    const n = nuevo.trim();
+    if (getVendedores().includes(n)) { mostrarToast('⚠️ Ya existe ese vendedor', '#dc2626'); return; }
+    try {
+        if (!sbDisponible) throw new Error('Sin conexión con Supabase');
+        const { error: e1 } = await db.from('vendedores').update({ nombre: n }).eq('nombre', nombreActual);
+        if (e1) throw new Error(e1.message);
+        const { error: e2 } = await db.from('asignaciones').update({ vendedor_nombre: n }).eq('vendedor_nombre', nombreActual);
+        if (e2) throw new Error(e2.message);
+        if (vendedorActivo === nombreActual) vendedorActivo = n;
+        await refreshFromSupabase();
+        mostrarToast(`✅ Vendedor renombrado a "${n}"`);
+        console.log('[CRM] vendedor renombrado:', nombreActual, '→', n);
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] editarVendedor:', err);
+    }
+}
+
+async function eliminarVendedor(nombre) {
+    if (!confirm(`¿Eliminar a "${nombre}"? Sus clientes quedarán sin asignar.`)) return;
+    try {
+        if (!sbDisponible) throw new Error('Sin conexión con Supabase');
+        const { error: e1 } = await db.from('asignaciones').delete().eq('vendedor_nombre', nombre);
+        if (e1) throw new Error(e1.message);
+        const { error: e2 } = await db.from('vendedores').delete().eq('nombre', nombre);
+        if (e2) throw new Error(e2.message);
+        if (vendedorActivo === nombre) { vendedorActivo = null; crmClienteSel = null; }
+        await refreshFromSupabase();
+        mostrarToast(`🗑️ Vendedor "${nombre}" eliminado`, '#dc2626');
+        console.log('[CRM] vendedor eliminado:', nombre);
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] eliminarVendedor:', err);
+    }
+}
+
+function seleccionarVendedor(nombre) {
+    vendedorActivo = nombre;
+    renderVendedores();
+    filtrarCredifin();
+    filtrarSin();
+    filtrarRetail();
+    const sel = document.getElementById('sel-vendedor-asignar');
+    if (sel) sel.value = nombre;
+    selTodosLosClientes();
+}
+
+function selTodosLosClientes() {
+    document.querySelectorAll('.chk-cred, .chk-sin, .chk-retail').forEach(c => c.checked = true);
+    actualizarContadorSel();
+}
+
+// ============================================================
+// ASIGNAR — tablas
+// ============================================================
+function poblarFiltroProvincias() {
+    const cargados = getClientesCargados();
+    const provs = [...new Set(cargados.map(c=>c.provincia).filter(Boolean))].sort();
+    ['f-cred-prov','f-sin-prov'].forEach(id => {
+        const sel = document.getElementById(id); if(!sel) return;
+        const v = sel.value;
+        sel.innerHTML = '<option value="">Todas las provincias</option>' + provs.map(p=>`<option value="${p}">${p}</option>`).join('');
+        sel.value = v;
+    });
+}
+
+function renderTabla(tbodyId, cargados, asignados, tipo) {
+    const tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+    if (!cargados.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:14px;">Sin resultados — cargá un Excel en el tab 📁</td></tr>';
+        return;
+    }
+    // Map tipo → CSS class del checkbox
+    const clsMap = { 'Credifin':'chk-cred', 'Sin Credifin':'chk-sin', 'Retail':'chk-retail' };
+    const cls = clsMap[tipo] || 'chk-cred';
+    tbody.innerHTML = cargados.map(c => {
+        const a = asignados.find(x => String(x.id) === String(c.id));
+        const asigInfo = a && a.vendedorId ? `<span style="font-size:9px;color:#7c3aed;font-weight:700;margin-left:4px;">→${a.vendedorId}</span>` : '';
+        const enc = encodeURIComponent(JSON.stringify({id:c.id,nombre:c.nombre,cuit:c.cuit||'',telefono:c.telefono||'',telefono2:c.telefono2||'',email:c.email||'',ciudad:c.ciudad||'',provincia:c.provincia||'',direccion:c.direccion||'',rubro:c.rubro||'',vendedor_sugerido:c.vendedor_sugerido||'',tipo:c.tipo}));
+        return `<tr>
+            <td><input type="checkbox" class="${cls}" data-c="${enc}" style="width:auto;" onchange="actualizarContadorSel()"></td>
+            <td>${c.nombre}${asigInfo}</td>
+            <td>${c.cuit||'-'}</td><td>${c.rubro||'-'}</td><td>${c.provincia||'-'}</td><td>${c.ciudad||'-'}</td><td>${c.telefono||'-'}</td>
+        </tr>`;
+    }).join('');
+}
+
+function _filtrarPorTipo(tipo, prefijo, tbodyId, countId) {
+    const todos     = getClientesCargados().filter(c => c.tipo === tipo);
+    const asignados = getClientesAsignados();
+    const nombre = (document.getElementById(`f-${prefijo}-nombre`)||{}).value||'';
+    const cuit   = (document.getElementById(`f-${prefijo}-cuit`)  ||{}).value||'';
+    const prov   = (document.getElementById(`f-${prefijo}-prov`)  ||{}).value||'';
+    const ciudad = (document.getElementById(`f-${prefijo}-ciudad`)||{}).value||'';
+    const rubro  = (document.getElementById(`f-${prefijo}-rubro`) ||{}).value||'';
+    const filtrados = todos.filter(c =>
+        (!nombre || c.nombre.toLowerCase().includes(nombre.toLowerCase())) &&
+        (!cuit   || (c.cuit||'').toLowerCase().includes(cuit.toLowerCase())) &&
+        (!prov   || c.provincia===prov) &&
+        (!ciudad || (c.ciudad||'').toLowerCase().includes(ciudad.toLowerCase())) &&
+        (!rubro  || (c.rubro||'').toLowerCase().includes(rubro.toLowerCase()))
+    );
+    const el = document.getElementById(countId); if(el) el.textContent = todos.length;
+    renderTabla(tbodyId, filtrados, asignados, tipo);
+}
+
+function filtrarCredifin() { _filtrarPorTipo('Credifin',     'cred',   'tbody-cred',   'count-cred'); }
+function filtrarSin()      { _filtrarPorTipo('Sin Credifin', 'sin',    'tbody-sin',    'count-sin'); }
+function filtrarRetail()   { _filtrarPorTipo('Retail',       'retail', 'tbody-retail', 'count-retail'); }
+
+function selTodoCred() {
+    const ch = document.getElementById('sel-todo-cred').checked;
+    document.querySelectorAll('.chk-cred').forEach(c=>c.checked=ch);
+    document.getElementById('sel-todo-cred-h').checked=ch;
+    actualizarContadorSel();
+}
+function selTodoSin() {
+    const ch = document.getElementById('sel-todo-sin').checked;
+    document.querySelectorAll('.chk-sin').forEach(c=>c.checked=ch);
+    document.getElementById('sel-todo-sin-h').checked=ch;
+    actualizarContadorSel();
+}
+function selTodoRetail() {
+    const ch = document.getElementById('sel-todo-retail').checked;
+    document.querySelectorAll('.chk-retail').forEach(c=>c.checked=ch);
+    document.getElementById('sel-todo-retail-h').checked=ch;
+    actualizarContadorSel();
+}
+function deselCred()   { document.querySelectorAll('.chk-cred').forEach(c=>c.checked=false);   document.getElementById('sel-todo-cred').checked=false;   document.getElementById('sel-todo-cred-h').checked=false;   actualizarContadorSel(); }
+function deselSin()    { document.querySelectorAll('.chk-sin').forEach(c=>c.checked=false);    document.getElementById('sel-todo-sin').checked=false;    document.getElementById('sel-todo-sin-h').checked=false;    actualizarContadorSel(); }
+function deselRetail() { document.querySelectorAll('.chk-retail').forEach(c=>c.checked=false); document.getElementById('sel-todo-retail').checked=false; document.getElementById('sel-todo-retail-h').checked=false; actualizarContadorSel(); }
+
+function mostrarErrorAsignar(msg) {
+    const el = document.getElementById('asignar-error');
+    if (!el) return;
+    el.textContent = '⚠️ ' + msg;
+    el.style.display = 'block';
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+
+function actualizarContadorSel() {
+    const n = document.querySelectorAll('.chk-cred:checked, .chk-sin:checked, .chk-retail:checked').length;
+    const el = document.getElementById('contador-sel');
+    if (el) {
+        el.textContent = n > 0 ? `${n} seleccionado${n>1?'s':''}` : '0 seleccionados';
+        el.style.color = n > 0 ? '#16a34a' : '#555';
+        el.style.fontWeight = n > 0 ? '700' : '400';
+    }
+}
+
+async function asignarClientes() {
+    const vendedor = (document.getElementById('sel-vendedor-asignar').value||'').trim();
+    if (!vendedor) {
+        mostrarToast('⚠️ Elegí un vendedor del selector o hacé clic en una tarjeta', '#dc2626');
+        return;
+    }
+
+    const checkeados = [...document.querySelectorAll('.chk-cred:checked, .chk-sin:checked, .chk-retail:checked')];
+    if (!checkeados.length) {
+        mostrarToast('⚠️ Marcá al menos un cliente con el checkbox ✓', '#dc2626');
+        return;
+    }
+
+    if (!sbDisponible) {
+        mostrarToast('❌ Sin conexión con Supabase, no se puede asignar', '#dc2626');
+        return;
+    }
+
+    const btnAsignar = document.getElementById('btn-asignar');
+    if (btnAsignar) { btnAsignar.disabled = true; btnAsignar.textContent = 'Guardando...'; }
+
+    // Construir payload de upsert batch
+    const asignadosActuales = getClientesAsignados();
+    const payload = [];
+    checkeados.forEach(chk => {
+        let cliente;
+        try { cliente = JSON.parse(decodeURIComponent(chk.dataset.c)); } catch(e) { return; }
+        if (!cliente || !cliente.id) return;
+        const existente = asignadosActuales.find(a => String(a.id) === String(cliente.id));
+        payload.push({
+            cliente_id: cliente.id,
+            vendedor_nombre: vendedor,
+            estado: existente?.estado || 'Sin contactar',
+            notas:  existente?.notas  || ''
+        });
+    });
+
+    if (!payload.length) {
+        mostrarToast('⚠️ No se pudieron leer los clientes seleccionados', '#dc2626');
+        if (btnAsignar) { btnAsignar.disabled = false; btnAsignar.textContent = '✅ Asignar'; }
+        return;
+    }
+
+    try {
+        // Upsert batch a Supabase (una sola llamada para N clientes)
+        const { error } = await db.from('asignaciones').upsert(payload, { onConflict: 'cliente_id' });
+        if (error) throw new Error(error.message);
+        console.log(`[CRM] ${payload.length} asignaciones guardadas en Supabase para vendedor: ${vendedor}`);
+
+        vendedorActivo = vendedor;
+        await refreshFromSupabase();
+        deselCred(); deselSin(); deselRetail();
+        actualizarContadorSel();
+
+        // Ir al CRM directamente
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-crm').classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            if ((b.getAttribute('onclick')||'').includes("'crm'")) b.classList.add('active');
+        });
+        seleccionarVendedorCRM(vendedor);
+        mostrarToast(`✅ ${payload.length} cliente(s) asignados a ${vendedor}`);
+    } catch (err) {
+        mostrarToast(`❌ Error al asignar: ${err.message}`, '#dc2626');
+        console.error('[CRM] asignarClientes:', err);
+    } finally {
+        if (btnAsignar) { btnAsignar.disabled = false; btnAsignar.textContent = '✅ Asignar'; }
+    }
+}
+
+// ============================================================
+// CRM
+// ============================================================
+function seleccionarVendedorCRM(nombre) {
+    vendedorActivo = nombre || null;
+    crmFiltroEstado = 'todos';
+    crmClienteSel = null;
+    renderCRM();
+}
+
+function renderCRM() {
+    const selCRM = document.getElementById('sel-vendedor-crm');
+    if (selCRM && vendedorActivo) selCRM.value = vendedorActivo;
+
+    const todosLS = getClientesAsignados();
+    console.log(`[CRM] renderCRM — vendedorActivo="${vendedorActivo}" | total asignados: ${todosLS.length} | con este vendedor: ${todosLS.filter(c=>c.vendedorId===vendedorActivo).length}`);
+
+    const sinVend = document.getElementById('crm-sin-vend');
+    const main    = document.getElementById('crm-main');
+
+    if (!vendedorActivo) {
+        sinVend.style.display = 'block';
+        main.style.display    = 'none';
+        document.getElementById('pills-bar').innerHTML = '';
+        document.getElementById('crm-stats-row').innerHTML = '';
+        return;
+    }
+
+    sinVend.style.display = 'none';
+    main.style.display    = 'block';
+
+    const todos  = getClientesAsignados().filter(c => c.vendedorId === vendedorActivo);
+    const busq   = (document.getElementById('f-crm')?.value||'').toLowerCase();
+    const filtrados = todos.filter(c => {
+        const okEst  = crmFiltroEstado === 'todos' || c.estado === crmFiltroEstado;
+        const okBusq = !busq || c.nombre.toLowerCase().includes(busq) || (c.telefono||'').includes(busq) || (c.ciudad||'').toLowerCase().includes(busq);
+        return okEst && okBusq;
+    });
+
+    // Pills
+    const pillsBar = document.getElementById('pills-bar');
+    pillsBar.innerHTML = `<span class="pill p-todos ${crmFiltroEstado==='todos'?'on':''}" onclick="crmFiltroEstado='todos';renderCRM()">Todos <strong>${todos.length}</strong></span>` +
+        ESTADOS.map(e => {
+            const n = todos.filter(c=>c.estado===e.key).length;
+            return `<span class="pill ${e.pill} ${crmFiltroEstado===e.key?'on':''}" onclick="crmFiltroEstado='${e.key}';renderCRM()">${e.icon} ${e.key} <strong>${n}</strong></span>`;
+        }).join('');
+
+    // Stats
+    document.getElementById('crm-stats-row').innerHTML = [
+        { label:'Total', val:todos.length, color:'#0066cc' },
+        { label:'Credifin', val:todos.filter(c=>c.tipo==='Credifin').length, color:'#16a34a' },
+        { label:'Sin Credifin', val:todos.filter(c=>c.tipo==='Sin Credifin').length, color:'#d97706' },
+        { label:'Retail', val:todos.filter(c=>c.tipo==='Retail').length, color:'#7c3aed' },
+        { label:'Cerrados', val:todos.filter(c=>c.estado==='Cerrado').length, color:'#15803d' },
+        { label:'En negociación', val:todos.filter(c=>c.estado==='En negociación').length, color:'#c2410c' },
+    ].map(s=>`<div class="stat-box"><h3 style="color:${s.color}">${s.val}</h3><p>${s.label}</p></div>`).join('');
+
+    // Label
+    document.getElementById('crm-count-label').textContent = `${filtrados.length} cliente${filtrados.length!==1?'s':''} ${crmFiltroEstado!=='todos'?'con estado "'+crmFiltroEstado+'"':'en total'}`;
+
+    // Lista
+    document.getElementById('crm-list').innerHTML = filtrados.map(c => {
+        const est = getEst(c.estado);
+        const sel = crmClienteSel && String(crmClienteSel.id)===String(c.id) ? 'sel' : '';
+        const badge = c.tipo==='Credifin' ? '<span class="badge-cred">CRE</span>'
+                   : c.tipo==='Retail'    ? '<span class="badge-retail">RET</span>'
+                                          : '<span class="badge-sin">SIN</span>';
+        return `<div class="crm-item ${sel}" data-id="${c.id}" onclick="seleccionarClienteCRM(this.dataset.id)">
+            <div class="crm-nombre">${badge} ${c.nombre}</div>
+            <div class="crm-datos">${c.ciudad||''}${c.provincia?' — '+c.provincia:''} · ${c.telefono||'—'}</div>
+            <span class="eb ${est.eb}">${est.icon} ${est.key}</span>
+        </div>`;
+    }).join('') || `<div style="padding:30px;text-align:center;color:#aaa;font-size:13px;">Sin clientes${crmFiltroEstado!=='todos'?' con estado "'+crmFiltroEstado+'"':''}</div>`;
+}
+
+function seleccionarClienteCRM(id) {
+    const asignados = getClientesAsignados();
+    crmClienteSel = asignados.find(c => String(c.id)===String(id)) || null;
+    renderCRM();
+    mostrarDetalleCRM();
+}
+
+function mostrarDetalleCRM() {
+    const det = document.getElementById('crm-detalle');
+    if (!crmClienteSel) { det.innerHTML = '<div class="aviso-msg" style="margin:0;">← Seleccioná un cliente de la lista</div>'; return; }
+    const c   = crmClienteSel;
+    const est = getEst(c.estado);
+
+    const campo = (lbl, val, link) => val ? `<div class="det-field"><div class="lbl">${lbl}</div><div class="val">${link?`<a href="${link}${val}">${val}</a>`:val}</div></div>` : '';
+
+    det.innerHTML = `<div class="crm-detalle-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px;flex-wrap:wrap;">
+            <div>
+                <div class="det-nombre">${c.nombre}</div>
+                <span class="eb ${est.eb}" style="font-size:12px;padding:4px 12px;">${est.icon} ${est.key}</span>
+            </div>
+            <button class="btn btn-red" style="font-size:11px;padding:6px 12px;" onclick="eliminarDelCRM('${c.id}')">🗑️ Quitar</button>
+        </div>
+
+        <div class="det-info-grid">
+            ${campo('CUIT', c.cuit)}
+            ${campo('Teléfono 1', c.telefono, 'tel:')}
+            ${campo('Teléfono 2', c.telefono2, 'tel:')}
+            ${campo('Email', c.email, 'mailto:')}
+            ${campo('Ciudad', c.ciudad)}
+            ${campo('Provincia', c.provincia)}
+            ${campo('Rubro', c.rubro)}
+            ${campo('Dirección', c.direccion)}
+            ${c.fechaAsignacion?campo('Asignado el', c.fechaAsignacion):''}
+        </div>
+
+        <div class="est-section-title">Cambiar estado</div>
+        <div class="est-btns">
+            ${ESTADOS.map(e=>`<button class="est-btn ${e.cls} ${c.estado===e.key?'on':''}" onclick="cambiarEstadoCRM('${e.key}')">${e.icon} ${e.key}</button>`).join('')}
+        </div>
+
+        <div class="form-group">
+            <label>Notas del contacto</label>
+            <textarea id="notas-crm" style="min-height:110px;" placeholder="Registrá aquí las observaciones...">${c.notas||''}</textarea>
+        </div>
+        <button class="btn btn-blue" style="width:100%;" onclick="guardarNotaCRM()">💾 Guardar Nota</button>
+    </div>`;
+}
+
+async function cambiarEstadoCRM(estado) {
+    if (!crmClienteSel) return;
+    const id = crmClienteSel.id;
+    try {
+        if (!sbDisponible) throw new Error('Sin conexión con Supabase');
+        const { error } = await db.from('asignaciones').update({ estado }).eq('cliente_id', id);
+        if (error) throw new Error(error.message);
+        await refreshFromSupabase();
+        mostrarToast(`Estado → ${estado}`);
+        console.log('[CRM] estado cambiado:', id, '→', estado);
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] cambiarEstadoCRM:', err);
+    }
+}
+
+async function guardarNotaCRM() {
+    if (!crmClienteSel) return;
+    const id = crmClienteSel.id;
+    const nota = document.getElementById('notas-crm')?.value || '';
+    try {
+        if (!sbDisponible) throw new Error('Sin conexión con Supabase');
+        const { error } = await db.from('asignaciones').update({ notas: nota }).eq('cliente_id', id);
+        if (error) throw new Error(error.message);
+        await refreshFromSupabase();
+        mostrarToast('💾 Nota guardada');
+        console.log('[CRM] nota guardada:', id);
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] guardarNotaCRM:', err);
+    }
+}
+
+async function eliminarDelCRM(id) {
+    if (!confirm('¿Quitar este cliente de la cartera?')) return;
+    try {
+        if (!sbDisponible) throw new Error('Sin conexión con Supabase');
+        const { error } = await db.from('asignaciones').delete().eq('cliente_id', id);
+        if (error) throw new Error(error.message);
+        if (crmClienteSel && String(crmClienteSel.id)===String(id)) crmClienteSel = null;
+        await refreshFromSupabase();
+        mostrarToast('🗑️ Cliente quitado de la cartera', '#dc2626');
+        console.log('[CRM] asignación eliminada:', id);
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] eliminarDelCRM:', err);
+    }
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function cambiarTab(id, btn) {
+    if (id === 'usuarios' && CURRENT_USER.rol !== 'admin') {
+        mostrarToast('❌ Solo administradores acceden a esta sección', '#dc2626');
+        return;
+    }
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    const tabEl = document.getElementById('tab-'+id);
+    if (tabEl) tabEl.classList.add('active');
+    if (btn) {
+        btn.classList.add('active');
+    } else {
+        document.querySelectorAll('.tab-btn').forEach(b=>{
+            if ((b.getAttribute('onclick')||'').indexOf("'"+id+"'")!==-1) b.classList.add('active');
+        });
+    }
+    if (id==='crm')      { renderCRM(); }
+    if (id==='asignar')  { renderVendedores(); filtrarCredifin(); filtrarSin(); filtrarRetail(); actualizarDebug(); }
+    if (id==='usuarios') { cargarListaUsuarios(); }
+}
+
+function actualizarDebug() {
+    console.log(`[CRM] debug — vendedores: ${getVendedores().length}, clientes: ${getClientesCargados().length}, SB: ${sbDisponible ? '🟢' : '🔴'}`);
+}
+
+// ============================================================
+// EXPORTAR
+// ============================================================
+function exportarCRM() {
+    if (!vendedorActivo) { alert('Seleccioná un vendedor en el CRM primero'); return; }
+    const datos = getClientesAsignados().filter(c=>c.vendedorId===vendedorActivo);
+    if (!datos.length) { alert('No hay clientes'); return; }
+    exportarExcel(datos, `crm_${vendedorActivo}`);
+}
+function exportarTodos() {
+    const datos = getClientesAsignados();
+    if (!datos.length) { alert('No hay clientes asignados'); return; }
+    exportarExcel(datos, 'todos_asignados');
+}
+function exportarVendedores() {
+    const vendedores = getVendedores();
+    const asignados  = getClientesAsignados();
+    const datos = vendedores.map(v => ({
+        Vendedor: v,
+        Total: asignados.filter(c=>c.vendedorId===v).length,
+        Credifin: asignados.filter(c=>c.vendedorId===v&&c.tipo==='Credifin').length,
+        SinCredifin: asignados.filter(c=>c.vendedorId===v&&c.tipo==='Sin Credifin').length,
+        Cerrados: asignados.filter(c=>c.vendedorId===v&&c.estado==='Cerrado').length,
+        EnNegociacion: asignados.filter(c=>c.vendedorId===v&&c.estado==='En negociación').length,
+        Interesados: asignados.filter(c=>c.vendedorId===v&&c.estado==='Interesado').length,
+    }));
+    const ws=XLSX.utils.json_to_sheet(datos); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Vendedores'); XLSX.writeFile(wb,'resumen_vendedores.xlsx');
+}
+function exportarExcel(datos, nombre) {
+    const filas = datos.map(c=>({ Nombre:c.nombre, CUIT:c.cuit||'', Tel1:c.telefono||'', Tel2:c.telefono2||'', Email:c.email||'', Ciudad:c.ciudad||'', Provincia:c.provincia||'', Rubro:c.rubro||'', Tipo:c.tipo, Vendedor:c.vendedorId, Estado:c.estado, Notas:c.notas||'', Asignado:c.fechaAsignacion||'' }));
+    const ws=XLSX.utils.json_to_sheet(filas); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Clientes'); XLSX.writeFile(wb,`${nombre}.xlsx`);
+}
+
+// ============================================================
+// CARGAR EXCEL
+// ============================================================
+// Normaliza un string para comparar: minúsculas, sin acentos, sin espacios/símbolos
+function normalizeKey(s) {
+    return String(s||'').toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quita acentos: "Teléfono" → "telefono"
+        .replace(/[\s_\-\.\(\)\/]/g,'');
+}
+function normalizarTipo(raw) {
+    const v = normalizeKey(raw);
+    if (v.includes('retail')) return 'Retail';
+    if (v.includes('sin'))    return 'Sin Credifin';
+    if (v.includes('cred'))   return 'Credifin';
+    return null;
+}
+function extraerCampo(row,...keys) { for(const k of keys){const v=row[k];if(v!==undefined&&v!==null&&String(v).trim()!=='')return String(v).trim();} return ''; }
+function detectarColumnas(f) {
+    const keys=Object.keys(f);
+    const find=(...ps)=>keys.find(k=>{
+        const nk = normalizeKey(k);
+        return ps.some(p => nk.includes(normalizeKey(p)));
+    })||'';
+    return {
+        nombre:   find('nombre','name','razonsocial','razon','comercio','cliente','empresa'),
+        cuit:     find('cuit','cuil','dni'),
+        telefono: find('telefono1','telefono','phone','cel','celular','movil','tel1','tel','whatsapp','contacto'),
+        telefono2:find('telefono2','tel2','celular2','alternativo'),
+        email:    find('email','mail','correo'),
+        ciudad:   find('ciudad','localidad'),
+        provincia:find('provincia','prov'),
+        direccion:find('direccion','domicilio','calle'),
+        rubro:    find('rubro','actividad','categoria'),
+        vendedor: find('vendedor','comercial','agente'),
+        tipo:     find('tipo','segmento'),
+    };
+}
+function cargarExcelTipo(input, tipoForzado) {
+    const file=input.files[0]; if(!file) return;
+    const prevId = tipoForzado==='Credifin'?'preview-credifin':'preview-sincredifin';
+    const reader=new FileReader();
+    reader.onload=async function(e){
+        try {
+            if (!sbDisponible) throw new Error('Sin conexión con Supabase, no se puede cargar');
+            const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+            const rows=[]; wb.SheetNames.forEach(s=>{rows.push(...XLSX.utils.sheet_to_json(wb.Sheets[s]));});
+            if(!rows.length){ mostrarToast('⚠️ Archivo vacío', '#dc2626'); return; }
+            const cols=detectarColumnas(rows[0]);
+            const allKeys=Object.keys(rows[0]);
+            const nKey=cols.nombre||allKeys[0]||'';
+            const nuevos=rows.map(r=>{
+                const tc=cols.tipo?r[cols.tipo]:'';
+                const td=tc?normalizarTipo(tc):null;
+                return { id:crypto.randomUUID(), nombre:cols.nombre?extraerCampo(r,cols.nombre):String(r[nKey]||'').trim(), cuit:extraerCampo(r,cols.cuit), telefono:extraerCampo(r,cols.telefono), telefono2:extraerCampo(r,cols.telefono2), email:extraerCampo(r,cols.email), ciudad:extraerCampo(r,cols.ciudad), provincia:extraerCampo(r,cols.provincia), direccion:extraerCampo(r,cols.direccion), rubro:extraerCampo(r,cols.rubro), vendedor_sugerido:extraerCampo(r,cols.vendedor), tipo:td||tipoForzado };
+            }).filter(c=>c.nombre);
+            if(!nuevos.length){ mostrarToast('⚠️ No se encontraron clientes. Revisá la columna "nombre".', '#dc2626'); input.value=''; return; }
+
+            // Insertar en Supabase en batch
+            const payload = nuevos.map(c => ({
+                id: c.id, nombre: c.nombre, cuit: c.cuit||'', telefono: c.telefono||'',
+                telefono2: c.telefono2||'', email: c.email||'', ciudad: c.ciudad||'',
+                provincia: c.provincia||'', direccion: c.direccion||'', rubro: c.rubro||'',
+                vendedor_sugerido: c.vendedor_sugerido||'', tipo: c.tipo
+            }));
+            const { error } = await db.from('clientes').upsert(payload, { onConflict: 'id' });
+            if (error) throw new Error(error.message);
+            console.log(`[CRM] ${nuevos.length} clientes insertados en Supabase como ${tipoForzado}`);
+
+            await refreshFromSupabase();
+            const total = getClientesCargados().length;
+            input.value='';
+            const bg=tipoForzado==='Credifin'?'#f0fdf4':'#fffbeb';
+            const bc=tipoForzado==='Credifin'?'#16a34a':'#f59e0b';
+            document.getElementById(prevId).innerHTML=`<div class="info-box" style="background:${bg};border-color:${bc};margin-top:8px;">✅ <strong>${nuevos.length}</strong> clientes cargados como <strong>${tipoForzado}</strong>. Total en DB: ${total}</div><div class="preview-small"><table><thead><tr><th>Nombre</th><th>CUIT</th><th>Tel.</th><th>Ciudad</th><th>Provincia</th><th>Rubro</th></tr></thead><tbody>${nuevos.slice(0,12).map(c=>`<tr><td>${c.nombre}</td><td>${c.cuit||'-'}</td><td>${c.telefono||'-'}</td><td>${c.ciudad||'-'}</td><td>${c.provincia||'-'}</td><td>${c.rubro||'-'}</td></tr>`).join('')}${nuevos.length>12?`<tr><td colspan="6" style="text-align:center;color:#888">+${nuevos.length-12} más</td></tr>`:''}</tbody></table></div>`;
+            mostrarToast(`✅ ${nuevos.length} clientes cargados`);
+        } catch(err) {
+            mostrarToast('❌ Error al cargar Excel: '+err.message, '#dc2626');
+            console.error('[CRM] cargarExcelTipo:', err);
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+// Carga Excel con múltiples hojas: detecta el tipo por nombre de hoja
+function cargarExcelCompleto(input) {
+    const file = input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            if (!sbDisponible) throw new Error('Sin conexión con Supabase');
+            const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+            const todos = [];
+            const resumen = [];
+
+            wb.SheetNames.forEach(sheetName => {
+                const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName]);
+                if (!rows.length) return;
+
+                // Detectar tipo por nombre de hoja (con normalización: sin acentos, sin espacios)
+                const sn = normalizeKey(sheetName);
+                let tipoHoja;
+                if (sn.includes('retail')) {
+                    tipoHoja = 'Retail';
+                } else if (sn.includes('sin') || sn.includes('nocredifin')) {
+                    tipoHoja = 'Sin Credifin';
+                } else if (sn.includes('cred')) {
+                    tipoHoja = 'Credifin';
+                } else {
+                    // Hojas genéricas (Hoja1, Sheet1, etc) — saltar y avisar
+                    console.warn(`[CRM] hoja "${sheetName}" no se reconoce — se omite. Renombrá la hoja con "Credifin", "Sin Credifin" o "Retail".`);
+                    resumen.push({ sheetName, tipo: 'IGNORADA', count: 0 });
+                    return;
+                }
+
+                const cols = detectarColumnas(rows[0]);
+                const allKeys = Object.keys(rows[0]);
+                const nKey = cols.nombre || allKeys[0] || '';
+
+                const nuevosHoja = rows.map(r => {
+                    const tc = cols.tipo ? r[cols.tipo] : '';
+                    const td = tc ? normalizarTipo(tc) : null;
+                    return {
+                        id: crypto.randomUUID(),
+                        nombre: cols.nombre ? extraerCampo(r, cols.nombre) : String(r[nKey]||'').trim(),
+                        cuit: extraerCampo(r, cols.cuit),
+                        telefono: extraerCampo(r, cols.telefono),
+                        telefono2: extraerCampo(r, cols.telefono2),
+                        email: extraerCampo(r, cols.email),
+                        ciudad: extraerCampo(r, cols.ciudad),
+                        provincia: extraerCampo(r, cols.provincia),
+                        direccion: extraerCampo(r, cols.direccion),
+                        rubro: extraerCampo(r, cols.rubro),
+                        vendedor_sugerido: extraerCampo(r, cols.vendedor),
+                        tipo: td || tipoHoja
+                    };
+                }).filter(c => c.nombre);
+
+                todos.push(...nuevosHoja);
+                resumen.push({ sheetName, tipo: tipoHoja, count: nuevosHoja.length });
+                console.log(`[CRM] hoja "${sheetName}" → ${nuevosHoja.length} clientes como ${tipoHoja}`);
+            });
+
+            if (!todos.length) {
+                mostrarToast('⚠️ No se encontraron clientes válidos en ninguna hoja', '#dc2626');
+                return;
+            }
+
+            // Insertar en batch (Supabase aguanta ~1000 rows por request, pero por las dudas chunkeamos)
+            const CHUNK = 500;
+            const payload = todos.map(c => ({
+                id: c.id, nombre: c.nombre, cuit: c.cuit||'', telefono: c.telefono||'',
+                telefono2: c.telefono2||'', email: c.email||'', ciudad: c.ciudad||'',
+                provincia: c.provincia||'', direccion: c.direccion||'', rubro: c.rubro||'',
+                vendedor_sugerido: c.vendedor_sugerido||'', tipo: c.tipo
+            }));
+
+            for (let i = 0; i < payload.length; i += CHUNK) {
+                const slice = payload.slice(i, i + CHUNK);
+                const { error } = await db.from('clientes').upsert(slice, { onConflict: 'id' });
+                if (error) throw new Error(`Lote ${i/CHUNK+1}: ${error.message}`);
+                console.log(`[CRM] insertado lote ${i/CHUNK+1} (${slice.length} clientes)`);
+            }
+
+            await refreshFromSupabase();
+            const total = getClientesCargados().length;
+            input.value = '';
+
+            const colorTipo = (t) => ({
+                'Credifin':     '#16a34a',
+                'Sin Credifin': '#d97706',
+                'Retail':       '#7c3aed',
+                'IGNORADA':     '#9ca3af'
+            }[t] || '#0066cc');
+            const detalle = resumen.map(r => {
+                const color = colorTipo(r.tipo);
+                if (r.tipo === 'IGNORADA') {
+                    return `<li style="margin:4px 0;color:#9ca3af;"><strong>${r.sheetName}</strong> → <em>hoja ignorada</em> (renombrala con "Credifin", "Sin Credifin" o "Retail" para que se cargue)</li>`;
+                }
+                return `<li style="margin:4px 0;"><strong>${r.sheetName}</strong> → <span style="color:${color};font-weight:700;">${r.count} clientes</span> como <strong>${r.tipo}</strong></li>`;
+            }).join('');
+
+            document.getElementById('preview-completo').innerHTML =
+                `<div class="info-box" style="background:#f3e8ff;border-color:#7c3aed;margin-top:10px;">
+                    ✅ <strong>${todos.length}</strong> clientes cargados desde <strong>${wb.SheetNames.length}</strong> hoja(s). Total en DB: ${total}
+                    <ul style="margin-top:8px;margin-left:20px;font-size:12px;">${detalle}</ul>
+                </div>`;
+
+            mostrarToast(`✅ ${todos.length} clientes cargados desde ${wb.SheetNames.length} hoja(s)`);
+        } catch(err) {
+            mostrarToast('❌ Error al cargar Excel: ' + err.message, '#dc2626');
+            console.error('[CRM] cargarExcelCompleto:', err);
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+async function borrarTodosLosClientes() {
+    if(!confirm('¿Seguro? Se borran todos los clientes cargados (y todas sus asignaciones).')) return;
+    try {
+        if (!sbDisponible) throw new Error('Sin conexión con Supabase');
+        const { error } = await db.from('clientes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        if (error) throw new Error(error.message);
+        await refreshFromSupabase();
+        document.getElementById('preview-credifin').innerHTML='';
+        document.getElementById('preview-sincredifin').innerHTML='';
+        mostrarToast('🗑️ Todos los clientes eliminados', '#dc2626');
+        console.log('[CRM] todos los clientes borrados');
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] borrarTodosLosClientes:', err);
+    }
+}
+
+// ============================================================
+// USUARIOS (gestión multi-empleado)
+// ============================================================
+async function cargarListaUsuarios() {
+    if (!sbDisponible) return;
+    const lista = document.getElementById('lista-usuarios');
+    if (!lista) return;
+    try {
+        const { data, error } = await db.from('usuarios')
+            .select('id, username, nombre, rol, created_at')
+            .order('rol', { ascending: true })
+            .order('username', { ascending: true });
+        if (error) throw new Error(error.message);
+        if (!data || !data.length) {
+            lista.innerHTML = '<p style="color:#888;font-size:12px;">Sin usuarios</p>';
+            return;
+        }
+        lista.innerHTML = data.map(u => {
+            const esMi = u.username === CURRENT_USER.username;
+            const badge = u.rol === 'admin'
+                ? '<span style="background:#dc2626;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800;">ADMIN</span>'
+                : '<span style="background:#6b7280;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800;">USER</span>';
+            const acciones = esMi
+                ? '<span style="font-size:11px;color:#888;">(vos)</span>'
+                : `<button class="btn btn-yellow" style="padding:4px 10px;font-size:11px;" onclick="cambiarRolUsuario('${u.username}','${u.rol === 'admin' ? 'user' : 'admin'}')">${u.rol === 'admin' ? '↓ Quitar admin' : '↑ Hacer admin'}</button>
+                   <button class="btn btn-blue" style="padding:4px 10px;font-size:11px;margin-left:4px;" onclick="resetearPasswordUsuario('${u.username}')">🔑 Reset pass</button>
+                   <button class="btn btn-red" style="padding:4px 10px;font-size:11px;margin-left:4px;" onclick="eliminarUsuario('${u.username}')">🗑️</button>`;
+            return `<div style="background:#f8fafc;padding:10px 12px;border-radius:8px;border:1px solid #e0e0e0;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+                <div>
+                    <div style="font-weight:700;font-size:13px;">${u.nombre} ${badge}</div>
+                    <div style="font-size:11px;color:#888;">@${u.username}</div>
+                </div>
+                <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">${acciones}</div>
+            </div>`;
+        }).join('');
+    } catch (err) {
+        console.error('[CRM] cargarListaUsuarios:', err);
+        lista.innerHTML = `<p style="color:#dc2626;font-size:12px;">Error: ${err.message}</p>`;
+    }
+}
+
+async function crearUsuario() {
+    if (CURRENT_USER.rol !== 'admin') return mostrarToast('❌ Solo admins pueden crear usuarios', '#dc2626');
+    const nombre   = document.getElementById('nuevo-user-nombre').value.trim();
+    const username = document.getElementById('nuevo-user-username').value.trim().toLowerCase();
+    const password = document.getElementById('nuevo-user-password').value;
+    const rol      = document.getElementById('nuevo-user-rol').value;
+
+    if (!nombre || !username || !password) return mostrarToast('⚠️ Completá todos los campos', '#dc2626');
+    if (!/^[a-z0-9_]+$/.test(username)) return mostrarToast('⚠️ Username solo letras minúsculas, números y guión bajo', '#dc2626');
+    if (password.length < 6) return mostrarToast('⚠️ La contraseña debe tener al menos 6 caracteres', '#dc2626');
+
+    try {
+        const password_hash = hashPassword(password, username);
+        const { error } = await db.from('usuarios').insert({ username, password_hash, nombre, rol });
+        if (error) {
+            if (error.code === '23505') throw new Error('Ese username ya existe');
+            throw new Error(error.message);
+        }
+        document.getElementById('nuevo-user-nombre').value = '';
+        document.getElementById('nuevo-user-username').value = '';
+        document.getElementById('nuevo-user-password').value = '';
+        document.getElementById('nuevo-user-rol').value = 'user';
+        await cargarListaUsuarios();
+        mostrarToast(`✅ Usuario "${nombre}" creado`);
+        console.log('[CRM] usuario creado:', username);
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] crearUsuario:', err);
+    }
+}
+
+async function cambiarRolUsuario(username, nuevoRol) {
+    if (CURRENT_USER.rol !== 'admin') return;
+    if (!confirm(`¿Cambiar rol de "${username}" a ${nuevoRol}?`)) return;
+    try {
+        const { error } = await db.from('usuarios').update({ rol: nuevoRol }).eq('username', username);
+        if (error) throw new Error(error.message);
+        await cargarListaUsuarios();
+        mostrarToast(`✅ Rol actualizado`);
+        console.log('[CRM] rol cambiado:', username, '→', nuevoRol);
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] cambiarRolUsuario:', err);
+    }
+}
+
+async function resetearPasswordUsuario(username) {
+    if (CURRENT_USER.rol !== 'admin') return;
+    const nueva = prompt(`Nueva contraseña para "${username}" (mínimo 6 caracteres):`);
+    if (!nueva) return;
+    if (nueva.length < 6) return mostrarToast('⚠️ Mínimo 6 caracteres', '#dc2626');
+    try {
+        const password_hash = hashPassword(nueva, username);
+        const { error } = await db.from('usuarios').update({ password_hash }).eq('username', username);
+        if (error) throw new Error(error.message);
+        mostrarToast(`✅ Contraseña de "${username}" actualizada`);
+        console.log('[CRM] password reseteado para:', username);
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] resetearPasswordUsuario:', err);
+    }
+}
+
+async function eliminarUsuario(username) {
+    if (CURRENT_USER.rol !== 'admin') return;
+    if (username === CURRENT_USER.username) return mostrarToast('⚠️ No podés eliminar tu propio usuario', '#dc2626');
+    if (!confirm(`¿Eliminar definitivamente al usuario "${username}"?`)) return;
+    try {
+        const { error } = await db.from('usuarios').delete().eq('username', username);
+        if (error) throw new Error(error.message);
+        await cargarListaUsuarios();
+        mostrarToast(`🗑️ Usuario "${username}" eliminado`, '#dc2626');
+        console.log('[CRM] usuario eliminado:', username);
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] eliminarUsuario:', err);
+    }
+}
+
+async function cambiarMiPassword() {
+    const nueva = document.getElementById('mi-nueva-pass').value;
+    if (!nueva || nueva.length < 6) return mostrarToast('⚠️ Mínimo 6 caracteres', '#dc2626');
+    try {
+        const password_hash = hashPassword(nueva, CURRENT_USER.username);
+        const { error } = await db.from('usuarios').update({ password_hash }).eq('username', CURRENT_USER.username);
+        if (error) throw new Error(error.message);
+        document.getElementById('mi-nueva-pass').value = '';
+        mostrarToast('✅ Tu contraseña fue actualizada');
+        console.log('[CRM] mi password actualizado');
+    } catch (err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+        console.error('[CRM] cambiarMiPassword:', err);
+    }
+}
+
+// ============================================================
+// MISC
+// ============================================================
+async function recargarDatos() {
+    await refreshFromSupabase();
+    mostrarToast('✅ Datos actualizados');
+}
+function cerrarSesion() {
+    ['crm_auth','crm_auth_exp','crm_user','crm_user_nombre','crm_user_rol'].forEach(k => localStorage.removeItem(k));
+    window.location.href = 'index.html';
+}
+
+// ============================================================
+// INIT
+// ============================================================
+aplicarPermisos();
+inicializarDB();
+</script>
+</body>
+</html>

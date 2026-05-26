@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargador Excel - Sistema de Gestión</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 15px;
+            background: #f0f0f0;
+            border: 2px dashed #667eea;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: 500;
+            color: #667eea;
+        }
+
+        .file-input-wrapper:hover .file-input-label {
+            background: #e8e8ff;
+        }
+
+        .file-name {
+            margin-top: 8px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: scale(1.02);
+        }
+
+        button.secondary {
+            background: #6c757d;
+        }
+
+        button.secondary:hover {
+            background: #5a6268;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .preview {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            display: block;
+            border: 1px solid #bee5eb;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            background: none;
+            color: #666;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            font-weight: 600;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Cargador Excel → Supabase</h1>
+
+        <!-- DESCARGAR PLANTILLAS -->
+        <div class="card">
+            <h2>📥 Descargar Plantillas</h2>
+            <p style="color: #666; margin-bottom: 15px;">Descargá las plantillas Excel, llenalas y subelas para cargar datos automáticamente.</p>
+            <div class="button-group">
+                <button onclick="descargarPlantilla('clientes')" class="secondary">📋 Plantilla Clientes</button>
+                <button onclick="descargarPlantilla('productos')" class="secondary">🚲 Plantilla Productos</button>
+                <button onclick="descargarPlantilla('pedidos')" class="secondary">📦 Plantilla Pedidos</button>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="card">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="cambiarTab('clientes')">👥 Clientes</button>
+                <button class="tab-btn" onclick="cambiarTab('productos')">🚲 Productos</button>
+                <button class="tab-btn" onclick="cambiarTab('pedidos')">📦 Pedidos</button>
+            </div>
+
+            <!-- TAB CLIENTES -->
+            <div id="tab-clientes" class="tab-content active">
+                <h3>Cargar Clientes desde Excel</h3>
+                <div class="form-group">
+                    <label>Seleccionar archivo Excel (cliente):</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileClientes" accept=".xlsx,.xls" onchange="previewArchivo('clientes')">
+                        <label for="fileClientes" class="file-input-label">
+                            Arrastrá aquí o hacé click para seleccionar
+                        </label>
+                    </div>
+                    <div id="fileNameClientes" class="file-name"></div>
+                </div>
+                <div id="previewClientes" class="preview"></div>
+                <button onclick="cargarDatos('clientes')" style="margin-top: 15px;">✅ Cargar Clientes</button>
+                <div id="msgClientes" class="message"></div>
+            </div>
+
+            <!-- TAB PRODUCTOS -->
+            <div id="tab-productos" class="tab-content">
+                <h3>Cargar Productos desde Excel</h3>
+                <div class="form-group">
+                    <label>Seleccionar archivo Excel (productos):</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileProductos" accept=".xlsx,.xls" onchange="previewArchivo('productos')">
+                        <label for="fileProductos" class="file-input-label">
+                            Arrastrá aquí o hacé click para seleccionar
+                        </label>
+                    </div>
+                    <div id="fileNameProductos" class="file-name"></div>
+                </div>
+                <div id="previewProductos" class="preview"></div>
+                <button onclick="cargarDatos('productos')" style="margin-top: 15px;">✅ Cargar Productos</button>
+                <div id="msgProductos" class="message"></div>
+            </div>
+
+            <!-- TAB PEDIDOS -->
+            <div id="tab-pedidos" class="tab-content">
+                <h3>Cargar Pedidos desde Excel</h3>
+                <div class="form-group">
+                    <label>Seleccionar archivo Excel (pedidos):</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="filePedidos" accept=".xlsx,.xls" onchange="previewArchivo('pedidos')">
+                        <label for="filePedidos" class="file-input-label">
+                            Arrastrá aquí o hacé click para seleccionar
+                        </label>
+                    </div>
+                    <div id="fileNamePedidos" class="file-name"></div>
+                </div>
+                <div id="previewPedidos" class="preview"></div>
+                <button onclick="cargarDatos('pedidos')" style="margin-top: 15px;">✅ Cargar Pedidos</button>
+                <div id="msgPedidos" class="message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración Supabase
+        const SUPABASE_URL = 'https://nwlvvtcltnatkuljtlob.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53bHZ2dGNsdG5hdGt1bGp0bG9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NTU0NTQsImV4cCI6MjA5NTAzMTQ1NH0.q9XDqJ_yfqgO3A1hrkgtHTLtYax-vMUIXy-6x2NzVPw';
+        
+        const { createClient } = window.supabase;
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Estado global
+        let datosExcel = {
+            clientes: null,
+            productos: null,
+            pedidos: null
+        };
+
+        // Cambiar tabs
+        function cambiarTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Descargar plantillas Excel
+        function descargarPlantilla(tipo) {
+            let columnas, nombreArchivo;
+
+            if (tipo === 'clientes') {
+                columnas = ['Nombre', 'Email', 'Teléfono', 'Provincia'];
+                nombreArchivo = 'plantilla_clientes.xlsx';
+            } else if (tipo === 'productos') {
+                columnas = ['Nombre', 'Marca', 'Precio', 'Stock', 'Descripción'];
+                nombreArchivo = 'plantilla_productos.xlsx';
+            } else {
+                columnas = ['Cliente ID', 'Producto ID', 'Cantidad', 'Estado'];
+                nombreArchivo = 'plantilla_pedidos.xlsx';
+            }
+
+            const ws = XLSX.utils.aoa_to_sheet([columnas]);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Datos");
+            XLSX.writeFile(wb, nombreArchivo);
+        }
+
+        // Preview del archivo
+        function previewArchivo(tipo) {
+            const fileInput = document.getElementById(`file${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+            const file = fileInput.files[0];
+
+            if (!file) return;
+
+            document.getElementById(`fileName${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`).textContent = `Archivo: ${file.name}`;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const datos = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(datos, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet);
+
+                    datosExcel[tipo] = json;
+
+                    // Preview
+                    let html = '<table><thead><tr>';
+                    if (json.length > 0) {
+                        Object.keys(json[0]).forEach(col => {
+                            html += `<th>${col}</th>`;
+                        });
+                        html += '</tr></thead><tbody>';
+                        json.slice(0, 5).forEach(row => {
+                            html += '<tr>';
+                            Object.values(row).forEach(val => {
+                                html += `<td>${val}</td>`;
+                            });
+                            html += '</tr>';
+                        });
+                        html += '</tbody></table>';
+                        if (json.length > 5) {
+                            html += `<p style="margin-top: 10px; color: #666;">+${json.length - 5} filas más</p>`;
+                        }
+                    }
+
+                    document.getElementById(`preview${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`).innerHTML = html;
+                } catch (error) {
+                    mostrarMensaje(tipo, `❌ Error al leer archivo: ${error.message}`, 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Cargar datos a Supabase
+        async function cargarDatos(tipo) {
+            if (!datosExcel[tipo]) {
+                mostrarMensaje(tipo, '❌ Por favor selecciona un archivo primero', 'error');
+                return;
+            }
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.classList.add('loading');
+
+            try {
+                const datos = datosExcel[tipo];
+                let datosLimpios = [];
+
+                if (tipo === 'clientes') {
+                    datosLimpios = datos.map(d => ({
+                        nombre: d['Nombre'] || d['nombre'],
+                        email: d['Email'] || d['email'] || null,
+                        telefono: d['Teléfono'] || d['telefono'] || null,
+                        provincia: d['Provincia'] || d['provincia'] || null,
+                    }));
+                } else if (tipo === 'productos') {
+                    datosLimpios = datos.map(d => ({
+                        nombre: d['Nombre'] || d['nombre'],
+                        marca: d['Marca'] || d['marca'] || null,
+                        precio: parseFloat(d['Precio'] || d['precio']),
+                        stock: parseInt(d['Stock'] || d['stock']) || 0,
+                        descripcion: d['Descripción'] || d['descripcion'] || null,
+                    }));
+                } else if (tipo === 'pedidos') {
+                    datosLimpios = datos.map(d => ({
+                        cliente_id: parseInt(d['Cliente ID'] || d['cliente_id']),
+                        producto_id: parseInt(d['Producto ID'] || d['producto_id']),
+                        cantidad: parseInt(d['Cantidad'] || d['cantidad']),
+                        estado: d['Estado'] || d['estado'] || 'pendiente',
+                    }));
+                }
+
+                const { error } = await supabase.from(tipo).insert(datosLimpios);
+
+                if (error) throw error;
+
+                mostrarMensaje(tipo, `✅ ${datosLimpios.length} registros cargados correctamente`, 'success');
+                datosExcel[tipo] = null;
+                document.getElementById(`file${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`).value = '';
+                document.getElementById(`preview${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`).innerHTML = '';
+            } catch (error) {
+                mostrarMensaje(tipo, `❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            }
+        }
+
+        // Mostrar mensajes
+        function mostrarMensaje(tipo, mensaje, tipoMsg) {
+            const el = document.getElementById(`msg${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+            el.textContent = mensaje;
+            el.className = `message ${tipoMsg}`;
+            setTimeout(() => {
+                el.className = 'message';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

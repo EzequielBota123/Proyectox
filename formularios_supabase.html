@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión - Bicis Samurai & Bowie</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+        }
+
+        .forms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .form-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: scale(1.02);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-top: 30px;
+            overflow-x: auto;
+        }
+
+        .data-table h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚴 Sistema de Gestión de Ventas</h1>
+
+        <div class="forms-grid">
+            <!-- FORMULARIO CLIENTES -->
+            <div class="form-card">
+                <h2>👥 Agregar Cliente</h2>
+                <form id="formClientes">
+                    <div class="form-group">
+                        <label for="nombre">Nombre *</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="tel" id="telefono" name="telefono">
+                    </div>
+                    <div class="form-group">
+                        <label for="provincia">Provincia</label>
+                        <select id="provincia" name="provincia">
+                            <option value="">Seleccionar...</option>
+                            <option value="Buenos Aires">Buenos Aires</option>
+                            <option value="CABA">CABA</option>
+                            <option value="Córdoba">Córdoba</option>
+                            <option value="Santa Fe">Santa Fe</option>
+                            <option value="Mendoza">Mendoza</option>
+                            <option value="Otra">Otra</option>
+                        </select>
+                    </div>
+                    <button type="submit">Guardar Cliente</button>
+                    <div id="msgClientes" class="message"></div>
+                </form>
+            </div>
+
+            <!-- FORMULARIO PRODUCTOS -->
+            <div class="form-card">
+                <h2>🚲 Agregar Producto</h2>
+                <form id="formProductos">
+                    <div class="form-group">
+                        <label for="nombreProd">Nombre del Producto *</label>
+                        <input type="text" id="nombreProd" name="nombreProd" placeholder="ej: Gozen, Shonen" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="marca">Marca</label>
+                        <select id="marca" name="marca">
+                            <option value="">Seleccionar...</option>
+                            <option value="Samurai">Samurai</option>
+                            <option value="Bowie">Bowie</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="precio">Precio ($) *</label>
+                        <input type="number" id="precio" name="precio" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stock">Stock</label>
+                        <input type="number" id="stock" name="stock" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="descripcion">Descripción</label>
+                        <input type="text" id="descripcion" name="descripcion">
+                    </div>
+                    <button type="submit">Guardar Producto</button>
+                    <div id="msgProductos" class="message"></div>
+                </form>
+            </div>
+
+            <!-- FORMULARIO PEDIDOS -->
+            <div class="form-card">
+                <h2>📋 Agregar Pedido</h2>
+                <form id="formPedidos">
+                    <div class="form-group">
+                        <label for="clienteId">Cliente ID *</label>
+                        <input type="number" id="clienteId" name="clienteId" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productoId">Producto ID *</label>
+                        <input type="number" id="productoId" name="productoId" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cantidad">Cantidad *</label>
+                        <input type="number" id="cantidad" name="cantidad" value="1" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" name="estado">
+                            <option value="pendiente">Pendiente</option>
+                            <option value="confirmado">Confirmado</option>
+                            <option value="enviado">Enviado</option>
+                            <option value="entregado">Entregado</option>
+                        </select>
+                    </div>
+                    <button type="submit">Guardar Pedido</button>
+                    <div id="msgPedidos" class="message"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- TABLA DE DATOS -->
+        <div class="data-table">
+            <h3>📊 Datos en la Base de Datos</h3>
+            <div id="datosContainer">
+                <p style="text-align: center; color: #999;">Cargando datos...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de Supabase
+        const SUPABASE_URL = 'https://nwlvvtcltnatkuljtlob.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53bHZ2dGNsdG5hdGt1bGp0bG9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NTU0NTQsImV4cCI6MjA5NTAzMTQ1NH0.q9XDqJ_yfqgO3A1hrkgtHTLtYax-vMUIXy-6x2NzVPw';
+        
+        const { createClient } = window.supabase;
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Función para mostrar mensajes
+        function mostrarMensaje(elementId, mensaje, tipo) {
+            const el = document.getElementById(elementId);
+            el.textContent = mensaje;
+            el.className = `message ${tipo}`;
+            setTimeout(() => {
+                el.className = 'message';
+            }, 4000);
+        }
+
+        // FORMULARIO CLIENTES
+        document.getElementById('formClientes').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.classList.add('loading');
+
+            const data = {
+                nombre: document.getElementById('nombre').value,
+                email: document.getElementById('email').value || null,
+                telefono: document.getElementById('telefono').value || null,
+                provincia: document.getElementById('provincia').value || null,
+            };
+
+            try {
+                const { error } = await supabase.from('clientes').insert([data]);
+                if (error) throw error;
+                
+                mostrarMensaje('msgClientes', '✅ Cliente guardado correctamente', 'success');
+                document.getElementById('formClientes').reset();
+                cargarDatos();
+            } catch (error) {
+                mostrarMensaje('msgClientes', `❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.classList.remove('loading');
+            }
+        });
+
+        // FORMULARIO PRODUCTOS
+        document.getElementById('formProductos').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.classList.add('loading');
+
+            const data = {
+                nombre: document.getElementById('nombreProd').value,
+                marca: document.getElementById('marca').value || null,
+                precio: parseFloat(document.getElementById('precio').value),
+                stock: parseInt(document.getElementById('stock').value) || 0,
+                descripcion: document.getElementById('descripcion').value || null,
+            };
+
+            try {
+                const { error } = await supabase.from('productos').insert([data]);
+                if (error) throw error;
+                
+                mostrarMensaje('msgProductos', '✅ Producto guardado correctamente', 'success');
+                document.getElementById('formProductos').reset();
+                cargarDatos();
+            } catch (error) {
+                mostrarMensaje('msgProductos', `❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.classList.remove('loading');
+            }
+        });
+
+        // FORMULARIO PEDIDOS
+        document.getElementById('formPedidos').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.classList.add('loading');
+
+            const data = {
+                cliente_id: parseInt(document.getElementById('clienteId').value),
+                producto_id: parseInt(document.getElementById('productoId').value),
+                cantidad: parseInt(document.getElementById('cantidad').value),
+                estado: document.getElementById('estado').value,
+            };
+
+            try {
+                const { error } = await supabase.from('pedidos').insert([data]);
+                if (error) throw error;
+                
+                mostrarMensaje('msgPedidos', '✅ Pedido guardado correctamente', 'success');
+                document.getElementById('formPedidos').reset();
+                cargarDatos();
+            } catch (error) {
+                mostrarMensaje('msgPedidos', `❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.classList.remove('loading');
+            }
+        });
+
+        // Cargar y mostrar datos
+        async function cargarDatos() {
+            try {
+                const [clientes, productos, pedidos] = await Promise.all([
+                    supabase.from('clientes').select('*').limit(5),
+                    supabase.from('productos').select('*').limit(5),
+                    supabase.from('pedidos').select('*').limit(5),
+                ]);
+
+                let html = '';
+
+                if (clientes.data?.length) {
+                    html += '<h4 style="margin-top: 20px; color: #667eea;">Últimos Clientes</h4>';
+                    html += '<table><thead><tr><th>ID</th><th>Nombre</th><th>Email</th><th>Provincia</th></tr></thead><tbody>';
+                    clientes.data.forEach(c => {
+                        html += `<tr><td>${c.id}</td><td>${c.nombre}</td><td>${c.email || '-'}</td><td>${c.provincia || '-'}</td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                }
+
+                if (productos.data?.length) {
+                    html += '<h4 style="margin-top: 20px; color: #667eea;">Últimos Productos</h4>';
+                    html += '<table><thead><tr><th>ID</th><th>Nombre</th><th>Marca</th><th>Precio</th><th>Stock</th></tr></thead><tbody>';
+                    productos.data.forEach(p => {
+                        html += `<tr><td>${p.id}</td><td>${p.nombre}</td><td>${p.marca || '-'}</td><td>$${p.precio}</td><td>${p.stock}</td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                }
+
+                if (pedidos.data?.length) {
+                    html += '<h4 style="margin-top: 20px; color: #667eea;">Últimos Pedidos</h4>';
+                    html += '<table><thead><tr><th>ID</th><th>Cliente</th><th>Producto</th><th>Cantidad</th><th>Estado</th></tr></thead><tbody>';
+                    pedidos.data.forEach(pe => {
+                        html += `<tr><td>${pe.id}</td><td>${pe.cliente_id}</td><td>${pe.producto_id}</td><td>${pe.cantidad}</td><td>${pe.estado}</td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                }
+
+                document.getElementById('datosContainer').innerHTML = html || '<p style="text-align: center; color: #999;">Sin datos aún</p>';
+            } catch (error) {
+                console.error('Error al cargar datos:', error);
+            }
+        }
+
+        // Cargar datos al iniciar
+        cargarDatos();
+    </script>
+</body>
+</html>

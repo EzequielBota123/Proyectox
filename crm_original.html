@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Center Samurai & Bowie -  Profesional v2</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; }
+        
+        #mainApp { display: block; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
+        
+        header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 20px; }
+        .header-info { flex: 1; min-width: 200px; }
+        .header-info h1 { font-size: 24px; margin-bottom: 5px; }
+        .header-info p { font-size: 12px; opacity: 0.9; }
+        .header-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+        .stat { text-align: center; }
+        .stat-number { font-size: 24px; font-weight: bold; }
+        .stat-label { font-size: 11px; opacity: 0.8; }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #ddd; flex-wrap: wrap; }
+        .tab-btn { padding: 12px 24px; border: none; background: none; cursor: pointer; font-size: 14px; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s; }
+        .tab-btn:hover { color: #0066cc; }
+        .tab-btn.active { color: #0066cc; border-bottom-color: #0066cc; }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); border: 1px solid #e0e0e0; margin-bottom: 20px; }
+        .card h2 { font-size: 18px; margin-bottom: 15px; color: #1a1a2e; border-bottom: 2px solid #0066cc; padding-bottom: 10px; }
+        
+        .btn-script { padding: 10px; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; margin-bottom: 5px; transition: all 0.3s; }
+        .btn-script:hover { background: #f0f0f0; }
+        .btn-script.active { background: #0066cc; color: white; border-color: #0066cc; }
+        
+        .script-box { background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; font-size: 13px; line-height: 1.8; min-height: 120px; white-space: pre-wrap; word-wrap: break-word; margin-bottom: 10px; max-height: 300px; overflow-y: auto; }
+        .script-tips { background: #e8f4f8; border-left: 4px solid #0066cc; padding: 12px; border-radius: 4px; font-size: 12px; margin-bottom: 10px; }
+        .script-cliente { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; border-radius: 4px; font-size: 11px; margin-bottom: 10px; font-weight: 600; }
+        
+        .copy-btn, .btn-primary, .btn-export { background: #0066cc; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .copy-btn:hover, .btn-primary:hover, .btn-export:hover { background: #0052a3; }
+        .copy-btn:disabled, .btn-primary:disabled, .btn-export:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .btn-export { background: #28a745; margin-right: 8px; }
+        .btn-export:hover { background: #218838; }
+        
+        .btn-export-secondary { background: #f0ad4e; color: #333; }
+        .btn-export-secondary:hover { background: #e09b3a; }
+        
+        .btn-editar-script { background: #f0ad4e; color: #333; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; }
+        .btn-editar-script:hover { background: #e09b3a; }
+        
+        .main-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 20px; }
+        
+        .vendedores-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        .vendedor-card { background: #f5f5f5; padding: 12px; border-radius: 6px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: all 0.3s; }
+        .vendedor-card:hover { border-color: #0066cc; background: #e8f4f8; }
+        .vendedor-card.selected { border-color: #0066cc; background: #0066cc; color: white; }
+        .vendedor-card .nombre { font-weight: bold; margin-bottom: 5px; font-size: 13px; }
+        .vendedor-card .count { font-size: 20px; font-weight: bold; margin-bottom: 8px; }
+        .btn-delete-vendedor { background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; width: 100%; }
+        
+        .seccion-tipo { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); border: 1px solid #e0e0e0; margin-bottom: 20px; }
+        .seccion-tipo h3 { font-size: 16px; margin-bottom: 12px; padding: 12px; border-radius: 6px; color: white; font-weight: bold; }
+        .seccion-credifin h3 { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); }
+        .seccion-sin h3 { background: linear-gradient(135deg, #f0ad4e 0%, #ffc107 100%); }
+        
+        .filtros { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 15px; }
+        input, select, textarea { padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; width: 100%; font-family: inherit; transition: all 0.3s; }
+        input:focus, select:focus, textarea:focus { border-color: #0066cc; outline: none; box-shadow: 0 0 4px rgba(0,102,204,0.2); }
+        
+        .tabla-selector { overflow-x: auto; border: 1px solid #ddd; border-radius: 6px; max-height: 400px; overflow-y: auto; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        thead { background: #f5f5f5; position: sticky; top: 0; z-index: 10; }
+        th { padding: 10px 8px; text-align: left; font-weight: 600; border-bottom: 2px solid #0066cc; }
+        td { padding: 8px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f9f9f9; }
+        
+        .ba-badge { display: inline-block; padding: 2px 6px; background: #0066cc; color: white; border-radius: 3px; font-size: 8px; font-weight: 600; margin-right: 3px; }
+        .sin-badge { display: inline-block; padding: 2px 6px; background: #f0ad4e; color: #333; border-radius: 3px; font-size: 8px; font-weight: 600; margin-right: 3px; }
+        
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 12px; }
+        
+        .cliente-detalle { background: #f9f9f9; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #0066cc; }
+        .cliente-detalle h3 { font-size: 16px; margin-bottom: 10px; color: #1a1a2e; }
+        .cliente-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+        .info-field { font-size: 12px; }
+        .info-field .label { color: #666; font-weight: 600; margin-bottom: 2px; }
+        .info-field .valor { color: #1a1a2e; }
+        
+        .btn-states { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
+        .btn-state { flex: 1; min-width: 100px; padding: 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; transition: all 0.3s; }
+        .btn-state:hover { border-color: #0066cc; }
+        .btn-state.active { background: #0066cc; color: white; border-color: #0066cc; }
+        
+        .cliente-list { max-height: 500px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; }
+        .cliente-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
+        .cliente-item:hover { background: #f5f5f5; }
+        .cliente-item.selected { background: #e8f4f8; border-left: 4px solid #0066cc; }
+        .cliente-item-info { flex: 1; }
+        .cliente-item-nombre { font-weight: bold; font-size: 12px; }
+        .cliente-item-datos { font-size: 11px; color: #666; margin-top: 2px; }
+        .btn-delete { background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; white-space: nowrap; margin-left: 8px; }
+        .btn-delete:hover { background: #c82333; }
+        
+        .sin-vendedor { background: #fff3cd; padding: 15px; border-radius: 6px; text-align: center; color: #856404; margin: 20px 0; border: 1px solid #ffc107; }
+        
+        .btn-asignar { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; margin-bottom: 10px; transition: all 0.3s; }
+        .btn-asignar:hover { background: #218838; }
+        .btn-asignar:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .import-section { background: #e8f4f8; padding: 15px; border-radius: 6px; border: 2px dashed #0066cc; margin-bottom: 20px; }
+        .import-section h3 { margin-bottom: 10px; color: #0066cc; }
+        .import-btn { background: #0066cc; padding: 10px 20px; margin-right: 10px; }
+        
+        .editor-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .editor-contenido { background: white; border-radius: 8px; padding: 25px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .editor-contenido h3 { margin-bottom: 15px; color: #1a1a2e; }
+        .editor-btn-row { display: flex; gap: 10px; margin-top: 15px; }
+        .editor-btn-row button { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn-guardar { background: #28a745; color: white; }
+        .btn-guardar:hover { background: #218838; }
+        .btn-cancelar { background: #6c757d; color: white; }
+        .btn-cancelar:hover { background: #5a6268; }
+        
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-left: 10px; }
+        .badge-credifin { background: #28a745; color: white; }
+        .badge-sin { background: #f0ad4e; color: #333; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 15px; border-radius: 6px; border-left: 4px solid #0066cc; text-align: center; }
+        .stat-card h3 { font-size: 24px; font-weight: bold; color: #0066cc; }
+        .stat-card p { font-size: 12px; color: #666; margin-top: 5px; }
+        
+        .export-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .export-buttons > * { flex: 1; min-width: 120px; }
+        
+        .info-box { background: #e8f5e9; border-left: 4px solid #28a745; padding: 12px; border-radius: 4px; margin-bottom: 15px; font-size: 12px; color: #2e7d32; }
+        
+        @media (max-width: 1200px) { .main-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .header-stats { flex-direction: column; gap: 10px; } .export-buttons { flex-direction: column; } }
+    </style>
+</head>
+<body>
+    <div id="mainApp">
+        <div class="container">
+            <header>
+                <div class="header-info">
+                    <h1>📞 Call Center Samurai & Bowie</h1>
+                    <p>Sistema  Profesional - 525 Clientes Cargados ✅</p>
+                </div>
+                <div class="header-stats">
+                    <div class="stat">
+                        <div class="stat-number" id="total-clientes">525</div>
+                        <div class="stat-label">CLIENTES</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="total-vendedores">0</div>
+                        <div class="stat-label">VENDEDORES</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="total-asignados">0</div>
+                        <div class="stat-label">ASIGNADOS</div>
+                    </div>
+                </div>
+                <div class="header-actions" style="display: flex; align-items: center; margin-left: 20px;">
+                    <button onclick="window.location.reload();" style="background: rgba(220,53,69,0.9); color: white; border: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-size: 13px;" onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='rgba(220,53,69,0.9)'">🚪 Cerrar Sesión</button>
+                </div>
+            </header>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="cambiarTab('scripts')">📋 Scripts</button>
+                <button class="tab-btn" onclick="cambiarTab('importar')">🎯 Asignar Clientes</button>
+                <button class="tab-btn" onclick="cambiarTab('')">📊 Mi </button>
+                <button class="tab-btn" onclick="cambiarTab('exportar')">📥 Exportar Datos</button>
+                <button class="tab-btn" onclick="cambiarTab('cargar')">📁 Cargar Excel</button>
+            </div>
+            
+            <!-- TAB SCRIPTS -->
+            <div id="tab-scripts" class="tab-content active">
+                <div class="card">
+                    <h2>📋 Scripts de Venta - Editables</h2>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 15px;">💡 Todos los scripts se guardan automáticamente. Haz clic en "Editar" para personalizarlos.</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 5px; margin-bottom: 15px;">
+                        <button class="btn-script" onclick="mostrarScript('presentacion')">Presentación</button>
+                        <button class="btn-script" onclick="mostrarScript('objecion-a')">Obj. A</button>
+                        <button class="btn-script" onclick="mostrarScript('objecion-b')">Obj. B</button>
+                        <button class="btn-script" onclick="mostrarScript('objecion-c')">Obj. C</button>
+                        <button class="btn-script" onclick="mostrarScript('objecion-d')">Obj. D</button>
+                        <button class="btn-script" onclick="mostrarScript('objecion-e')">Obj. E</button>
+                        <button class="btn-script" onclick="mostrarScript('objecion-f')">Obj. F</button>
+                        <button class="btn-script" onclick="mostrarScript('cierre')">Cierre</button>
+                        <button class="btn-script" onclick="mostrarScript('p1')">P1</button>
+                        <button class="btn-script" onclick="mostrarScript('p2')">P2</button>
+                        <button class="btn-script" onclick="mostrarScript('p3')">P3</button>
+                        <button class="btn-script" onclick="mostrarScript('p4')">P4</button>
+                        <button class="btn-script" onclick="mostrarScript('p5')">P5</button>
+                        <button class="btn-script" onclick="mostrarScript('p6')">P6</button>
+                    </div>
+                    <div id="script-cliente-display" class="script-cliente" style="display:none;"></div>
+                    <div id="script-content" class="script-box"></div>
+                    <div id="script-tips-display" class="script-tips" style="display:none;"></div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="copy-btn" onclick="copiarScript()">📋 Copiar Script</button>
+                        <button class="btn-editar-script" onclick="abrirEditorScript()">✏️ Editar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TAB ASIGNAR CLIENTES -->
+            <div id="tab-importar" class="tab-content">
+                <div class="info-box">
+                    ✅ <strong>525 clientes cargados:</strong> 450 Credifin (🟢) + 75 Sin Credifin (🟡) | Filtros funcionan en tiempo real
+                </div>
+                
+                <div class="main-grid">
+                    <div class="card">
+                        <h2>👤 Mis Vendedores</h2>
+                        <div class="vendedores-grid" id="vendedores-list"></div>
+                        <hr style="margin: 15px 0; border: none; border-top: 1px solid #ddd;">
+                        <div class="form-group">
+                            <label>➕ Agregar Nuevo Vendedor</label>
+                            <input type="text" id="nuevo-vendedor" placeholder="Nombre del vendedor" onkeypress="if(event.key==='Enter')agregarVendedor()">
+                        </div>
+                        <button class="btn-primary" onclick="agregarVendedor()" style="width: 100%;">Agregar Vendedor</button>
+                    </div>
+                    
+                    <div>
+                        <!-- CREDIFIN -->
+                        <div class="seccion-tipo seccion-credifin">
+                            <h3>🟢 CREDIFIN (450 Clientes)</h3>
+                            <div class="filtros">
+                                <input type="text" id="filtro-cred-nombre" placeholder="Nombre" onkeyup="filtrarCredifin()" autocomplete="off">
+                                <select id="filtro-cred-provincia" onchange="filtrarCredifin()"><option value="">Todas las provincias</option></select>
+                                <input type="text" id="filtro-cred-ciudad" placeholder="Ciudad" onkeyup="filtrarCredifin()" autocomplete="off">
+                                <input type="text" id="filtro-cred-telefono" placeholder="Teléfono" onkeyup="filtrarCredifin()" autocomplete="off">
+                            </div>
+                            <div style="margin-bottom: 8px; display: flex; gap: 8px;">
+                                <label style="flex: 1;"><input type="checkbox" id="check-cred" onchange="cambiarTodosCred()" style="width: auto;"> Sel. Todo</label>
+                                <button class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="deselTodosCred()">Deseleccionar</button>
+                            </div>
+                            <div class="tabla-selector">
+                                <table>
+                                    <thead>
+                                        <tr><th style="width: 30px;"><input type="checkbox" id="check-cred-header" onchange="cambiarTodosCred()" style="width: auto;"></th><th>Nombre</th><th>Provincia</th><th>Ciudad</th><th>Teléfono</th></tr>
+                                    </thead>
+                                    <tbody id="tabla-cred"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- SIN CREDIFIN -->
+                        <div class="seccion-tipo seccion-sin" style="margin-top: 20px;">
+                            <h3>🟡 SIN CREDIFIN (75 Clientes)</h3>
+                            <div class="filtros">
+                                <input type="text" id="filtro-sin-nombre" placeholder="Nombre" onkeyup="filtrarSin()" autocomplete="off">
+                                <select id="filtro-sin-provincia" onchange="filtrarSin()"><option value="">Todas las provincias</option></select>
+                                <input type="text" id="filtro-sin-ciudad" placeholder="Ciudad" onkeyup="filtrarSin()" autocomplete="off">
+                                <input type="text" id="filtro-sin-telefono" placeholder="Teléfono" onkeyup="filtrarSin()" autocomplete="off">
+                            </div>
+                            <div style="margin-bottom: 8px; display: flex; gap: 8px;">
+                                <label style="flex: 1;"><input type="checkbox" id="check-sin" onchange="cambiarTodosSin()" style="width: auto;"> Sel. Todo</label>
+                                <button class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="deselTodosSin()">Deseleccionar</button>
+                            </div>
+                            <div class="tabla-selector">
+                                <table>
+                                    <thead>
+                                        <tr><th style="width: 30px;"><input type="checkbox" id="check-sin-header" onchange="cambiarTodosSin()" style="width: auto;"></th><th>Nombre</th><th>Provincia</th><th>Ciudad</th><th>Teléfono</th></tr>
+                                    </thead>
+                                    <tbody id="tabla-sin"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <button class="btn-asignar" id="btn-asignar" onclick="asignarClientes()" style="margin-top: 20px;">✅ Asignar Clientes al </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TAB  -->
+            <div id="tab-" class="tab-content">
+                <div class="export-buttons">
+                    <button class="btn-export" onclick="exportarAExcel()">📥 Descargar Mi  (Excel)</button>
+                    <button class="btn-export btn-export-secondary" onclick="exportarTodos()">📥 Descargar Todos en  (Excel)</button>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3 id="-total">0</h3>
+                        <p>Clientes en </p>
+                    </div>
+                    <div class="stat-card" style="border-left-color: #28a745;">
+                        <h3 id="-credifin" style="color: #28a745;">0</h3>
+                        <p>Credifin</p>
+                    </div>
+                    <div class="stat-card" style="border-left-color: #f0ad4e;">
+                        <h3 id="-sin" style="color: #f0ad4e;">0</h3>
+                        <p>Sin Credifin</p>
+                    </div>
+                </div>
+                
+                <div class="main-grid">
+                    <div id="sin-vendedor-" class="sin-vendedor">
+                        <p>⚠️ Selecciona un vendedor en "Asignar Clientes" para ver tu </p>
+                    </div>
+                    <div id="con-vendedor-" style="display:none;">
+                        <div class="card">
+                            <h2 id="vendedor--nombre">Mi </h2>
+                            <input type="text" id="filtro-" placeholder="🔍 Buscar en ..." onkeyup="filtrar()" autocomplete="off" style="margin-bottom: 10px;">
+                            <div class="cliente-list" id="-clientes-list"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="-detail"></div>
+                </div>
+            </div>
+            
+            <!-- TAB EXPORTAR -->
+            <div id="tab-exportar" class="tab-content">
+                <div class="card">
+                    <h2>📥 Exportar Datos</h2>
+                    
+                    <div class="export-buttons">
+                        <button class="btn-export" onclick="exportarCredifin()">
+                            🟢 Exportar CREDIFIN (450)
+                        </button>
+                        <button class="btn-export btn-export-secondary" onclick="exportarSinCredifin()">
+                            🟡 Exportar SIN CREDIFIN (75)
+                        </button>
+                        <button class="btn-export" style="background: #dc3545;" onclick="exportarTodos()">
+                            📊 Exportar TODO (525)
+                        </button>
+                    </div>
+                    
+                    <hr style="margin: 20px 0; border: none; border-top: 2px solid #ddd;">
+                    
+                    <h3 style="font-size: 16px; margin-bottom: 15px; color: #1a1a2e;">📋 Otros Exportes</h3>
+                    
+                    <div class="export-buttons">
+                        <button class="btn-primary" onclick="exportarVendedores()">
+                            👥 Exportar Vendedores
+                        </button>
+                        <button class="btn-primary" onclick="exportarScripts()">
+                            📝 Exportar Scripts (JSON)
+                        </button>
+                    </div>
+                    
+                    <div class="info-box" style="margin-top: 20px;">
+                        <strong>ℹ️ Cómo funciona:</strong><br>
+                        • Haz clic en cualquier botón para descargar automáticamente<br>
+                        • Los datos se exportan en formato Excel (.xlsx)<br>
+                        • Los scripts se exportan en JSON para respaldo<br>
+                        • Todo lo que descargas está 100% guardado en tu navegador
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TAB CARGAR EXCEL -->
+            <div id="tab-cargar" class="tab-content">
+                <div class="card">
+                    <h2>📁 Cargar Nuevo Excel</h2>
+                    <div class="import-section">
+                        <h3>⚡ Importar Clientes desde Excel</h3>
+                        <p style="font-size: 12px; color: #555; margin-bottom: 15px;">
+                            📋 Sube tu archivo Excel con las columnas: Nombre, Provincia, Ciudad, Email, Teléfono
+                        </p>
+                        <input type="file" id="excel-input" accept=".xlsx,.xls" style="margin-bottom: 10px;">
+                        <button class="import-btn btn-primary" onclick="cargarExcel()">📤 Cargar Excel</button>
+                        <p id="excel-status" style="font-size: 12px; color: #666; margin-top: 10px;"></p>
+                    </div>
+                    
+                    <div class="card" style="background: #f9f9f9; margin-top: 20px;">
+                        <h3 style="font-size: 14px; color: #1a1a2e; margin-bottom: 10px;">📊 Estado Actual de Clientes</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                            <div style="text-align: center; padding: 15px; background: white; border-radius: 6px; border-left: 4px solid #28a745;">
+                                <div style="font-size: 24px; font-weight: bold; color: #28a745;" id="count-credifin">450</div>
+                                <div style="font-size: 12px; color: #666; margin-top: 5px;">Credifin</div>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: white; border-radius: 6px; border-left: 4px solid #f0ad4e;">
+                                <div style="font-size: 24px; font-weight: bold; color: #f0ad4e;" id="count-sin">75</div>
+                                <div style="font-size: 12px; color: #666; margin-top: 5px;">Sin Credifin</div>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: white; border-radius: 6px; border-left: 4px solid #0066cc;">
+                                <div style="font-size: 24px; font-weight: bold; color: #0066cc;" id="count-total">525</div>
+                                <div style="font-size: 12px; color: #666; margin-top: 5px;">TOTAL</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITOR SCRIPTS -->
+    <div id="editor-modal" class="editor-modal" style="display:none;" onclick="if(event.target===this)cerrarEditorScript()">
+        <div class="editor-contenido">
+            <h3 id="editor-titulo">Editar Script</h3>
+            <div class="form-group">
+                <label>Cliente (opcional - lo que dice el cliente)</label>
+                <input type="text" id="editor-cliente" placeholder="Ej: ❌ Cliente dice: '...'">
+            </div>
+            <div class="form-group">
+                <label>Script (lo que decís vos)</label>
+                <textarea id="editor-texto" style="min-height: 200px; font-family: 'Courier New', monospace;"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Tips / Consejos</label>
+                <textarea id="editor-tips" style="min-height: 100px;"></textarea>
+            </div>
+            <div class="editor-btn-row">
+                <button class="btn-guardar" onclick="guardarScriptEditado()">💾 Guardar</button>
+                <button class="btn-cancelar" onclick="cerrarEditorScript()">✖ Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <script>
+        // ============================================================
+        // SCRIPTS DE VENTA - Totalmente editables y guardables
+        // ============================================================
+        
+        const scripts = {
+            'presentacion': { cliente: '', texto: `Hola, ¿qué tal? ¿Hablo con [Nombre del dueño/encargado]?\n\nQué tal, [Nombre], te saluda [Nombre del vendedor] de la marca Samurai.\n\nTe llamaba porque estamos expandiendo nuestra red de distribución oficial en tu zona.\n\nNosotros nos dedicamos exclusivamente a abastecer a bicicleterías con stock real, sin competencia retail en tu zona.\n\nTe cuento brevemente cómo trabajamos:\n\n• Cero competencia: No le vendemos jamás al consumidor final.\n• Exclusividad de zona: Si armamos la cuenta con vos, respetamos tu radio.\n• Logística bonificada: Te la dejamos puesta sin costo de envío.\n\n¿Cómo te trata la temporada por allá?`, tips: '💡 Detecta quién toma decisiones. Abre con confianza mayorista. Enfatiza exclusividad y flete gratis.' },
+            'objecion-a': { cliente: '❌ "No estoy vendiendo, el mostrador está parado"', texto: 'Te entiendo perfectamente. Cuando el mostrador está más tranquilo, el secreto no es dejar vacía la bicicletería, sino rotar con productos que llamen la atención.\n\nNosotros te resolvemos eso: flete gratis y plazos con cheques a 30, 60, 90 y hasta 120 días.\n\nPonés las bicis en la vidriera, las vendés, y después las pagás. ¿Qué modelos te están faltando hoy?', tips: '💡 Convierte la objeción en oportunidad. Ofrece financiamiento flexible. Pregunta qué modelos específicos le faltan.' },
+            'objecion-b': { cliente: '❌ "Ya tengo cubierto el stock con otras marcas"', texto: 'Buenísimo que estés stockeado, habla muy bien de tu negocio. Esas son marcas instaladas, pero hoy tenés un problema: te compiten directo al público en la web.\n\nLo que te propongo con Samurai y Bowie no es que dejes lo que tenés, sino que sumes una alternativa donde vos manejás el precio y tenés la zona asegurada.\n\nSi vos me comprás a mí, tu competencia no va a tener la misma bici. ¿Te mando el catálogo digital?', tips: '💡 No compitás en precio, compitá en exclusividad. Posicionate como complemento con valor agregado.' },
+            'objecion-c': { cliente: '❌ "El flete al interior me mata el costo"', texto: 'Olvidate de eso, ese costo corre por nuestra cuenta. Nosotros tenemos envío gratuito a casi todo el país a través de Credifin.\n\nLa bici te llega a la puerta de tu local y el renglón de flete en tu costo es cero. El precio que ves es el precio final.\n\n¿En qué zona exacta estás así te confirmo la frecuencia de entrega?', tips: '💡 Cierra la objeción logística. Reconfirma que el flete está 100% cubierto.' },
+            'objecion-d': { cliente: '❌ "Está muy caro, me parece que la otra marca me lo vende más barato"', texto: 'Entiendo, [Nombre]. Pero fijate bien en qué estamos comparando. Si ves un precio más bajo en la web, es porque ese proveedor le vende directo al público. Vos estás pagando mayorista.\n\nCon nosotros vos ganás:\n\n• Margen protegido: Tu competencia no tiene la misma bici.\n• Rotación rápida: La estética de Samurai se vende sola.\n• Financiación flexible: Cheques a 30, 60, 90 días.\n\nNo es "más caro", es mejor negocio. ¿Armamos un pedido pequeño para que compruebes?', tips: '💡 No bajes precio, sube valor. Reencuadra "caro" como "mejor inversión".' },
+            'objecion-e': { cliente: '❌ "No me cierres con tanta información"', texto: 'Dale, vamos a lo importante: modelos que rotan solos, flete gratis, plazos que te permiten vender y después pagar.\n\n¿Con qué te quedo más cómodo?', tips: '💡 Simplifica. Ofrece opciones claras y cierra rápido.' },
+            'objecion-f': { cliente: '❌ "¿Qué pasa si no logro vender? ¿Vos me sacás la mercadería?"', texto: 'Buena pregunta, [Nombre]. Mira, nosotros no hacemos devoluciones porque la bici Samurai rota sola.\n\nPero te doy algo mejor que eso:\n\nPrimero: te mando cantidad chica, 5 o 10 unidades.\nSegundo: vos pagás con cheques a 30, 60, 90 días.\nTercero: si algo no funciona, hablamos.\n\n¿Me entendés? Es bajo riesgo.', tips: '💡 Convierte el miedo en confianza. Cantidad chica + financiación = bajo riesgo.' },
+            'cierre': { cliente: '', texto: 'Bueno [Nombre], para arrancar y que pruebes cómo responden las marcas en tu vidriera, armemos un pedido inicial chico con los modelos que más están saliendo.\n\nComo queremos que veas que somos socios flexibles, te puedo abrir la jugada con la financiación: lo armamos con pago combinado o me estiro a los cheques a 30 y 60 días.\n\n¿Te armo la nota de pedido con 5 o con 10 unidades para aprovechar el camión?', tips: '💡 Cierra con opciones, no con "sí o no". Menciona el camión para crear urgencia.' },
+            'p1': { cliente: '❓ "¿Qué stock tienen? ¿Tienen para entregar ya?"', texto: 'Sí, [Nombre], tenemos stock disponible ahora mismo para despachar esta semana.\n\nLos modelos más fuertes en este momento son la línea Gozen y Shonen — son los que más están saliendo en varios talles y colores.\n\n¿Te cuento cuáles son los más pedidos esta temporada?', tips: '💡 Confirmá disponibilidad sin dudar. Menciona modelos concretos.' },
+            'p2': { cliente: '❓ "¿Qué modelos tienen? ¿Me podés mandar el catálogo?"', texto: 'Claro, [Nombre], te mando el catálogo digital por WhatsApp ahora mismo.\n\nPero para que no pierdas tiempo, te cuento cuáles son los top vendedores: la Samurai Gozen tiene una estética que entra por los ojos; y la línea Shonen es ideal para el segmento infantil y juvenil.\n\n¿Cuál es el perfil de tu cliente habitual?', tips: '💡 No te limites al catálogo. Haz una recomendación personalizada.' },
+            'p3': { cliente: '❓ "¿Cuánto es la inversión inicial? ¿Cuánto tengo que desembolsar?"', texto: '[Nombre], lo bueno de arrancar con nosotros es que no necesitás hacer una inversión grande.\n\nPara probar cómo responden, podés arrancar con un pedido chico de 5 a 10 unidades.\n\nY lo mejor: no lo pagás hoy. Manejamos cheques a 30, 60 y hasta 90 días.\n\n¿Te cuento cuánto sería el pedido inicial?', tips: '💡 Quitá el miedo al desembolso. Enfatiza que no se paga al contado.' },
+            'p4': { cliente: '❓ "¿Me dán cuotas? ¿Cómo es el financiamiento?"', texto: 'Sí, [Nombre], trabajamos con financiación flexible en cheques.\n\nEl esquema estándar es a 30, 60 y 90 días. Para pedidos de mayor volumen podemos estirarnos hasta 120 días.\n\nLa idea es que el financiamiento se calce con tu flujo de caja: vos vendés, cobrás, y con eso me pagás a mí.\n\n¿Con qué plazo te quedarías más cómodo?', tips: '💡 Explicá el sistema con claridad. Cheques, no tarjeta.' },
+            'p5': { cliente: '❓ "¿Tienen garantía las bicis? ¿Qué pasa si algo llega con falla?"', texto: 'Sí, [Nombre], las bicis tienen garantía por defectos de fábrica.\n\nCualquier desperfecto lo manejamos nosotros. Si una unidad llega con algún problema, me avisás, sacamos fotos o video y lo resolvemos.\n\nAdemás, los repuestos de la línea Samurai y Bowie tienen buena disponibilidad.\n\n¿Eso te da más tranquilidad?', tips: '💡 Sé directo: hay garantía, se resuelve rápido, repuestos disponibles.' },
+            'p6': { cliente: '❓ "¿Tienen soporte técnico? ¿Si mi técnico necesita ayuda?"', texto: '[Nombre], los repuestos de Samurai y Bowie están disponibles para que cualquier técnico los consiga sin drama.\n\nSi tu técnico necesita orientación sobre algún modelo, nos puede contactar directo y lo guiamos. No te dejamos colgado.\n\nPara pedidos armados o con adaptación puntual, lo coordinamos antes del despacho.\n\n¿Tu local tiene técnico propio?', tips: '💡 Transmití soporte post-venta real. Nombrá disponibilidad de repuestos.' }
+        };
+        
+        // Variables globales
+        let scriptTipoActual = null;
+        let scriptActualObj = null;
+        let vendedorActivo = '';
+        let clienteActualesList = [];
+        let clienteSeleccionado = null;
+        
+        // Datos cargados
+        const CLIENTES_CREDIFIN = [{"id": 0, "nombre": "FERNANDEZ MARIO ANTONIO", "provincia": "Buenos Aires", "ciudad": "Azul", "email": "bicimundo2002@hotmail.com", "telefono": "2281532444", "tipo": "Credifin"}, {"id": 1, "nombre": "MICHELLI GUSTAVO ALCIDES", "provincia": "Buenos Aires", "ciudad": "Tandil", "email": "michelligustavo@yahoo.com.ar", "telefono": "+54 249 455-0789", "tipo": "Credifin"}, {"id": 2, "nombre": "AGUERO LAUREANO ALIDES", "provincia": "Buenos Aires", "ciudad": "Azul", "email": "lauchaazul@hotmail.com", "telefono": "2281410059", "tipo": "Credifin"}, {"id": 3, "nombre": "DIAZ PABLO ARIEL", "provincia": "Buenos Aires", "ciudad": "Junin", "email": "motosbenitojunin@gmail.com", "telefono": "+54 236 453-4087", "tipo": "Credifin"}, {"id": 4, "nombre": "PELIZZA PABLO MARIANO", "provincia": "Buenos Aires", "ciudad": "Junin", "email": "bikeshopjunin@gmail.com", "telefono": "2364334453", "tipo": "Credifin"}, {"id": 5, "nombre": "MAGGIORA MATIAS DAVID", "provincia": "Buenos Aires", "ciudad": "Tres Arroyos", "email": "matiasmaggiora@live.com.ar", "telefono": "2983585026", "tipo": "Credifin"}, {"id": 6, "nombre": "RANUCCI ANA ELISABET", "provincia": "Buenos Aires", "ciudad": "Pergamino", "email": "bikesrmpichin@yahoo.com.ar", "telefono": "2477 61-1612//247768141", "tipo": "Credifin"}, {"id": 7, "nombre": "BARRIO EVE DALILA", "provincia": "Buenos Aires", "ciudad": "Tres Arroyos", "email": "lindybarrio@yahoo.com.ar", "telefono": "2983416466", "tipo": "Credifin"}, {"id": 8, "nombre": "MARTINEZ JAVIER OSVALDO", "provincia": "Chaco", "ciudad": "Resistencia", "email": "javi1552@gmail.com", "telefono": "3624227081", "tipo": "Credifin"}, {"id": 9, "nombre": "CERRUDO MONICA EVELYN", "provincia": "Chaco", "ciudad": "Resistencia", "email": "rodalberdi@hotmail.com", "telefono": "3624534328", "tipo": "Credifin"}, {"id": 10, "nombre": "AYALA HILDA SILVANA", "provincia": "Chaco", "ciudad": "Barranqueras", "email": "silvanaayala1981@gmail.com", "telefono": "3624485740", "tipo": "Credifin"}, {"id": 11, "nombre": "VALIENTE ROXANA", "provincia": "Chaco", "ciudad": "Barranqueras", "email": "romerojd67@gmail.com", "telefono": "3624653746", "tipo": "Credifin"}, {"id": 12, "nombre": "CHIQURAS SA", "provincia": "Chaco", "ciudad": "Resistencia", "email": "bebeschiquras@hotmail.com", "telefono": "3731421357", "tipo": "Credifin"}, {"id": 13, "nombre": "BICI MAX SA", "provincia": "Chaco", "ciudad": "Resistencia", "email": "bicimax@hotmail.com", "telefono": "+54 362 461-8144", "tipo": "Credifin"}, {"id": 14, "nombre": "BRIANTE RAFAEL OMAR", "provincia": "Buenos Aires", "ciudad": "Chivilcoy", "email": "rodadosbriante@hotmail.com", "telefono": "+54 9 2346 65-8357", "tipo": "Credifin"}, {"id": 15, "nombre": "YANNELLI NESTOR MARCELO", "provincia": "Buenos Aires", "ciudad": "Berazategui", "email": "yancenbike2007@gmail.com", "telefono": "+54 11 6103-9430", "tipo": "Credifin"}, {"id": 16, "nombre": "DEUS JAVIER EDUARDO", "provincia": "Buenos Aires", "ciudad": "9 De Julio", "email": "dbikes.9dejulio@gmail.com", "telefono": "+54 9 2317 47-0748", "tipo": "Credifin"}, {"id": 17, "nombre": "CURA KARINA ELIZABETH", "provincia": "Buenos Aires", "ciudad": "Tandil", "email": "salustandil@hotmail.com", "telefono": "+54 249 421-3229", "tipo": "Credifin"}, {"id": 18, "nombre": "PRIETO JULIAN", "provincia": "Buenos Aires", "ciudad": "Tres Arroyos", "email": "ccjrs@outlook.com", "telefono": "+54 2983 61-0343", "tipo": "Credifin"}, {"id": 19, "nombre": "RODAVAS S.A", "provincia": "Buenos Aires", "ciudad": "Chivilcoy", "email": "rodavas2004@yahoo.com.ar", "telefono": "+54 9 2346 50-8127", "tipo": "Credifin"}, {"id": 20, "nombre": "BARRITTA MARIANO GABRIEL Y BARRITTA GUSTAVO PASCUAL S.DE H.", "provincia": "Buenos Aires", "ciudad": "Lanus", "email": "b.mariano@racerbikes.com.ar", "telefono": "+54 11 3084-1704", "tipo": "Credifin"}, {"id": 21, "nombre": "BICICLETAS PIONEER SA", "provincia": "Buenos Aires", "ciudad": "San Justo", "email": "tadeo.tolosa@hotmail.com", "telefono": "+54 9 11 4199-0665", "tipo": "Credifin"}, {"id": 22, "nombre": "BENITEZ RAMON DANIEL", "provincia": "Chaco", "ciudad": "Resistencia", "email": "drb_competicion@hotmail.com", "telefono": "+54 9 362 439-6818", "tipo": "Credifin"}, {"id": 23, "nombre": "GOMEZ MARIO", "provincia": "Chaco", "ciudad": "Fontana", "email": "mariogomez.33.1951@gmail.com", "telefono": "3624887310", "tipo": "Credifin"}, {"id": 24, "nombre": "IMHOFF NESTOR ROGELIO", "provincia": "Chaco", "ciudad": "Resistencia", "email": "rodadosimhoff@hotmail.com.ar", "telefono": "+54 362 433-3266", "tipo": "Credifin"}, {"id": 25, "nombre": "BENITEZ RAMON OSCAR", "provincia": "Chaco", "ciudad": "Barranqueras", "email": "oscarramonbenitez@hotmail.com", "telefono": "3624746422", "tipo": "Credifin"}, {"id": 26, "nombre": "TRABALON GREGORIO ALEJANDRO", "provincia": "Chaco", "ciudad": "Presidencia Roque Saenz Peña", "email": "trabgoyo@gmail.com", "telefono": "3644501000", "tipo": "Credifin"}, {"id": 27, "nombre": "STEKETEE ROBERTO JOSE", "provincia": "Chaco", "ciudad": "Charata", "email": "silviaitati.gorocito@gmail.com", "telefono": "+54 9 362 406-4212", "tipo": "Credifin"}, {"id": 28, "nombre": "AGUIRRE BERNARDO MERCEDES", "provincia": "Chaco", "ciudad": "Presidencia De La Plaza", "email": "repuestosplaza@live.com.ar", "telefono": "+54 3734 41-7194", "tipo": "Credifin"}, {"id": 29, "nombre": "SAEZ CARLOS ARIEL", "provincia": "Chaco", "ciudad": "Presidencia Roque Saenz Peña", "email": "casasaezsp@gmail.com", "telefono": "3644342498", "tipo": "Credifin"}, {"id": 30, "nombre": "ARCHILLA MONTEAVARO EMANUEL ELIAS", "provincia": "Chaco", "ciudad": "Presidencia Roque Saenz Peña", "email": "emanuelarchilla@gmail.com", "telefono": "+54 364 446-4378", "tipo": "Credifin"}, {"id": 31, "nombre": "QUIROZ WALTER MARCELO", "provincia": "Chaco", "ciudad": "Coronel Du Graty", "email": "casamarcel@hotmail.com", "telefono": "+54 3735 40-3213", "tipo": "Credifin"}, {"id": 32, "nombre": "BORDON HORACIO JAVIER", "provincia": "Chaco", "ciudad": "Fontana", "email": "Cintiaalmada72@icloud.com", "telefono": "+54 9 362 436-1317", "tipo": "Credifin"}, {"id": 33, "nombre": "LALOMIA PABLO ALBERTO", "provincia": "Chaco", "ciudad": "Charata", "email": "koldrita@hotmail.com", "telefono": "+54 3731 50-4141", "tipo": "Credifin"}, {"id": 34, "nombre": "NAVARRETE ENRIQUE ALFREDO", "provincia": "Chaco", "ciudad": "Machagai", "email": "navarrete_hogar@hotmail.com", "telefono": "3734605438", "tipo": "Credifin"}, {"id": 35, "nombre": "VEGA MATIAS FELIX", "provincia": "Chaco", "ciudad": "Presidencia Roque Saenz Peña", "email": "matifelixvega@gmail.com", "telefono": "+54 364 471-8584", "tipo": "Credifin"}, {"id": 36, "nombre": "GONZALEZ ALBERTO JOSE", "provincia": "Chaco", "ciudad": "Quitilipi", "email": "famarhogar@gmail.com", "telefono": "+54 364 445-8373", "tipo": "Credifin"}, {"id": 37, "nombre": "MARTINEZ MIRIAM ROSALIA", "provincia": "Chaco", "ciudad": "General Vedia", "email": "mir_ros1819@hotmail.com", "telefono": "+54 9 362 521-9303", "tipo": "Credifin"}, {"id": 38, "nombre": "LOPEZ ANTONIO AMADEO", "provincia": "Chaco", "ciudad": "La Escondida", "email": "amadeo82@hotmail.com.ar", "telefono": "3624865183", "tipo": "Credifin"}, {"id": 39, "nombre": "GARCIA PERLA ROSA", "provincia": "Chaco", "ciudad": "Villa Angela", "email": "casamaurova@hotmail.com", "telefono": "3735420463", "tipo": "Credifin"}, {"id": 40, "nombre": "MAIDANA MERCEDES GLADYS", "provincia": "Chaco", "ciudad": "Colonia Popular", "email": "baldovinoalejandro25@gmail.com", "telefono": "3624629314", "tipo": "Credifin"}, {"id": 41, "nombre": "OVIEDO ROCIO GISELA", "provincia": "Chaco", "ciudad": "Makalle", "email": "rociomak@hotmail.com", "telefono": "+54 9 362 430-8800", "tipo": "Credifin"}, {"id": 42, "nombre": "DOPSLAFF KOBERSTEIN MARISEL", "provincia": "Chaco", "ciudad": "Coronel Du Graty", "email": "mueblesjamara@gmail.com", "telefono": "+54 3735 60-1613", "tipo": "Credifin"}, {"id": 43, "nombre": "TREPPO DANIELA VERONICA", "provincia": "Chaco", "ciudad": "Margarita Belen", "email": "danielatreppo@hotmail.com", "telefono": "+54 9 362 454-5206", "tipo": "Credifin"}, {"id": 44, "nombre": "GOMEZ NATALIA ANABEL", "provincia": "Chaco", "ciudad": "General Jose De San Martin", "email": "casaalbertogomez@yahoo.com.ar", "telefono": "+54 9 3725 41-3049", "tipo": "Credifin"}, {"id": 45, "nombre": "TODO MOTO SRL", "provincia": "Chaco", "ciudad": "Machagai", "email": "todomotosrl@hotmail.com", "telefono": "3734447770", "tipo": "Credifin"}, {"id": 46, "nombre": "WIN SA", "provincia": "Chaco", "ciudad": "Resistencia", "email": "adm.winsas@gmail.com", "telefono": "+54 362 515-3334", "tipo": "Credifin"}, {"id": 47, "nombre": "TIO PASCUAL SAS", "provincia": "Chaco", "ciudad": "Las Breñas", "email": "Stancheff motors@gmail.com", "telefono": "+54 3731 49-3950", "tipo": "Credifin"}, {"id": 48, "nombre": "NOSSTRA", "provincia": "Chaco", "ciudad": "Fontana", "email": "josefinarolfi@hotmail.com", "telefono": "+54 9 362 468-1472", "tipo": "Credifin"}, {"id": 49, "nombre": "FORBIKES SRL", "provincia": "Chaco", "ciudad": "RESISTENCIA", "email": "bebeschiquras@hotmail.com", "telefono": "+54 3731 42-1357", "tipo": "Credifin"}, {"id": 50, "nombre": "BERNAL ALBERTO AGUSTIN", "provincia": "Chaco", "ciudad": "Basail", "email": "gonza.92.gb80@gmail.com", "telefono": "+54 362 464-0897", "tipo": "Credifin"}, {"id": 51, "nombre": "SZPIGA SAMUEL SENOBIO", "provincia": "Chaco", "ciudad": "La Clotilde", "email": "samuelszpiga@hotmail.com", "telefono": "+54 9 3735 45-5909", "tipo": "Credifin"}, {"id": 52, "nombre": "BORTKIEWICZ SERGIO MANUEL", "provincia": "Chaco", "ciudad": "Villa Angela", "email": "sergio_bortkiewicz@hotmail.com", "telefono": "+54 3735 40-4268", "tipo": "Credifin"}, {"id": 53, "nombre": "CAMARASA EMILIANO FERNANDO", "provincia": "Chaco", "ciudad": "Resistencia", "email": "gerencia@credivip.com.ar", "telefono": "+54 9 362 473-0350", "tipo": "Credifin"}, {"id": 54, "nombre": "CANO ROBERTO NICOLAS", "provincia": "Chaco", "ciudad": "Puerto Vilelas", "email": "Canonicolas32@gmail.com", "telefono": "+54 9 362 471-6232", "tipo": "Credifin"}, {"id": 55, "nombre": "MONZON CESAR OSMAR", "provincia": "Chaco", "ciudad": "Resistencia", "email": "Cesar.osmon@gmail.com", "telefono": "+54 9 362 429-1771", "tipo": "Credifin"}, {"id": 56, "nombre": "FOGAR JAVIER ALEJANDRO", "provincia": "Chaco", "ciudad": "Presidencia Roque Saenz Peña", "email": "javierfogar@gmail.com", "telefono": "+54 9 364 437-1187", "tipo": "Credifin"}, {"id": 57, "nombre": "MOSSO MAYCO ALEXIS", "provincia": "Chaco", "ciudad": "General Jose De San Martin", "email": "ecomosso.ar@gmail.com", "telefono": "+54 9 3725 40-0561, +54 9 3725 48-0757", "tipo": "Credifin"}, {"id": 58, "nombre": "RIQUELME PEDRO JUAN CARLOS", "provincia": "Chaco", "ciudad": "Colonia Unidas", "email": "pedrojuancarlos3624@gmail.com", "telefono": "+54 3725 41-7687", "tipo": "Credifin"}, {"id": 59, "nombre": "BARRIONUEVO RODOLFO PABLO", "provincia": "Chaco", "ciudad": "Presidencia Roque Saenz Peña", "email": "bienestarconfort@hotmail.com", "telefono": "+54 9 364 465-0320", "tipo": "Credifin"}, {"id": 60, "nombre": "SALTO TIAGO NICOLAS", "provincia": "Chaco", "ciudad": "Pampa Del Infierno", "email": "horebtecnoyhogar@gmail.com", "telefono": "+54 9 364 413-1052", "tipo": "Credifin"}, {"id": 61, "nombre": "IMBACHI MONTENEGRO VICTOR MARIO", "provincia": "Chaco", "ciudad": "Presidencia Roque Saenz Peña", "email": "jaimesmile285@gmail.com", "telefono": "+54 364 467-4311", "tipo": "Credifin"}, {"id": 62, "nombre": "DUARTE AGUSTINA", "provincia": "Chaco", "ciudad": "Resistencia", "email": "duarte_muebles@hotmail.com", "telefono": "+54 9 362 470-1267", "tipo": "Credifin"}, {"id": 63, "nombre": "HERRERA MONICA ANDREA", "provincia": "Chaco", "ciudad": "Laguna Limpia", "email": "Joelr0599@gmail.com", "telefono": "+54 362 462-5548", "tipo": "Credifin"}, {"id": 64, "nombre": "TIRADO GABRIELA NOEMI", "provincia": "Chaco", "ciudad": "Presidencia De La Plaza", "email": "gabrielatirado2000@gmail.com", "telefono": "+54 3734 41-6010", "tipo": "Credifin"}, {"id": 65, "nombre": "MORDACINI MARIA SOLEDAD", "provincia": "Chaco", "ciudad": "Resistencia", "email": "davidmedina967@gmail.com", "telefono": "+54 9 362 424-0830", "tipo": "Credifin"}, {"id": 66, "nombre": "PELOZO MAYRA BELEN", "provincia": "Chaco", "ciudad": "Presidencia Roque Saenz Peña", "email": "pelozomai8@gmail.com", "telefono": "+54 9 364 430-3887", "tipo": "Credifin"}, {"id": 67, "nombre": "RENACER SOCIEDAD ANONIMA", "provincia": "Chaco", "ciudad": "General Jose De San Martin", "email": "renacersa@hotmail.com.ar", "telefono": "+54 9 362 532-3362", "tipo": "Credifin"}, {"id": 68, "nombre": "NORDESTE GLOBAL SAS", "provincia": "Chaco", "ciudad": "Resistencia", "email": "Lukkasmonzon@gmail.com", "telefono": "30719184029", "tipo": "Credifin"}, {"id": 69, "nombre": "OLIVARES CARLOS ALBERTO", "provincia": "Buenos Aires", "ciudad": "Maquinista Francisco Savio", "email": "gatolivares25@gmail.com", "telefono": "1153690504", "tipo": "Credifin"}, {"id": 70, "nombre": "BOLAÑO JUAN CARLOS", "provincia": "Buenos Aires", "ciudad": "Roberts", "email": "electroroberts@gmail.com", "telefono": "+54 2355 41-0025", "tipo": "Credifin"}, {"id": 71, "nombre": "IRIBARREN JORGE HORACIO", "provincia": "Buenos Aires", "ciudad": "Lujan", "email": "bisavuela@gmail.com", "telefono": "2323340232", "tipo": "Credifin"}, {"id": 72, "nombre": "SIMON JULIO OMAR", "provincia": "Buenos Aires", "ciudad": "Mar De Ajo", "email": "bordenavebike@hotmail.com", "telefono": "2257665813", "tipo": "Credifin"}, {"id": 73, "nombre": "MONTERO LUIS ERNESTO", "provincia": "Buenos Aires", "ciudad": "Punta Alta", "email": "rodadosmanija@yahoo.com.ar", "telefono": "2932516568", "tipo": "Credifin"}, {"id": 74, "nombre": "CONSTANTIN EDUARDO MIGUEL", "provincia": "Buenos Aires", "ciudad": "Hilario Ascasubi", "email": "laboticadelhogar32@gmail.com", "telefono": "2928491149", "tipo": "Credifin"}, {"id": 75, "nombre": "SARANITTES HECTOR DOMINGO", "provincia": "Buenos Aires", "ciudad": "Pergamino", "email": "hector_saranittes@hotmail.com", "telefono": "3462554527", "tipo": "Credifin"}, {"id": 76, "nombre": "RICHEZE OMAR ROBERTO", "provincia": "Buenos Aires", "ciudad": "Bella Vista", "email": "omarricheze@hotmail.com", "telefono": "1146669331", "tipo": "Credifin"}, {"id": 77, "nombre": "MENZO JOSE LUIS TEOFILO", "provincia": "Buenos Aires", "ciudad": "Ciudad Autónoma de Buenos Aires", "email": "bicicleteriamenzobike@hotmail.com", "telefono": "+54 11 4411-7728", "tipo": "Credifin"}, {"id": 78, "nombre": "BARBERA PEDRO ANTONIO", "provincia": "Buenos Aires", "ciudad": "Coronel Pringles", "email": "bicicleteriabarbera@gmail.com", "telefono": "+54 2922 42-1463", "tipo": "Credifin"}, {"id": 79, "nombre": "FARIS GUSTAVO ALBERTO", "provincia": "Buenos Aires", "ciudad": "Adrogue", "email": "gustavofaris@hotmail.com", "telefono": "1158816893", "tipo": "Credifin"}, {"id": 80, "nombre": "GIANCATERINO JUAN CARLOS", "provincia": "Buenos Aires", "ciudad": "Adolfo Gonzales Chaves", "email": "juangiancaterino94@gmail.com", "telefono": "2494580122", "tipo": "Credifin"}, {"id": 81, "nombre": "REISVIG HUGO JACOBO", "provincia": "Buenos Aires", "ciudad": "Villalonga", "email": "hugoreisvig@hotmail.com", "telefono": "+54 9 291 412-3980", "tipo": "Credifin"}, {"id": 82, "nombre": "STOESSEL ANGEL", "provincia": "Buenos Aires", "ciudad": "Pedro Luro", "email": "angelstoessel28@gmail.com", "telefono": "2916457554", "tipo": "Credifin"}, {"id": 83, "nombre": "IRIARTE GABRIEL", "provincia": "Buenos Aires", "ciudad": "Marcos Paz", "email": "gabrielis1209@gmail.com", "telefono": "2226511018", "tipo": "Credifin"}, {"id": 84, "nombre": "FERNANDEZ AGUIRRE JOSE IGNACIO", "provincia": "Buenos Aires", "ciudad": "America", "email": "mariaantoniavitores@hotmail.com", "telefono": "2392630885", "tipo": "Credifin"}, {"id": 85, "nombre": "PAVON JUAN MARCELO", "provincia": "Buenos Aires", "ciudad": "Carmen De Patagones", "email": "bicicleteriamarcelo@hotmail.com", "telefono": "3624488456", "tipo": "Credifin"}, {"id": 86, "nombre": "DEL GIORGIO MARIO VICTOR", "provincia": "Buenos Aires", "ciudad": "Benito Juarez", "email": "mariodelgiorgio@gmail.com", "telefono": "2281549151", "tipo": "Credifin"}, {"id": 87, "nombre": "LOPEZ ADRIAN HORACIO", "provincia": "Buenos Aires", "ciudad": "Tres Algarrobos", "email": "altelefoniacel@hotmail.com", "telefono": "+54 3388 50-4941", "tipo": "Credifin"}, {"id": 88, "nombre": "ALVAREZ MARTIN ALEJANDRO", "provincia": "Buenos Aires", "ciudad": "Junin", "email": "info@alvarezbikeshop.com.ar", "telefono": "2364641141", "tipo": "Credifin"}, {"id": 89, "nombre": "FULGENCI DANIEL HORACIO", "provincia": "Buenos Aires", "ciudad": "25 De Mayo", "email": "dfulgenci@yahoo.com", "telefono": "+54 2345 46-5791", "tipo": "Credifin"}, {"id": 90, "nombre": "TOMEO ANGEL NORBERTO", "provincia": "Buenos Aires", "ciudad": "Ensenada", "email": "laruedabicicleteria@gmail.com", "telefono": "2215383918", "tipo": "Credifin"}, {"id": 91, "nombre": "ANGULO FABRICIO", "provincia": "Buenos Aires", "ciudad": "San Antonio De Padua", "email": "rodadospadua@gmail.com", "telefono": "2204824622", "tipo": "Credifin"}, {"id": 92, "nombre": "VACCARINI LIONEL GERARDO", "provincia": "Buenos Aires", "ciudad": "Quilmes", "email": "lionelvaccarini@hotmail.com", "telefono": "+54 9 11 5651-1350", "tipo": "Credifin"}, {"id": 93, "nombre": "AGUERO JAUREGUIBERRI LUCAS RAUL", "provincia": "Buenos Aires", "ciudad": "Azul", "email": "lucasazules@yahoo.com.ar", "telefono": "2281599687", "tipo": "Credifin"}, {"id": 94, "nombre": "PRIETO LUCIANO EZEQUIEL", "provincia": "Buenos Aires", "ciudad": "Tres Arroyos", "email": "la.bicicleteria@outlook.com", "telefono": "2983354525", "tipo": "Credifin"}, {"id": 95, "nombre": "FREDES JOSE HERNAN", "provincia": "Buenos Aires", "ciudad": "Rauch", "email": "hernanf13@hotmail.com", "telefono": "1161215486", "tipo": "Credifin"}, {"id": 96, "nombre": "SAUCO FERNANDO", "provincia": "Buenos Aires", "ciudad": "Bragado", "email": "saucofernando@hotmail.com", "telefono": "2342510211", "tipo": "Credifin"}, {"id": 97, "nombre": "FERRADAS EDUARDO GABRIEL", "provincia": "Buenos Aires", "ciudad": "Ezeiza", "email": "royalbikesargentina@gmail.com", "telefono": "1169255178", "tipo": "Credifin"}, {"id": 98, "nombre": "CARACCIOLI LUCIANO ARIEL", "provincia": "Buenos Aires", "ciudad": "General Madariaga", "email": "luchocaraccioli@hotmail.com", "telefono": "+54 9 2267 41-0743", "tipo": "Credifin"}, {"id": 99, "nombre": "PORCHILE TOMAS", "provincia": "Buenos Aires", "ciudad": "Coronel Vidal", "email": "tommyporchi@hotmail.com", "telefono": "+54 223 596-9918", "tipo": "Credifin"}, {"id": 100, "nombre": "FERNANDEZ PRADO MARIANO ANDRES", "provincia": "Buenos Aires", "ciudad": "Tandil", "email": "nanomotos@live.com", "telefono": "2494252727", "tipo": "Credifin"}, {"id": 101, "nombre": "MORENO ALEXIS OMAR", "provincia": "Buenos Aires", "ciudad": "Los Toldos", "email": "indumentaria32bikes@hotmail.com", "telefono": "2355646263", "tipo": "Credifin"}, {"id": 102, "nombre": "RODRIGUEZ MARIANO JOAQUIN", "provincia": "Buenos Aires", "ciudad": "Florencio Varela", "email": "mariano_51094@hotmail.com", "telefono": "1138543879", "tipo": "Credifin"}, {"id": 103, "nombre": "SAUCO EDUARDO NICOLAS", "provincia": "Buenos Aires", "ciudad": "Saladillo", "email": "nicopalomeque30@gmail.com", "telefono": "+54 9 2344 40-2165", "tipo": "Credifin"}, {"id": 104, "nombre": "AYALA JEAN PAUL", "provincia": "Buenos Aires", "ciudad": "Azul", "email": "yampa582@gmail.com", "telefono": "2281349757", "tipo": "Credifin"}, {"id": 105, "nombre": "BARROSO EMANUEL AMADEO", "provincia": "Buenos Aires", "ciudad": "Campana", "email": "emanuelbarroso1997@hotmail.com", "telefono": "+54 3489 62-2712", "tipo": "Credifin"}, {"id": 106, "nombre": "CARRIL FEDERICO AGUSTIN", "provincia": "Buenos Aires", "ciudad": "Monte Grande", "email": "federicoagustincarril@gmail.com", "telefono": "+54 9 11 3919-8678", "tipo": "Credifin"}, {"id": 107, "nombre": "WELANDER GABRIEL ULISES", "provincia": "Buenos Aires", "ciudad": "Villa Gesell", "email": "Zenkoproducciones@gmail.com", "telefono": "+54 9 2255 60-0806", "tipo": "Credifin"}, {"id": 108, "nombre": "LOPEZ FEDERICO DANIEL", "provincia": "Buenos Aires", "ciudad": "Remedios De Escalada", "email": "rodadoslopez.18@gmail.com", "telefono": "+54 11 6675-0296", "tipo": "Credifin"}, {"id": 109, "nombre": "ROMAN NICOLAS LAUTARO", "provincia": "Buenos Aires", "ciudad": "Berazategui", "email": "nlautaro12@gmail.com", "telefono": "+54 11 3600-1231", "tipo": "Credifin"}, {"id": 110, "nombre": "DE CILLIS GUILLERMO ALBERTO", "provincia": "Buenos Aires", "ciudad": "Chascomus", "email": "guilledecillis@yahoo.com.ar", "telefono": "2241496803", "tipo": "Credifin"}, {"id": 111, "nombre": "DIORIO HEIM OSVALDO JAVIER", "provincia": "Buenos Aires", "ciudad": "Chillar", "email": "nz.18.1991@gmail.com", "telefono": "+54 2281 55-3829", "tipo": "Credifin"}, {"id": 112, "nombre": "SCATIZZA CARLOS MARTIN", "provincia": "Buenos Aires", "ciudad": "Jose Clemente Paz", "email": "scatizzamartin@gmail.com", "telefono": "+54 11 3019-2568", "tipo": "Credifin"}, {"id": 113, "nombre": "MIRABELLI PABLO ENRIQUE", "provincia": "Buenos Aires", "ciudad": "Mar De Ajo", "email": "mda_pablo82@hotmail.com", "telefono": "2257617138", "tipo": "Credifin"}, {"id": 114, "nombre": "MORAN ANDREA FABIANA", "provincia": "Buenos Aires", "ciudad": "San Francisco Solano (Quilmes)", "email": "an.f.moran@gmail.com", "telefono": "+54 11 6860-6319", "tipo": "Credifin"}, {"id": 115, "nombre": "TORRES VERONICA PATRICIA", "provincia": "Buenos Aires", "ciudad": "Adrogue", "email": "bicicletasgorriti@hotmail.com", "telefono": "1163535533", "tipo": "Credifin"}, {"id": 116, "nombre": "GIMENEZ AZUCENA EVANGELINA", "provincia": "Buenos Aires", "ciudad": "Chivilcoy", "email": "negrinoviedo@hotmail.com.ar", "telefono": "2346687867", "tipo": "Credifin"}, {"id": 117, "nombre": "JOANDET LETICIA FERNANDA", "provincia": "Buenos Aires", "ciudad": "Moron", "email": "power-bikes@hotmail.com", "telefono": "1160625123", "tipo": "Credifin"}, {"id": 118, "nombre": "ALBERDI LILIAN VICTORIA", "provincia": "Buenos Aires", "ciudad": "Laprida", "email": "rodanii@outlook.com", "telefono": "2284605319", "tipo": "Credifin"}, {"id": 119, "nombre": "MAGNO ESTEFANIA", "provincia": "Buenos Aires", "ciudad": "Pigue", "email": "estefaniamagno.m@gmail.com", "telefono": "2923658452", "tipo": "Credifin"}, {"id": 120, "nombre": "SCATORCIO TAMARA ESTEFANIA", "provincia": "Buenos Aires", "ciudad": "Bragado", "email": "totoguidi1995@gmail.com", "telefono": "+54 9 2342 48-3870", "tipo": "Credifin"}, {"id": 121, "nombre": "MASCIERI NICOLE", "provincia": "Buenos Aires", "ciudad": "Santa Teresita Estafeta Nâº2", "email": "rmascieri@gmail.com", "telefono": "2246519863", "tipo": "Credifin"}, {"id": 122, "nombre": "BELGOR SRL", "provincia": "Buenos Aires", "ciudad": "Villa Libertad", "email": "info@bicicletasliberty.com.ar", "telefono": "1118443304", "tipo": "Credifin"}, {"id": 123, "nombre": "RODADOS NENE DE SAAVEDRA LUIS ALFREDO Y FACUNDO SH", "provincia": "Buenos Aires", "ciudad": "Banfield", "email": "luis-lomaz@hotmail.com", "telefono": "1141998788", "tipo": "Credifin"}, {"id": 124, "nombre": "OTHAR HORACIO ALFREDO Y OTTHAR SUSANA CECILIA S DE H", "provincia": "Buenos Aires", "ciudad": "Rauch", "email": "bicicletasalmar@yahoo.com.ar", "telefono": "+54 249 469-1417", "tipo": "Credifin"}, {"id": 125, "nombre": "EL HUECU S.A.", "provincia": "Buenos Aires", "ciudad": "Olavarria", "email": "olavarria@goldenbike.com.ar; facturacion@goldenbike.com.ar;", "telefono": "2284552489", "tipo": "Credifin"}, {"id": 126, "nombre": "TRADICION HOGAR S. A.", "provincia": "Buenos Aires", "ciudad": "Barrio San Jose", "email": "compras@confortacuario.com.ar", "telefono": "1142151767", "tipo": "Credifin"}, {"id": 127, "nombre": "TU JUGUETERIA SH DE ALFREDO E CROTTI Y ERNESTO A CROTTI", "provincia": "Buenos Aires", "ciudad": "La Plata Sudeste Calle 50 Ambas Veredas", "email": "tujugueteria@hotmail.com", "telefono": "+54 221 501-1507", "tipo": "Credifin"}, {"id": 128, "nombre": "ODEMARSA SA", "provincia": "Buenos Aires", "ciudad": "Saladillo", "email": "cacomartinez@hotmail.com", "telefono": "2345689432", "tipo": "Credifin"}, {"id": 129, "nombre": "LOGUI SH", "provincia": "Buenos Aires", "ciudad": "Pigue", "email": "campanaeugenio@hotmail.com", "telefono": "2923402121", "tipo": "Credifin"}, {"id": 130, "nombre": "ACTIVE TRADE", "provincia": "Buenos Aires", "ciudad": "Villa Dominico", "email": "activestorearg@gmail.com", "telefono": "+54 11 6193-4551", "tipo": "Credifin"}, {"id": 131, "nombre": "RODAEQUIP S.R.L", "provincia": "Buenos Aires", "ciudad": "Luis Guillon", "email": "lucasanjuan77@gmail.com", "telefono": "1141904389", "tipo": "Credifin"}, {"id": 132, "nombre": "PUNTO MOTOR S.R.L.", "provincia": "Buenos Aires", "ciudad": "Alejandro Petion", "email": "Matitorales17@gmail.com", "telefono": "+54 11 4083-4824", "tipo": "Credifin"}, {"id": 133, "nombre": "TECNO SISTEMAS LUJAN S.R.L", "provincia": "Buenos Aires", "ciudad": "Lujan", "email": "nikocaffiero@gmail.com", "telefono": "1149914352", "tipo": "Credifin"}, {"id": 134, "nombre": "MANRIQUE ALBERTO EUGENIO", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "Capital Federal", "email": "aemanrique93@gmail.com", "telefono": "1145232400", "tipo": "Credifin"}, {"id": 135, "nombre": "MARISCAL DAMIAN SERGIO", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "Capital Federal", "email": "mariscaldamian@gmail.com", "telefono": "1156585559", "tipo": "Credifin"}, {"id": 136, "nombre": "MOTONET S.R.L", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "Pilar", "email": "administracion@soulbikers.com.ar; soulbikers@motonet.com.ar", "telefono": "27057839", "tipo": "Credifin"}, {"id": 137, "nombre": "SAS DISTRIBUIDORA S.R.L", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "Ciudad Autonoma de Buenos Aires", "email": "sasdistribuidora@outlook.com", "telefono": "1137741942", "tipo": "Credifin"}, {"id": 138, "nombre": "YAG PRO SRL", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "Capital Federal", "email": "facturacion@goldenbike.com.ar", "telefono": "67080908", "tipo": "Credifin"}, {"id": 139, "nombre": "REYNA CICLISMO SRL", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "Buenos Aires", "email": "administracion@reynaciclismo.com.ar", "telefono": "+54 9 11 6819-1070", "tipo": "Credifin"}, {"id": 140, "nombre": "GBK NORTE SRL", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "Ciudad Autonoma de Buenos Aires", "email": "Juanchihaun@gmail.com", "telefono": "50397053 ,  9 11 5703-5170", "tipo": "Credifin"}, {"id": 141, "nombre": "MASSA CARLOS IGNACIO", "provincia": "Buenos Aires", "ciudad": "San Justo", "email": "info@massabikes.com.ar", "telefono": "+54 11 5812-9991", "tipo": "Credifin"}, {"id": 142, "nombre": "SABADINI MIGUEL ANGEL", "provincia": "Buenos Aires", "ciudad": "Comandante Nicanor Otamendi", "email": "sabadinimiguel@gmail.com", "telefono": "+54 223 543-3388", "tipo": "Credifin"}, {"id": 143, "nombre": "CEREZUELA JUAN ANGEL", "provincia": "Buenos Aires", "ciudad": "Necochea", "email": "cerezuelaja@hotmail.com", "telefono": "+54 9 2262 61-2283", "tipo": "Credifin"}, {"id": 144, "nombre": "MASCIERI ROBERTO", "provincia": "Buenos Aires", "ciudad": "Santa Teresita", "email": "rmascieri@gmail.com", "telefono": "+54 2246 51-9863", "tipo": "Credifin"}, {"id": 145, "nombre": "CAZAUX CLAUDIO ALBERTO", "provincia": "Buenos Aires", "ciudad": "Lobos", "email": "rodadospinocho@hotmail.com", "telefono": "+54 9 2227 55-0061", "tipo": "Credifin"}, {"id": 146, "nombre": "WELANDER GABRIEL WALTER", "provincia": "Buenos Aires", "ciudad": "Villa Gesell", "email": "gwwelander@gmail.com", "telefono": "+54 2255 41-3520", "tipo": "Credifin"}, {"id": 147, "nombre": "BATISTA OSVALDO DANIEL", "provincia": "Buenos Aires", "ciudad": "Villa Ramallo", "email": "bicicleteriablasnelo@gmail.com", "telefono": "+54 3407 40-0917", "tipo": "Credifin"}, {"id": 148, "nombre": "BARLETTA LEONELO MARCELO", "provincia": "Buenos Aires", "ciudad": "Florencio Varela", "email": "bybbikes@gmail.com ", "telefono": "+54 11 2400-1279", "tipo": "Credifin"}, {"id": 149, "nombre": "BARROS GUSTAVO", "provincia": "Buenos Aires", "ciudad": "Carhue", "email": "barrosbikescarhue@hotmail.com", "telefono": "2923505681", "tipo": "Credifin"}, {"id": 150, "nombre": "ARIAS FERNANDO RAUL", "provincia": "Buenos Aires", "ciudad": "Adolfo Gonzales Chaves", "email": "fernandoarias71@hotmail.com", "telefono": "+54 2983 55-4064", "tipo": "Credifin"}, {"id": 151, "nombre": "LOBOSCO ANGEL JAVIER", "provincia": "Buenos Aires", "ciudad": "Trenque Lauquen", "email": "j.lobosco@hotmail.com", "telefono": "+54 2392 40-6874", "tipo": "Credifin"}, {"id": 152, "nombre": "ANDRIOLETTI JORGE LUIS", "provincia": "Buenos Aires", "ciudad": "Valeria Del Mar", "email": "actionbike2000@hotmail.com", "telefono": "+54 2267 44-9045", "tipo": "Credifin"}, {"id": 153, "nombre": "MORALES LEONARDO RAUL", "provincia": "Buenos Aires", "ciudad": "Coronel Brandsen", "email": "leo_morales73@hotmail.com", "telefono": "+54 2223 50-2227", "tipo": "Credifin"}, {"id": 154, "nombre": "CHAAR JOSE DARIO", "provincia": "Buenos Aires", "ciudad": "Ituzaingo", "email": "bicicleteriayahir2@yahoo.com.ar", "telefono": "+54 9 11 5157-4954", "tipo": "Credifin"}, {"id": 155, "nombre": "OLARI JUAN IGNACIO", "provincia": "Buenos Aires", "ciudad": "Rojas", "email": "mecanicajuani@hotmail.com", "telefono": "+54 2474 67-8975", "tipo": "Credifin"}, {"id": 156, "nombre": "ALESSANDRIA MARIANO EZEQUIEL", "provincia": "Buenos Aires", "ciudad": "Libertad", "email": "eltanoalessandria@gmail.com", "telefono": "+54 9 11 3361-2162", "tipo": "Credifin"}, {"id": 157, "nombre": "AMADO DIEGO OMAR", "provincia": "Buenos Aires", "ciudad": "Mar Del Tuyu", "email": "neraydiebesi@gmail.com", "telefono": "+54 11 3497-5394", "tipo": "Credifin"}, {"id": 158, "nombre": "LO CASTRO MATIAS JAVIER", "provincia": "Buenos Aires", "ciudad": "Carlos Casares", "email": "ml.bikes20@gmail.com", "telefono": "+54 2396 51-6317", "tipo": "Credifin"}, {"id": 159, "nombre": "MOTTA ANGEL FERNANDO", "provincia": "Buenos Aires", "ciudad": "Pergamino", "email": "rmbikes@hotmail.com", "telefono": "+54 2477 45-0016", "tipo": "Credifin"}, {"id": 160, "nombre": "ACOSTA GERARDO ADRIAN", "provincia": "Buenos Aires", "ciudad": "Lanus", "email": "julietagrupobaires@gmail.com", "telefono": "+54 11 2303-2607", "tipo": "Credifin"}, {"id": 161, "nombre": "BERZONI GUSTAVO ANIBAL", "provincia": "Buenos Aires", "ciudad": "San Miguel", "email": "gus_bike@hotmail.com", "telefono": "+54 11 6041-5186", "tipo": "Credifin"}, {"id": 162, "nombre": "CABALLERO MARCELO DAVID", "provincia": "Buenos Aires", "ciudad": "Luis Guillon", "email": "msgserviciotecnico@gmail.com", "telefono": "+54 11 2453-6200", "tipo": "Credifin"}, {"id": 163, "nombre": "FERNANDEZ DINO PAOLO AGUSTIN", "provincia": "Buenos Aires", "ciudad": "Las Flores", "email": "dinofernandez2013@gmail.com", "telefono": "+54 9 249 421-1661", "tipo": "Credifin"}, {"id": 164, "nombre": "VELASCO IGNACIO GONZALO", "provincia": "Buenos Aires", "ciudad": "Bragado", "email": "Nacho18_22@hotmail.com", "telefono": "+54 9 2342 53-2766", "tipo": "Credifin"}, {"id": 165, "nombre": "LEOTTA ANGEL", "provincia": "Buenos Aires", "ciudad": "Mar Del Tuyu", "email": "fernando_leotta@hotmail.com", "telefono": "+54 2246 46-1599", "tipo": "Credifin"}, {"id": 166, "nombre": "FEDRIGO TOMAS", "provincia": "Buenos Aires", "ciudad": "Las Flores", "email": "tfbikes.store@gmail.com", "telefono": "+54 9 2244 44-9149", "tipo": "Credifin"}, {"id": 167, "nombre": "MALENA FEDERICO", "provincia": "Buenos Aires", "ciudad": "Balcarce", "email": "fmmotoventas@gmail.com ", "telefono": "+54 2266 44-0191", "tipo": "Credifin"}, {"id": 168, "nombre": "GONZALEZ YOLANDA", "provincia": "Buenos Aires", "ciudad": "Arenaza", "email": "rarenaza@hotmail.com", "telefono": "+54 2355 57-9389", "tipo": "Credifin"}, {"id": 169, "nombre": "RAMIREZ MARIA VERONICA", "provincia": "Buenos Aires", "ciudad": "Comandante Nicanor Otamendi", "email": "bicicleteriamoncada@gmail.com       ", "telefono": "+54 9 2266 53-3835", "tipo": "Credifin"}, {"id": 170, "nombre": "GOMEZ LUZ", "provincia": "Buenos Aires", "ciudad": "Villa Gesell", "email": "zenkoproducciones@gmail.com", "telefono": "+54 2255 41-3520", "tipo": "Credifin"}, {"id": 171, "nombre": "TT HOGAR S.A.", "provincia": "Buenos Aires", "ciudad": "Miramar", "email": "admtthogar@gmail.com", "telefono": "+54 2291 41-6310", "tipo": "Credifin"}, {"id": 172, "nombre": "TJJAA SRL", "provincia": "Buenos Aires", "ciudad": "Florencio Varela", "email": "pablolayusmelamina@gmail.com", "telefono": "+54 3858 43-7140", "tipo": "Credifin"}, {"id": 173, "nombre": "BICICLETAS GORRITI S.R.L.", "provincia": "Buenos Aires", "ciudad": "Adrogue", "email": "bicicletasgorriti@hotmail.com", "telefono": "+54 9 11 6353-5533", "tipo": "Credifin"}, {"id": 174, "nombre": "D ANDREA ALEJANDRO NATALIO", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "Ciudad Autonoma de Buenos Aires", "email": "alejandrobluemoon@outlook.com", "telefono": "+54 11 6733-1334", "tipo": "Credifin"}, {"id": 175, "nombre": "ROBIN GUSTAVO MARCELO", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "CABA", "email": "suipachabike@gmail.com", "telefono": "+54 11 6115-6413", "tipo": "Credifin"}, {"id": 176, "nombre": "FREY MAXIMILIANO", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "Villa Ballester", "email": "mymbikes@gmail.com", "telefono": "+54 11 2468-4828", "tipo": "Credifin"}, {"id": 177, "nombre": "LIM KYONG YUN", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "Almagro", "email": "leandrolim@hotmail.com", "telefono": "+54 11 5180-4787", "tipo": "Credifin"}, {"id": 178, "nombre": "ARAUCO ALIAGA WALTER", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "CABA", "email": "walterarauco@yahoo.com.ar", "telefono": "+54 9 11 5997-7753", "tipo": "Credifin"}, {"id": 179, "nombre": "GIRON FLORES JULIO CESAR", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "Ciudad Autonoma de Buenos Aires", "email": "juliogiron72@gmail.com", "telefono": "+54 11 5386-3364", "tipo": "Credifin"}, {"id": 180, "nombre": "DURAN MARCELO ALEJANDRO Y FIOROTTO AMERICO ANTONIO SH", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "Ciudad Autonoma de Buenos Aires", "email": "wkbicicletas@gmail.com", "telefono": "+54 11 4564-5675", "tipo": "Credifin"}, {"id": 181, "nombre": "CULLARI DANIEL Y CHERIF DANIEL SOCIEDAD DE HECHO", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "CABA", "email": "losprimosbikes@gmail.com", "telefono": "+54 9 11 3392-1756", "tipo": "Credifin"}, {"id": 182, "nombre": "CAPITALBICI S.A.S.", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "Ciudad Autonoma de Buenos Aires", "email": "capitalbici@gmail.com", "telefono": "+54 11 4037-2068", "tipo": "Credifin"}, {"id": 183, "nombre": "BIKE SOLUTIONS SRL", "provincia": "Ciudad Autónoma de Buenos Aires", "ciudad": "Ciudad Autonoma de Buenos Aires", "email": "bikesolu@gmail.com", "telefono": "+54 11 6638-2139", "tipo": "Credifin"}, {"id": 184, "nombre": "DELAMER HECTOR RAUL", "provincia": "Córdoba", "ciudad": "Justiniano Posse", "email": "hectordelamer@nodosud.com.ar", "telefono": "3537338496", "tipo": "Credifin"}, {"id": 185, "nombre": "FORNO HECTOR JUAN", "provincia": "Córdoba", "ciudad": "Hernando", "email": "hfornometal@coop-her.com.ar", "telefono": "+54 353 413-6357", "tipo": "Credifin"}, {"id": 186, "nombre": "SALERNO FRANCISCO JOSE", "provincia": "Córdoba", "ciudad": "Cruz Alta", "email": "funcional@copca.com", "telefono": "+54 3467 52-2285", "tipo": "Credifin"}, {"id": 187, "nombre": "RUIZ JAVIER ERNESTO", "provincia": "Córdoba", "ciudad": "Barrio Parque Liceo", "email": "bultakomotos@gmail.com", "telefono": "3516076100", "tipo": "Credifin"}, {"id": 188, "nombre": "FALCON MARTIN JAVIER", "provincia": "Córdoba", "ciudad": "Barrio Centro Norte", "email": "kromosbicicletas@gmail.com", "telefono": "+54 351 621-9205", "tipo": "Credifin"}, {"id": 189, "nombre": "SERRANO ANGEL ALFREDO", "provincia": "Córdoba", "ciudad": "San Francisco", "email": "bachi2262@hotmail.com", "telefono": "+54 341 643-9655", "tipo": "Credifin"}, {"id": 190, "nombre": "POBOR NEIBER DANIEL", "provincia": "Córdoba", "ciudad": "Rio Tercero", "email": "neiberpobor@gmail.com", "telefono": "+54 3571 61-5138", "tipo": "Credifin"}, {"id": 191, "nombre": "HERRERA JAVIER ANGEL", "provincia": "Córdoba", "ciudad": "Marcos Juarez", "email": "Nachosbike@hotmail.com", "telefono": "+54 3472 64-6883", "tipo": "Credifin"}, {"id": 192, "nombre": "GOMEZ ARIEL EDUARDO", "provincia": "Córdoba", "ciudad": "Alta Gracia", "email": "gomezrodados@yahoo.com.ar", "telefono": "3547468047", "tipo": "Credifin"}, {"id": 193, "nombre": "ESCUDERO FABIO HECTOR", "provincia": "Córdoba", "ciudad": "Las Tapias", "email": "jeremiasescudero67@gmail.com", "telefono": "3544625652", "tipo": "Credifin"}, {"id": 194, "nombre": "IWULSKI GUSTAVO JOSE", "provincia": "Córdoba", "ciudad": "Barrio Centro Norte", "email": "g_iwulski@hotmail.com", "telefono": "3515304613", "tipo": "Credifin"}, {"id": 195, "nombre": "GILI MARCOS MAURICIO", "provincia": "Córdoba", "ciudad": "Villa Nueva", "email": "marcosgili@hotmail.com", "telefono": "+54 353 481-2196", "tipo": "Credifin"}, {"id": 196, "nombre": "GARRIDO MAYORGA MARTIN GERARDO", "provincia": "Córdoba", "ciudad": "La Falda", "email": "leonmg@hotmail.com", "telefono": "3512416286", "tipo": "Credifin"}, {"id": 197, "nombre": "BOJ MAURICIO ANGEL", "provincia": "Córdoba", "ciudad": "Cruz Del Eje", "email": "mauricioboj437@hotmail.com", "telefono": "3549448892", "tipo": "Credifin"}, {"id": 198, "nombre": "WENDEL CARLOS DANIEL", "provincia": "Córdoba", "ciudad": "Coronel Moldes", "email": "martin_wendel1@hotmail.com", "telefono": "3582413781", "tipo": "Credifin"}, {"id": 199, "nombre": "ARGENTE JULIAN ORLANDO", "provincia": "Córdoba", "ciudad": "Rio Primero", "email": "adm.iltreno@gmail.com", "telefono": "+54 351 238-7566", "tipo": "Credifin"}, {"id": 200, "nombre": "LUJAN CABRAL PABLO GABRIEL", "provincia": "Córdoba", "ciudad": "Alta Gracia", "email": "pablolujan@yahoo.com.ar", "telefono": "+54 351 590-4117", "tipo": "Credifin"}, {"id": 201, "nombre": "AGUERO HERNAN EUGENIO", "provincia": "Córdoba", "ciudad": "Jesus Maria", "email": "letourrodados@yahoo.com.ar", "telefono": "3525447525", "tipo": "Credifin"}, {"id": 202, "nombre": "AGUIRRE MAURO SEBASTIAN", "provincia": "Córdoba", "ciudad": "Villa Dolores", "email": "mauherbikes@gmail.com", "telefono": "+54 3544 57-9209", "tipo": "Credifin"}, {"id": 203, "nombre": "CAMUSSO JAVIER GUSTAVO", "provincia": "Córdoba", "ciudad": "Rio Tercero", "email": "javiercamusso@hotmail.com", "telefono": "3571546666", "tipo": "Credifin"}, {"id": 204, "nombre": "CASENAVE DAMIAN", "provincia": "Córdoba", "ciudad": "Villa Maria", "email": "dc.casenave@gmail.com", "telefono": "+54 353 564-4011", "tipo": "Credifin"}, {"id": 205, "nombre": "AGÜERO GUILLERMO GASTON", "provincia": "Córdoba", "ciudad": "Villa Del Dique", "email": "todobicivdd@gmail.com", "telefono": "+54 9 3546 48-9040", "tipo": "Credifin"}, {"id": 206, "nombre": "MARI EMILIANO ANGEL", "provincia": "Córdoba", "ciudad": "Inriville", "email": "pepemotorsracing@hotmail.com", "telefono": "+54 3467 41-4609", "tipo": "Credifin"}, {"id": 207, "nombre": "MUSSO FEDERICO MARTIN", "provincia": "Córdoba", "ciudad": "Villa De Soto", "email": "federicommusso@gmail.com", "telefono": "3549460989", "tipo": "Credifin"}, {"id": 208, "nombre": "BRITO FRANCISCO JEREMIAS", "provincia": "Córdoba", "ciudad": "La Falda", "email": "miguel_brito@hotmail.com.ar", "telefono": "3548574285", "tipo": "Credifin"}, {"id": 209, "nombre": "LOPEZ GUSTAVO ADRIAN", "provincia": "Córdoba", "ciudad": "Villa Dolores", "email": "juancruzlopez104@gmail.com", "telefono": "+54 3544 55-1485", "tipo": "Credifin"}, {"id": 210, "nombre": "GIOMI SANTIAGO ALEJO", "provincia": "Córdoba", "ciudad": "Oncativo", "email": "santiagogiomi666@gmail.com", "telefono": "3571606523", "tipo": "Credifin"}, {"id": 211, "nombre": "CABALLERO JULIO ALEXIS", "provincia": "Córdoba", "ciudad": "Villa Maria", "email": "ale.caballero1996@hotmail.com", "telefono": "+54 353 418-3762", "tipo": "Credifin"}, {"id": 212, "nombre": "TESAN EDGARDO ANIBAL", "provincia": "Córdoba", "ciudad": "Villa Maria", "email": "casatesan@hotmail.com", "telefono": "3535653119", "tipo": "Credifin"}, {"id": 213, "nombre": "MARCHISIO MARIA ALEJANDRA", "provincia": "Córdoba", "ciudad": "Las Varillas", "email": "gabicarena90@gmail.com", "telefono": "3533457674", "tipo": "Credifin"}, {"id": 214, "nombre": "FASSI LORENA ANA", "provincia": "Córdoba", "ciudad": "General Deheza", "email": "mcribotta@hotmail.com", "telefono": "+54 9 358 438-2458", "tipo": "Credifin"}, {"id": 215, "nombre": "FIGUEROA VIVIANA NATALIA", "provincia": "Córdoba", "ciudad": "Leones", "email": "guillermoquirinali@hotmail.com", "telefono": "3472449617", "tipo": "Credifin"}, {"id": 216, "nombre": "AMADO SORAYA MARIEL", "provincia": "Córdoba", "ciudad": "Villa General Belgrano", "email": "abriendohuella.cba@gmail.com", "telefono": "+54 3546 48-9143", "tipo": "Credifin"}, {"id": 217, "nombre": "BELTRAMO ELIZABETH DE LAS MERCEDES", "provincia": "Córdoba", "ciudad": "Idiazabal", "email": "nangutierrez52@gmail.com", "telefono": "3537513777", "tipo": "Credifin"}, {"id": 218, "nombre": "ALBRECHT MARIA SILVIN", "provincia": "Córdoba", "ciudad": "Embalse", "email": "cruellichi@hotmail.com", "telefono": "+54 3571 41-6880", "tipo": "Credifin"}, {"id": 219, "nombre": "EGIDIO P. HEYD Y CIA S.R.L.", "provincia": "Córdoba", "ciudad": "Barrio Centro Norte", "email": "epheyd@gmail.com", "telefono": "+54 351 663-0638", "tipo": "Credifin"}, {"id": 220, "nombre": "FOLCA S.R.L.", "provincia": "Córdoba", "ciudad": "Villa Concepcion Del Tio", "email": "folcasrl@gmail.com", "telefono": "3576529957", "tipo": "Credifin"}, {"id": 221, "nombre": "SAN LIN S.A.", "provincia": "Córdoba", "ciudad": "Adelia Maria", "email": "asanchi@amaria.com.ar", "telefono": "3585616408", "tipo": "Credifin"}, {"id": 222, "nombre": "WUPS S.A.S.", "provincia": "Córdoba", "ciudad": "Barrio General Paz Norte", "email": "administracion@wakeup-store.com", "telefono": "3513555553", "tipo": "Credifin"}, {"id": 223, "nombre": "RODAR CORDOBA S.S.", "provincia": "Córdoba", "ciudad": "Mendiolaza", "email": "administracion@rodarcordoba.com", "telefono": "3515902287", "tipo": "Credifin"}, {"id": 224, "nombre": "PUMALA S.A.S", "provincia": "Córdoba", "ciudad": "Villa Dolores", "email": "pumala.apellaniz@gmail.com", "telefono": "3544418980", "tipo": "Credifin"}, {"id": 225, "nombre": "HAROD BIKE GROUP S.A.S", "provincia": "Córdoba", "ciudad": "Arias", "email": "harodbike@hotmail.com", "telefono": "+54 3468 56-4180", "tipo": "Credifin"}, {"id": 226, "nombre": "RODRIGUEZ CARLOS ALBERTO", "provincia": "Córdoba", "ciudad": "Arias", "email": "harodbike@hotmail.com", "telefono": "+54 3468 56-4180", "tipo": "Credifin"}, {"id": 227, "nombre": "ROMERO CESAR GUSTAVO", "provincia": "Córdoba", "ciudad": "Pilar", "email": "cesarromero67@hotmail.com", "telefono": "+54 3572 53-9988", "tipo": "Credifin"}, {"id": 228, "nombre": "CANELO GUILLERMO ADRIAN", "provincia": "Córdoba", "ciudad": "Oliva", "email": "cyclescanelo@gmail.com", "telefono": "+54 3532 41-8102", "tipo": "Credifin"}, {"id": 229, "nombre": "VERNA CESAR VICTOR", "provincia": "Córdoba", "ciudad": "Alejandro", "email": "cesarverna@gmail.com ", "telefono": "+54 358 560-2232", "tipo": "Credifin"}, {"id": 230, "nombre": "MARTINEZ FERREYRA AGUSTIN", "provincia": "Córdoba", "ciudad": "Embalse", "email": "agustinmartinezferreyra@gmail.com", "telefono": "+54 3546 52-5994", "tipo": "Credifin"}, {"id": 231, "nombre": "LOPEZ JUAN CRUZ", "provincia": "Córdoba", "ciudad": "Villa Dolores", "email": "juancruzlopez104@gmail.com", "telefono": "+54 3544 30-8968", "tipo": "Credifin"}, {"id": 232, "nombre": "PERZI GUILLERMO GERMAN", "provincia": "Córdoba", "ciudad": "Noetinger", "email": "guiyeperzi@hotmail.com", "telefono": "+54 9 3472 43-3574", "tipo": "Credifin"}, {"id": 233, "nombre": "CARBAJAL ANALIA BEATRIZ", "provincia": "Córdoba", "ciudad": "Huinca Renanco", "email": "jesica.bringas94@gmail.com", "telefono": "+54 2302 20-8944", "tipo": "Credifin"}, {"id": 234, "nombre": "AGUERO DELIA VIRGINIA", "provincia": "Córdoba", "ciudad": "Las Tapias", "email": "yacare2014@gmail.com", "telefono": "+54 3544 62-5652", "tipo": "Credifin"}, {"id": 235, "nombre": "BERTI MARIA LAURA", "provincia": "Córdoba", "ciudad": "Marcos Juarez", "email": "bertimarialaura@hotmail.com", "telefono": "+54 3472 43-7165", "tipo": "Credifin"}, {"id": 236, "nombre": "ISLEÑO NORMA VALERIA", "provincia": "Córdoba", "ciudad": "Balnearia", "email": "lionelrbadino@gmail.com", "telefono": "+54 9 3576 51-5254", "tipo": "Credifin"}, {"id": 237, "nombre": "PALACIOS IVANA BEATRIZ", "provincia": "Córdoba", "ciudad": "Monte Cristo", "email": "palacioivanabeatriz96@gmail.com", "telefono": "+54 351 371-6298", "tipo": "Credifin"}, {"id": 238, "nombre": "SALAS FERREYRA VERONICA PAOLA", "provincia": "Córdoba", "ciudad": "Rio Ceballos", "email": "matias_appendino@hotmail.com", "telefono": "+54 351 528-0312", "tipo": "Credifin"}, {"id": 239, "nombre": "LA BICICLETERIA S.A.S.", "provincia": "Córdoba", "ciudad": "Bell Ville", "email": "orlandogerman@hotmail.com.ar", "telefono": "+54 9 3537 31-0161", "tipo": "Credifin"}, {"id": 240, "nombre": "FERREYRA LEONARDO FABIAN", "provincia": "La Rioja", "ciudad": "La Rioja", "email": "cyclesferreyra@yahoo.com.ar", "telefono": "2615322054", "tipo": "Credifin"}, {"id": 241, "nombre": "PRIETO GABRIEL SEBASTIAN", "provincia": "La Rioja", "ciudad": "La Rioja", "email": "sebaprieto@hotmail.com", "telefono": "+54 264 469-5969", "tipo": "Credifin"}, {"id": 242, "nombre": "MURUA GERARDO ABEL", "provincia": "La Rioja", "ciudad": "La Rioja", "email": "muruacompeticion@yahoo.com.ar", "telefono": "2615365051", "tipo": "Credifin"}, {"id": 243, "nombre": "OLIVERA ANA CAROLINA", "provincia": "La Rioja", "ciudad": "La Rioja", "email": "bicibadesso@hotmail.com", "telefono": "3804525260", "tipo": "Credifin"}, {"id": 244, "nombre": "MARTINEZ JOSE DOMINGO", "provincia": "Mendoza", "ciudad": "Real Del Padre", "email": "casmartinez@gmail.com", "telefono": "+54 261 363-7882", "tipo": "Credifin"}, {"id": 245, "nombre": "PAGANO LUIS OSCAR", "provincia": "Mendoza", "ciudad": "General Alvear", "email": "luisoscarpagano6@yahoo.com", "telefono": "+54 9 2625 51-1573", "tipo": "Credifin"}, {"id": 246, "nombre": "PRISCO PABLO ANDRES", "provincia": "Mendoza", "ciudad": "Rivadavia", "email": "cicles_sanisidro@yahoo.com.ar", "telefono": "2657547471", "tipo": "Credifin"}, {"id": 247, "nombre": "MONASTERIOS EDUARDO FABIAN", "provincia": "Mendoza", "ciudad": "Villa Nueva", "email": "fo5556103@gmail.com", "telefono": "+54 261 551-2939", "tipo": "Credifin"}, {"id": 248, "nombre": "ALANIZ JUAN ALEJANDRO", "provincia": "Mendoza", "ciudad": "La Paz", "email": "juanchobikealaniz@gmail.com", "telefono": "+54 263 475-1127", "tipo": "Credifin"}, {"id": 249, "nombre": "DEL RE NELSON ANTONIO", "provincia": "Mendoza", "ciudad": "Campamentos", "email": "risk_s_a@yahoo.com.ar", "telefono": "+54 9 263 464-3763", "tipo": "Credifin"}, {"id": 250, "nombre": "VALE HNOS SA", "provincia": "Mendoza", "ciudad": "Los Corralitos", "email": "valehnossa@hotmail.com", "telefono": "2645464529", "tipo": "Credifin"}, {"id": 251, "nombre": "RODADOS CONTINO SA", "provincia": "Mendoza", "ciudad": "Rodeo De La Cruz", "email": "continoeduardo@hotmail.com", "telefono": "2664260336", "tipo": "Credifin"}, {"id": 252, "nombre": "CUENCA CAUTA INVERSIONES SOCIEDAD ANONIMA", "provincia": "Mendoza", "ciudad": "Malargue", "email": "alejocarrion@gmail.com", "telefono": "2634589215", "tipo": "Credifin"}, {"id": 253, "nombre": "HIGH BIKE SAS", "provincia": "Mendoza", "ciudad": "Maipu", "email": "highbikeciclismo@gmail.com", "telefono": "2644407760", "tipo": "Credifin"}, {"id": 254, "nombre": "BICICLETERIA TODO RUEDAS S.A.S", "provincia": "Mendoza", "ciudad": "Tunuyan", "email": "ferraridaniel1975@hotmail.com.ar", "telefono": "2664690883", "tipo": "Credifin"}, {"id": 255, "nombre": "ZAMITTO JAVIER ENRIQUE", "provincia": "San Juan", "ciudad": "Jachal", "email": "javierzamitto@hotmail.com", "telefono": "2615389983", "tipo": "Credifin"}, {"id": 256, "nombre": "CORTEZ NELSON JAVIER", "provincia": "San Juan", "ciudad": "San Juan", "email": "nelsonjavier1@live.com.ar", "telefono": "2644655170", "tipo": "Credifin"}, {"id": 257, "nombre": "SERRA ADOLFO FRANCO", "provincia": "San Juan", "ciudad": "Barrio Rawson", "email": "serrafranco31@gmail.com", "telefono": "+54 9 264 511-8280", "tipo": "Credifin"}, {"id": 258, "nombre": "AUGUSTO ANTONIO HECTOR", "provincia": "San Juan", "ciudad": "Capitan Lazo", "email": "rodadosaguzzi@gmail.com", "telefono": "2625456261", "tipo": "Credifin"}, {"id": 259, "nombre": "PUGLIESE ANALIA", "provincia": "San Juan", "ciudad": "Albardon", "email": "analiapugliese@yahoo.com", "telefono": "+54 9 264 414-8300", "tipo": "Credifin"}, {"id": 260, "nombre": "CASA BRISSON SRL", "provincia": "San Juan", "ciudad": "San Juan", "email": "casabrisson@yahoo.com.ar", "telefono": "+54 9 264 465-5170", "tipo": "Credifin"}, {"id": 261, "nombre": "TESI SA", "provincia": "San Juan", "ciudad": "San Juan", "email": "sofia.garbo@valenet.com.ar", "telefono": "2664310159", "tipo": "Credifin"}, {"id": 262, "nombre": "V.R.P. S.R.L.", "provincia": "San Juan", "ciudad": "San Juan", "email": "comercial@paezrefrigeracion.com.ar", "telefono": "+54 385 433-1217", "tipo": "Credifin"}, {"id": 263, "nombre": "BURANO SA", "provincia": "San Juan", "ciudad": "Santa Lucia", "email": "burano.sa@gmail.com", "telefono": "+54 260 443-9888", "tipo": "Credifin"}, {"id": 264, "nombre": "ARGUELLO DANTE ADRIAN", "provincia": "San Luis", "ciudad": "Merlo", "email": "nativomtbike@gmail.com", "telefono": "2615566644", "tipo": "Credifin"}, {"id": 265, "nombre": "AMODEY NICOLAS JEREMIAS", "provincia": "San Luis", "ciudad": "Villa Mercedes", "email": "bicicleteria.arpellino@gmail.com", "telefono": "2625438426", "tipo": "Credifin"}, {"id": 266, "nombre": "NIERPA SRL", "provincia": "San Luis", "ciudad": "San Luis", "email": "cobrabikecenter@gmail.com", "telefono": "2644407760", "tipo": "Credifin"}, {"id": 267, "nombre": "ESCUDERO JORGE ENRIQUE", "provincia": "La Rioja", "ciudad": "La Rioja", "email": "escuderoo.nahuel@gmail.com", "telefono": "+54 380 420-2624", "tipo": "Credifin"}, {"id": 268, "nombre": "GONZALEZ RAMON ANGEL", "provincia": "La Rioja", "ciudad": "La Rioja", "email": "bicicleteria_gonzalez@hotmail.com", "telefono": "+54 380 459-8704", "tipo": "Credifin"}, {"id": 269, "nombre": "MERCADO PATRICIA NOEMI", "provincia": "La Rioja", "ciudad": "La Rioja", "email": "muruajunior1@hotmail.com", "telefono": "+54 380 432-2674", "tipo": "Credifin"}, {"id": 270, "nombre": "VERDE ALFREDO VICENTE", "provincia": "Mendoza", "ciudad": "La Paz", "email": "lpzkever@yahoo.com.ar", "telefono": "+54 9 263 421-6778", "tipo": "Credifin"}, {"id": 271, "nombre": "LABRADOR CLAUDIO GERMAN", "provincia": "Mendoza", "ciudad": "General San Martin", "email": "cgl2006@hotmail.com", "telefono": "+54 261 207-0371", "tipo": "Credifin"}, {"id": 272, "nombre": "PIÑOL JUAN PABLO", "provincia": "Mendoza", "ciudad": "Tunuyan", "email": "estefi286@hotmail.com", "telefono": "+54 9 2622 22-0865", "tipo": "Credifin"}, {"id": 273, "nombre": "RODRIGUEZ SOSA AGUSTIN IVAN", "provincia": "Mendoza", "ciudad": "Junin", "email": "agusro1122@gmail.com", "telefono": "+54 9 263 457-4903", "tipo": "Credifin"}, {"id": 274, "nombre": "MANDRILLI ESTEBAN MARCELO", "provincia": "Mendoza", "ciudad": "Malargue", "email": "ciclesmarman@yahoo.com.ar", "telefono": "+54 9 260 464-1584", "tipo": "Credifin"}, {"id": 275, "nombre": "AGUILAR SILVIA MABEL", "provincia": "Mendoza", "ciudad": "General San Martin", "email": "bicicleteriacostebici@gmail.com", "telefono": "+54 9 263 465-7872", "tipo": "Credifin"}, {"id": 276, "nombre": "BRENDA KAREN PUEBLA NAVARRO", "provincia": "Mendoza", "ciudad": "General San Martin", "email": "brendapuebla97@gmail.com", "telefono": "+54 9 263 458-9215", "tipo": "Credifin"}, {"id": 277, "nombre": "ASSESS TODOCICLISMO S.A.", "provincia": "Mendoza", "ciudad": "San Jose", "email": "todociclismo1@gmail.com", "telefono": "+54 9 261 597-5757", "tipo": "Credifin"}, {"id": 278, "nombre": "PINOROSSO SOCIEDAD ANONIMA", "provincia": "Mendoza", "ciudad": "Godoy Cruz", "email": "ambrosibici@hotmail.com", "telefono": "+54 9 261 616-3556", "tipo": "Credifin"}, {"id": 279, "nombre": "METOLA CORIA DANTE ROBERTO", "provincia": "San Juan", "ciudad": "Caucete", "email": "dante_metola@hotmail.com", "telefono": "+54 9 264 463-2135", "tipo": "Credifin"}, {"id": 280, "nombre": "GIMENEZ JOFRE ANDRES OSCAR", "provincia": "San Juan", "ciudad": "San Juan", "email": "oscar_oag2006@hotmail.com", "telefono": "+54 9 264 586-0456", "tipo": "Credifin"}, {"id": 281, "nombre": "LIMA GODOY FEDERICO ALFREDO", "provincia": "San Juan", "ciudad": "Barrio Rawson", "email": "pyl.deporteshogar@gmail.com", "telefono": "+54 266 503-8671", "tipo": "Credifin"}, {"id": 282, "nombre": "BUSTOS FORTE MARIA EUGENIA", "provincia": "San Juan", "ciudad": "Angaco Norte", "email": "eugebustosforte@gmail.com", "telefono": "+54 264 661-6691", "tipo": "Credifin"}, {"id": 283, "nombre": "POWER BIKE S.R.L.", "provincia": "San Juan", "ciudad": "San Juan", "email": "fernandogimenez00@gmail.com", "telefono": "+54 264 415-5304", "tipo": "Credifin"}, {"id": 284, "nombre": "GONZALEZ MARTIN", "provincia": "San Luis", "ciudad": "Villa Mercedes", "email": "bartolomg@yahoo.com.ar", "telefono": "+54 2657 58-1821", "tipo": "Credifin"}, {"id": 285, "nombre": "SOSA WALTER JAVIER", "provincia": "San Luis", "ciudad": "Juana Koslay", "email": "atodacadencia@gmail.com", "telefono": "+54 9 266 458-3077", "tipo": "Credifin"}, {"id": 286, "nombre": "ALTAMIRANO PABLO SEBASTIAN", "provincia": "San Luis", "ciudad": "Villa Mercedes", "email": "Pablobike1978@gmail.com", "telefono": "+54 9 2657 60-9011", "tipo": "Credifin"}, {"id": 287, "nombre": "ZAMBON OSCAR UDELINO", "provincia": "Corrientes", "ciudad": "Mocoreta", "email": "casa_luismar@hotmail.com", "telefono": "3775401432", "tipo": "Credifin"}, {"id": 288, "nombre": "LOPEZ MIGUEL ANDRES", "provincia": "Corrientes", "ciudad": "Corrientes", "email": "martinbike@hotmail.com", "telefono": "+54 379 495-3368", "tipo": "Credifin"}, {"id": 289, "nombre": "AGUIRRE DIEGO RAUL", "provincia": "Corrientes", "ciudad": "Santa Lucia", "email": "diegoraulaguirre@gmail.com", "telefono": "+54 3777 68-3446", "tipo": "Credifin"}, {"id": 290, "nombre": "VENEGA HECTOR", "provincia": "Corrientes", "ciudad": "Bella Vista", "email": "javierlegar@hotmail.com", "telefono": "3777688165", "tipo": "Credifin"}, {"id": 291, "nombre": "BEJARANO JOSE LUIS", "provincia": "Corrientes", "ciudad": "Goya", "email": "bicicleteriacarlitos@hotmail.com", "telefono": "3777625695", "tipo": "Credifin"}, {"id": 292, "nombre": "SCHIRO DANIEL ALEJANDRO", "provincia": "Corrientes", "ciudad": "Ituzaingo", "email": "Schiromx@gmail.com", "telefono": "3756416590", "tipo": "Credifin"}, {"id": 293, "nombre": "ZARATE FABIAN ANTONIO", "provincia": "Corrientes", "ciudad": "Mercedes", "email": "fabianchypy@hotmail.com", "telefono": "3773440463", "tipo": "Credifin"}, {"id": 294, "nombre": "MENDEZ CESAR SAMUEL", "provincia": "Corrientes", "ciudad": "Gob. Ing. V. Virasoro", "email": "elcolovirasoro@hotmail.com", "telefono": "3756456483", "tipo": "Credifin"}, {"id": 295, "nombre": "VELAZCO GERMAN OSVALDO", "provincia": "Corrientes", "ciudad": "Paso De La Patria", "email": "anapvela1@gmail.com", "telefono": "+54 362 404-8374", "tipo": "Credifin"}, {"id": 296, "nombre": "LANZOS BREARD CARLOS ISMAEL", "provincia": "Corrientes", "ciudad": "Ituzaingo", "email": "termilan@hotmail.com", "telefono": "3786512629", "tipo": "Credifin"}, {"id": 297, "nombre": "YACUZZI JUAN PABLO", "provincia": "Corrientes", "ciudad": "Bella Vista", "email": "juanpabloyacuzzi@hotmail.com", "telefono": "3777470080", "tipo": "Credifin"}, {"id": 298, "nombre": "KAMMERICHS GERARDO ANDRES", "provincia": "Corrientes", "ciudad": "Goya", "email": "bicimundogek@hotmail.com", "telefono": "3777411579", "tipo": "Credifin"}, {"id": 299, "nombre": "ATAMAÑUK OSCAR EDUARDO", "provincia": "Corrientes", "ciudad": "Monte Caseros", "email": "oscarbike2017@gmail.com", "telefono": "3775404127", "tipo": "Credifin"}, {"id": 300, "nombre": "VILAS GONZALO JOAQUIN", "provincia": "Corrientes", "ciudad": "Santo Tome", "email": "ivandariom@hotmail.com ", "telefono": "+54 3756 45-9555", "tipo": "Credifin"}, {"id": 301, "nombre": "VALDES ORTIZ CARLOS MANUEL", "provincia": "Corrientes", "ciudad": "Corrientes", "email": "valdescarlos_1@hotmail.com", "telefono": "+54 379 479-2967", "tipo": "Credifin"}, {"id": 302, "nombre": "PARODI ENZO FABRICIO", "provincia": "Corrientes", "ciudad": "Goya", "email": "parodienzo250@gmail.com", "telefono": "3777479513", "tipo": "Credifin"}, {"id": 303, "nombre": "ROMERO CARLOS FEDERICO", "provincia": "Corrientes", "ciudad": "Bella Vista", "email": "parismuebleria84@gmail.com ", "telefono": "+54 3777 39-4330", "tipo": "Credifin"}, {"id": 304, "nombre": "GALIANO NESTOR MICHELL", "provincia": "Corrientes", "ciudad": "Paso De Los Libres", "email": "michellgaliano0@gmail.com", "telefono": "3772527084", "tipo": "Credifin"}, {"id": 305, "nombre": "MIGUEL CURA JOSE TOMAS", "provincia": "Corrientes", "ciudad": "Saladas", "email": " tomieme247@gmail.com", "telefono": "+54 3782 45-1830", "tipo": "Credifin"}, {"id": 306, "nombre": "PISARELLO GUIDO AGUSTIN", "provincia": "Corrientes", "ciudad": "Corrientes", "email": "pisarelloguido@gmail.com", "telefono": "+54 379 427-4203", "tipo": "Credifin"}, {"id": 307, "nombre": "BERNACHEA CYNTHIA JOANNA", "provincia": "Corrientes", "ciudad": "Saladas", "email": "cynthyab_c@hotmail.com", "telefono": "+54 9 3782 50-6866", "tipo": "Credifin"}, {"id": 308, "nombre": "VENEGA NANCY BEATRIZ", "provincia": "Corrientes", "ciudad": "Bella Vista", "email": "repuestodelsur@hotmail.com", "telefono": "3777688165", "tipo": "Credifin"}, {"id": 309, "nombre": "SANTIA CAROLINA CELESTE", "provincia": "Corrientes", "ciudad": "Paso De Los Libres", "email": "caaaro_12@hotmail.com.ar", "telefono": "+54 3772 58-0488", "tipo": "Credifin"}, {"id": 310, "nombre": "BAHAM CTES", "provincia": "Corrientes", "ciudad": "Corrientes", "email": "ethelborda@hotmail.com", "telefono": "3794783827", "tipo": "Credifin"}, {"id": 311, "nombre": "RIGONI JORGE CRISTOBAL", "provincia": "Entre Ríos", "ciudad": "San Jaime De La Frontera", "email": "rolandorigoni@hotmail.com", "telefono": "3458409541", "tipo": "Credifin"}, {"id": 312, "nombre": "COMPARIN MIGUEL ANGEL", "provincia": "Entre Ríos", "ciudad": "Chajari", "email": "miguelangelcomparin@hotmail.com", "telefono": "3456542429", "tipo": "Credifin"}, {"id": 313, "nombre": "CAINO WALTER DANIEL", "provincia": "Entre Ríos", "ciudad": "La Paz", "email": "ciclestopo@gmail.com", "telefono": "3437607551", "tipo": "Credifin"}, {"id": 314, "nombre": "MATTEODA ALEXIS MAXIMILIANO", "provincia": "Entre Ríos", "ciudad": "Viale", "email": "matteodabikeventas@hotmail.com", "telefono": "3435092036", "tipo": "Credifin"}, {"id": 315, "nombre": "COMETTI PABLO JOSE", "provincia": "Entre Ríos", "ciudad": "Chajari", "email": "pablojosecometti@hotmail.com", "telefono": "+54 3456 41-6091", "tipo": "Credifin"}, {"id": 316, "nombre": "TINELLO MARIO ANDRES", "provincia": "Entre Ríos", "ciudad": "Gualeguaychu", "email": "mtinello04@gmail.com", "telefono": "3446570444", "tipo": "Credifin"}, {"id": 317, "nombre": "VIOLLAZ ANTONIO FRANCISCO", "provincia": "Entre Ríos", "ciudad": "Gualeguaychu", "email": "ciscobike@hotmail.es", "telefono": "3446582734", "tipo": "Credifin"}, {"id": 318, "nombre": "IRIBERRY JOSE FERNANDO", "provincia": "Entre Ríos", "ciudad": "San Salvador", "email": "iriberryfernando72@gmail.com", "telefono": "+54 345 403-6566", "tipo": "Credifin"}, {"id": 319, "nombre": "CAINO GUILLERMO RAUL", "provincia": "Entre Ríos", "ciudad": "La Paz", "email": "guillecaino_lapaz@hotmail.com", "telefono": "3437410055", "tipo": "Credifin"}, {"id": 320, "nombre": "COMPARIN MAURICIO MIGUEL", "provincia": "Entre Ríos", "ciudad": "Chajari", "email": "mauriciocomparin9@gmail.com", "telefono": "+54 3456 54-2429", "tipo": "Credifin"}, {"id": 321, "nombre": "SALINAS ROBERTO NICOLAS", "provincia": "Formosa", "ciudad": "Pirane", "email": "Piki_salinas@hotmail.com", "telefono": "+54 370 485-0304", "tipo": "Credifin"}, {"id": 322, "nombre": "SOTELO CARLOS FABIAN", "provincia": "Formosa", "ciudad": "El Colorado", "email": "Kellymotosyhogar@gmail.com", "telefono": "+54 9 370 478-3560", "tipo": "Credifin"}, {"id": 323, "nombre": "CAJA GERARDO IVAN", "provincia": "Formosa", "ciudad": "El Colorado", "email": "gerardocaja@gmail.com", "telefono": "3704205754", "tipo": "Credifin"}, {"id": 324, "nombre": "PALMERI MARIA DEL CARMEN", "provincia": "Formosa", "ciudad": "Clorinda", "email": "mariadelcpalmeri16@gmail.com", "telefono": "+54 3718 41-7397", "tipo": "Credifin"}, {"id": 325, "nombre": "FLACH JOSE", "provincia": "Misiones", "ciudad": "Puerto Rico", "email": "joseflach@prico.com.ar", "telefono": "3743667657", "tipo": "Credifin"}, {"id": 326, "nombre": "CRECHI JORGE OSCAR", "provincia": "Misiones", "ciudad": "Montecarlo", "email": "marinasusanak@gmail.com", "telefono": "+54 3751 47-7277", "tipo": "Credifin"}, {"id": 327, "nombre": "LOPEZ CRISTIAN HERNAN", "provincia": "Misiones", "ciudad": "Santo Pipo", "email": "sandrabrondino@hotmail.com", "telefono": "3764536635", "tipo": "Credifin"}, {"id": 328, "nombre": "VOGERL RICARDO ANDRES", "provincia": "Misiones", "ciudad": "Colonia Wanda", "email": "superandymnes@gmail.com", "telefono": "+54 3757 67-1367", "tipo": "Credifin"}, {"id": 329, "nombre": "TORRES JUAN CARLOS", "provincia": "Misiones", "ciudad": "San Ignacio", "email": "3764179325ana@gmail.com", "telefono": "+54 9 376 482-9366", "tipo": "Credifin"}, {"id": 330, "nombre": "GALLO NUÑEZ SERGIO ARIEL", "provincia": "Misiones", "ciudad": "Leandro N. Alem", "email": "sergioarielgallo@gmail.com", "telefono": "3754401764", "tipo": "Credifin"}, {"id": 331, "nombre": "GONZALEZ ALBERTO RODRIGO IVAN", "provincia": "Misiones", "ciudad": "Leandro N. Alem", "email": "blockpass_motos@hotmail.com", "telefono": "3754439200", "tipo": "Credifin"}, {"id": 332, "nombre": "SOSA ELICEO", "provincia": "Misiones", "ciudad": "San Javier", "email": "eliceososa79@gmail.com", "telefono": "3754465681", "tipo": "Credifin"}, {"id": 333, "nombre": "BUCHINSKI YENNIFER", "provincia": "Misiones", "ciudad": "Eldorado", "email": "Viciobikes1@gmail.com", "telefono": "3751580813", "tipo": "Credifin"}, {"id": 334, "nombre": "BORGMANN PAOLA ELIZABET", "provincia": "Misiones", "ciudad": "Puerto Rico", "email": "jborgmann@prico.com.ar", "telefono": "3743498869", "tipo": "Credifin"}, {"id": 335, "nombre": "TACUARA VERDE S A S", "provincia": "Misiones", "ciudad": "Colonia Wanda", "email": "", "telefono": "+54 3757 67-1367", "tipo": "Credifin"}, {"id": 336, "nombre": "LIBORSI PABLO RODRIGO", "provincia": "Corrientes", "ciudad": "Corrientes", "email": "laurita.be159@gmail.com", "telefono": "+54 379 414-7234", "tipo": "Credifin"}, {"id": 337, "nombre": "PISARELLO GERMAN HORACIO", "provincia": "Corrientes", "ciudad": "Corrientes", "email": "pisarelloguido@gmail.com", "telefono": "+54 379 427-4203", "tipo": "Credifin"}, {"id": 338, "nombre": "MONTEJANO LUCAS DIONEL", "provincia": "Corrientes", "ciudad": "Corrientes", "email": "montejanolucas@gmail.com", "telefono": "+54 379 505-6287", "tipo": "Credifin"}, {"id": 339, "nombre": "ROMERO SAMUEL JOSE IGNACIO", "provincia": "Corrientes", "ciudad": "Corrientes", "email": "laquintanastore@gmail.com", "telefono": "+54 9 379 439-7934", "tipo": "Credifin"}, {"id": 340, "nombre": "MORENO ENRIQUE FABIAN", "provincia": "Corrientes", "ciudad": "Corrientes", "email": "morenoenriquef@hotmail.com", "telefono": "+54 379 491-0061", "tipo": "Credifin"}, {"id": 341, "nombre": "CACCIOPPOLI SILVIA ADRIANA", "provincia": "Corrientes", "ciudad": "Corrientes", "email": "elclubventas90@gmail.com ", "telefono": "+54 379 501-3551", "tipo": "Credifin"}, {"id": 342, "nombre": "ROMERO CATALINA", "provincia": "Corrientes", "ciudad": "Bella Vista", "email": "romero_federico2013@outlook.com", "telefono": "+54 3777 39-4330", "tipo": "Credifin"}, {"id": 343, "nombre": "COLETTI ANGELICA LILIAN", "provincia": "Corrientes", "ciudad": "Santa Lucia", "email": "liliancoletti6@gmail.com", "telefono": "+54 3777 68-3446", "tipo": "Credifin"}, {"id": 344, "nombre": "DOME MONICA MAGDALENA", "provincia": "Corrientes", "ciudad": "Paso De Los Libres", "email": "victorquintanamtb@gmail.com", "telefono": "+54 3772 40-5064", "tipo": "Credifin"}, {"id": 345, "nombre": "D ARIELLI YANINA LORENA", "provincia": "Corrientes", "ciudad": "Corrientes", "email": "darielliyanina@outlook.com", "telefono": "+54 3781 40-3403", "tipo": "Credifin"}, {"id": 346, "nombre": "BOHLE SRL", "provincia": "Corrientes", "ciudad": "Corrientes", "email": "comprabohlebicis@gmail.com", "telefono": "+54 379 466-3750", "tipo": "Credifin"}, {"id": 347, "nombre": "DON RENATO S. R. L.", "provincia": "Corrientes", "ciudad": "Corrientes", "email": "enzorasclard.drra@gmail.com ", "telefono": "+54 379 433-5011", "tipo": "Credifin"}, {"id": 348, "nombre": "TOLOMEI MARCELO DANIEL", "provincia": "Entre Ríos", "ciudad": "Villaguay", "email": "localesmaraton10@gmail.com", "telefono": "+54 3455 45-3586", "tipo": "Credifin"}, {"id": 349, "nombre": "ABRAHAN JUAN IGNACIO", "provincia": "Entre Ríos", "ciudad": "Gualeguay", "email": "ciclesabrahan@hotmail.com", "telefono": "+54 3444 50-4230", "tipo": "Credifin"}, {"id": 350, "nombre": "BRUZZONI LAUTARO LEONARDO", "provincia": "Entre Ríos", "ciudad": "Parana", "email": "lautarobruzzonid@hotmail.com", "telefono": "+54 343 500-2927", "tipo": "Credifin"}, {"id": 351, "nombre": "SOZA PEDROZO DIEGO ARTURO", "provincia": "Misiones", "ciudad": "Concepcion De La Sierra", "email": "sozapedrozo@gmail.com", "telefono": "+54 3758 45-6699", "tipo": "Credifin"}, {"id": 352, "nombre": "KONCEREWICZ LUIS ARIEL", "provincia": "Misiones", "ciudad": "Gobernador Roca", "email": "ariikonce22@gmail.com", "telefono": "+54 376 452-9083", "tipo": "Credifin"}, {"id": 353, "nombre": "SANCHEZ EMILIO FERNANDO", "provincia": "Catamarca", "ciudad": "San Fernando Del Valle De Catamarca", "email": "bicisport_cat@yahoo.com.ar", "telefono": "3834908910", "tipo": "Credifin"}, {"id": 354, "nombre": "VALVERDI RENE CARLOS", "provincia": "Catamarca", "ciudad": "San Fernando Del Valle De Catamarca", "email": "neovalverdi_82@hotmail.com", "telefono": "3834647391", "tipo": "Credifin"}, {"id": 355, "nombre": "ERAZO SEBASTIAN CONRADO", "provincia": "Catamarca", "ciudad": "Santa Maria", "email": "sebaerazo@hotmail.com", "telefono": "+54 3838 41-0340", "tipo": "Credifin"}, {"id": 356, "nombre": "GASO PABLO FERNANDO", "provincia": "Catamarca", "ciudad": "San Fernando Del Valle De Catamarca", "email": "pablo_ga02@hotmail.com", "telefono": "+54 9 383 420-8101", "tipo": "Credifin"}, {"id": 357, "nombre": "GRANDE DANTE RAMON", "provincia": "Catamarca", "ciudad": "Belen", "email": "dantegrande@hotmail.com", "telefono": "3835444511", "tipo": "Credifin"}, {"id": 358, "nombre": "FALCON ELIZABET DEL VALLE", "provincia": "Catamarca", "ciudad": "San Fernando Del Valle De Catamarca", "email": "bicicleteria_saseta@hotmail.com", "telefono": "3833429323", "tipo": "Credifin"}, {"id": 359, "nombre": "CATA STORE S. A. S.‬‬‬‬", "provincia": "Catamarca", "ciudad": "San Fernando Del Valle De Catamarca", "email": "francof@cataconceptstore.com.ar", "telefono": "+54 9 383 465-1587", "tipo": "Credifin"}, {"id": 360, "nombre": "BOIX MATEO", "provincia": "Santiago Del Estero", "ciudad": "Nueva Esperanza", "email": "mateoboix@hotmail.com", "telefono": "3814644603", "tipo": "Credifin"}, {"id": 361, "nombre": "LAQUIZ HECTOR DANIEL", "provincia": "Santiago Del Estero", "ciudad": "Frias", "email": "turcolaquiz@hotmail.com", "telefono": "+54 351 530-8674", "tipo": "Credifin"}, {"id": 362, "nombre": "ITURRE MIGUEL RICARDO", "provincia": "Santiago Del Estero", "ciudad": "La Banda", "email": "migueliturre25@hotmail.com", "telefono": "3854787768", "tipo": "Credifin"}, {"id": 363, "nombre": "SUAREZ JUAN JOSE", "provincia": "Santiago Del Estero", "ciudad": "Santiago Del Estero", "email": "bikeshopsgo@hotmail.com", "telefono": "3854718543", "tipo": "Credifin"}, {"id": 364, "nombre": "LOBO WALTER DARIO", "provincia": "Santiago Del Estero", "ciudad": "Santiago Del Estero", "email": "walterlobo180@gmail.com", "telefono": "3855878272", "tipo": "Credifin"}, {"id": 365, "nombre": "ROLDAN VELQUIS TERESA", "provincia": "Santiago Del Estero", "ciudad": "Santiago Del Estero", "email": "teresaroldan2590@gmail.com", "telefono": "3644596888", "tipo": "Credifin"}, {"id": 366, "nombre": "RODRIGUEZ RICARDO ROBERTO", "provincia": "Tucumán", "ciudad": "San Miguel De Tucuman", "email": "rodriguezmountainbike@yahoo.com.ar", "telefono": "3818263042", "tipo": "Credifin"}, {"id": 367, "nombre": "VICTOR HUGO YSA", "provincia": "Tucumán", "ciudad": "Famailla", "email": "consultas.doral@gmail.com", "telefono": "+54 381 458-0545", "tipo": "Credifin"}, {"id": 368, "nombre": "CASANOVA OMAR ANTONIO", "provincia": "Tucumán", "ciudad": "San Miguel De Tucuman", "email": "bikecasanova@gmail.com", "telefono": "3816531960", "tipo": "Credifin"}, {"id": 369, "nombre": "MANCERA RICARDO ANDRES", "provincia": "Tucumán", "ciudad": "San Miguel De Tucuman", "email": "bicicleteria_sol@hotmail.com", "telefono": "3815075319", "tipo": "Credifin"}, {"id": 370, "nombre": "SUAREZ MANUEL FRANCISCO", "provincia": "Tucumán", "ciudad": "Las Talitas", "email": "manuelfranciscosuarez@yahoo.com.ar", "telefono": "3812035708", "tipo": "Credifin"}, {"id": 371, "nombre": "SALOMON PABLO MARTIN", "provincia": "Tucumán", "ciudad": "San Miguel De Tucuman", "email": "biketurck@hotmail.com", "telefono": "3815400934", "tipo": "Credifin"}, {"id": 372, "nombre": "ASAF CARLOS JAVIER", "provincia": "Tucumán", "ciudad": "San Miguel De Tucuman", "email": "javierasaf@yahoo.com.ar", "telefono": "3814483432", "tipo": "Credifin"}, {"id": 373, "nombre": "ZOTES CARLOS ADRIAN", "provincia": "Tucumán", "ciudad": "Lules", "email": "bikekamikaze@yahoo.com.ar", "telefono": "3816703100", "tipo": "Credifin"}, {"id": 374, "nombre": "ALVAREZ MARCOS ESTEBAN", "provincia": "Tucumán", "ciudad": "Yerba Buena", "email": "lamecanica88@yahoo.com.ar", "telefono": "3815362795", "tipo": "Credifin"}, {"id": 375, "nombre": "CASANOVA ROSSI CRISTHIAN OMAR DEL VALLE", "provincia": "Tucumán", "ciudad": "San Miguel De Tucuman", "email": "casanovabikeshijo@gmail.com", "telefono": "3816441723", "tipo": "Credifin"}, {"id": 376, "nombre": "PELEGRINA CERRILLO RICARDO SALVADOR", "provincia": "Tucumán", "ciudad": "Concepcion", "email": "ricardopelegrina22@gmail.com", "telefono": "3865645900", "tipo": "Credifin"}, {"id": 377, "nombre": "MORENO ROLDAN ALBA MARIA", "provincia": "Tucumán", "ciudad": "Tafi Viejo", "email": "tafibikes@gmail.com", "telefono": "3813311981", "tipo": "Credifin"}, {"id": 378, "nombre": "DARNAY WALTER ARIEL", "provincia": "Tucumán", "ciudad": "Juan Bautista Alberdi", "email": "arieldarnay01@hotmail.com", "telefono": "+54 381 401-0135", "tipo": "Credifin"}, {"id": 379, "nombre": "GONZALEZ MARIA JOSE", "provincia": "Tucumán", "ciudad": "Juan Bautista Alberdi", "email": "mg9306275@gmail.com", "telefono": "+54 3865 20-6500", "tipo": "Credifin"}, {"id": 380, "nombre": "DE LA ROSA Y DAOUA S.H.", "provincia": "Tucumán", "ciudad": "Concepcion", "email": "mdaoua@hotmail.com", "telefono": "3865422612", "tipo": "Credifin"}, {"id": 381, "nombre": "MOTO PARTES RIN S. R. L", "provincia": "Tucumán", "ciudad": "Aguilares", "email": "mprinsrl@yahoo.com.ar", "telefono": "+54 3865 50-4002", "tipo": "Credifin"}, {"id": 382, "nombre": "ALVAREZ JUAN CARLOS", "provincia": "Catamarca", "ciudad": "Andalgala", "email": "pablo_martin01@hotmail.com", "telefono": "3835435307", "tipo": "Credifin"}, {"id": 383, "nombre": "REYNOSO MARCELO FABIAN", "provincia": "Catamarca", "ciudad": "San Fernando Del Valle De Catamarca", "email": "mf_reynoso@hotmail.com", "telefono": "3834281666", "tipo": "Credifin"}, {"id": 384, "nombre": "DIAZ WALTER MARTIN", "provincia": "Catamarca", "ciudad": "Andalgala", "email": "noarideok@gmail.com", "telefono": "+54 9 3835 40-2415", "tipo": "Credifin"}, {"id": 385, "nombre": "MURO DAYANA MACARENA", "provincia": "Catamarca", "ciudad": "San Fernando Del Valle De Catamarca", "email": "Peto.rm87@gmail.com ", "telefono": "+54 9 383 469-6424", "tipo": "Credifin"}, {"id": 386, "nombre": "PROBIKE S. R. L.", "provincia": "Catamarca", "ciudad": "San Fernando Del Valle De Catamarca", "email": "davidsebastianastuenaga@gmail.com", "telefono": "3834905232", "tipo": "Credifin"}, {"id": 387, "nombre": "LINDOW HOGAR SRL", "provincia": "Santiago Del Estero", "ciudad": "Santiago Del Estero", "email": "estudiolindow@hotmail.com", "telefono": "+54 9 385 609-7611", "tipo": "Credifin"}, {"id": 388, "nombre": "AMADO REGINO NESTOR", "provincia": "Tucumán", "ciudad": "Monteros", "email": "bicicleteriarivadavia2018@gmail.com", "telefono": "+54 9 3863 41-5852", "tipo": "Credifin"}, {"id": 389, "nombre": "CARRIZO MARIO FABIAN", "provincia": "Tucumán", "ciudad": "San Miguel De Tucuman", "email": "carrizo_mario_fabian@hotmail.com.ar", "telefono": "+54 9 381 419-6836", "tipo": "Credifin"}, {"id": 390, "nombre": "CASTRO BENJAMIN FEDERICO", "provincia": "Tucumán", "ciudad": "Yerba Buena", "email": "benjafc@hotmail.com", "telefono": "+54 381 507-2246", "tipo": "Credifin"}, {"id": 391, "nombre": "LERDA MAXIMILIANO", "provincia": "Tucumán", "ciudad": "Yerba Buena", "email": "mathiaslerda5@gmail.com", "telefono": "+54 9 381 330-4791", "tipo": "Credifin"}, {"id": 392, "nombre": "VICTORIANO JUAN MANUEL", "provincia": "Tucumán", "ciudad": "San Miguel De Tucuman", "email": "jvixtoriano@gmail.com ", "telefono": "+54 9 381 419-3144", "tipo": "Credifin"}, {"id": 393, "nombre": "GAY LUCIANO AGUSTIN", "provincia": "Tucumán", "ciudad": "San Miguel De Tucuman", "email": "luciano.gay@icloud.com", "telefono": "+54 381 574-1294", "tipo": "Credifin"}, {"id": 394, "nombre": "AMADO ANDREA", "provincia": "Tucumán", "ciudad": "San Miguel De Tucuman", "email": "pabloso.bicicleteria@gmail.com", "telefono": "+54 9 381 598-9001", "tipo": "Credifin"}, {"id": 395, "nombre": "TOME OMAR A.", "provincia": "Santa Fe", "ciudad": "Las Toscas", "email": "omartome@hotmail.es", "telefono": "3512452056", "tipo": "Credifin"}, {"id": 396, "nombre": "CABALLERO ALEJANDRO", "provincia": "Santa Fe", "ciudad": "Rosario Sud", "email": "bicigroup@hotmail.com", "telefono": "3416286644", "tipo": "Credifin"}, {"id": 397, "nombre": "BLASER PABLO ANTONIO", "provincia": "Santa Fe", "ciudad": "Rafaela", "email": "pabloblaser@hotmail.com.ar", "telefono": "+54 3492 52-2092", "tipo": "Credifin"}, {"id": 398, "nombre": "CAVALLO HUGO ALBERTO", "provincia": "Santa Fe", "ciudad": "Esperanza", "email": "hcavallo43@gmail.com", "telefono": "+54 9 3496 65-8645", "tipo": "Credifin"}, {"id": 399, "nombre": "SERRADELL PABLO ANDRES", "provincia": "Santa Fe", "ciudad": "Rosario Norte", "email": "pablo.serradell@extremebike.com.ar", "telefono": "3416694239", "tipo": "Credifin"}, {"id": 400, "nombre": "VACCARI DAVID JUAN", "provincia": "Santa Fe", "ciudad": "Rosario Sud", "email": "ciclesvaccari@hotmail.es", "telefono": "3415910940", "tipo": "Credifin"}, {"id": 401, "nombre": "NICASSIO MIGUEL ANGEL", "provincia": "Santa Fe", "ciudad": "Rosario Norte", "email": "Bicicleteriamendozarosario@gmail.com", "telefono": "+54 9 341 510-3713", "tipo": "Credifin"}, {"id": 402, "nombre": "PERALTA RUBEN OSCAR", "provincia": "Santa Fe", "ciudad": "Arroyo Seco", "email": "rubenperalta29@hotmail.com", "telefono": "3413619922", "tipo": "Credifin"}, {"id": 403, "nombre": "ROZIE DIEGO ALEJANDRO", "provincia": "Santa Fe", "ciudad": "San Lorenzo", "email": "actionbikegroup@hotmail.com", "telefono": "3476555335", "tipo": "Credifin"}, {"id": 404, "nombre": "CASADEI MARIO CESAR", "provincia": "Santa Fe", "ciudad": "Firmat", "email": "bimax_bike@hotmail.com", "telefono": "+54 3465 65-4483", "tipo": "Credifin"}, {"id": 405, "nombre": "RODRIGUEZ ARIEL LEOPOLDO", "provincia": "Santa Fe", "ciudad": "Villa Constitucion", "email": "arielleopoldorodriguez@hotmail.com", "telefono": "3400516185", "tipo": "Credifin"}, {"id": 406, "nombre": "PONS RODRIGO", "provincia": "Santa Fe", "ciudad": "Los Molinos", "email": "vickypons_08@hotmail.com", "telefono": "3464516394", "tipo": "Credifin"}, {"id": 407, "nombre": "ARDANA LUCIANO", "provincia": "Santa Fe", "ciudad": "Santo Tome", "email": "pulgabike@hotmail.com", "telefono": "+54 342 500-5131", "tipo": "Credifin"}, {"id": 408, "nombre": "GHLAS MORETTI ANDRES FABIAN", "provincia": "Santa Fe", "ciudad": "Firmat", "email": "migrafica25@gmail.com", "telefono": "+54 9 3465 59-6968", "tipo": "Credifin"}, {"id": 409, "nombre": "FERNANDEZ LEONARDO EZEQUIEL", "provincia": "Santa Fe", "ciudad": "Rosario Norte", "email": "infolabicicleteria@gmail.com", "telefono": "3416134423", "tipo": "Credifin"}, {"id": 410, "nombre": "CARLETTI EZEQUIEL MAURICIO", "provincia": "Santa Fe", "ciudad": "Wheelwright", "email": "ezequielcarletti@hotmail.com", "telefono": "+54 2473 41-0554", "tipo": "Credifin"}, {"id": 411, "nombre": "SANCHEZ MANUEL ALEJANDRO", "provincia": "Santa Fe", "ciudad": "San Justo", "email": "manalesan@hotmail.com", "telefono": "+54 3482 42-6908", "tipo": "Credifin"}, {"id": 412, "nombre": "PAZZI MARCOS JAVIER", "provincia": "Santa Fe", "ciudad": "San Lorenzo", "email": "m.p.motos@hotmail.com", "telefono": "+54 3476 52-5256", "tipo": "Credifin"}, {"id": 413, "nombre": "MOSCHEN DIEGO JAVIER", "provincia": "Santa Fe", "ciudad": "Lanteri", "email": "casaagustin@hotmail.com", "telefono": "+54 3482 66-1774", "tipo": "Credifin"}, {"id": 414, "nombre": "MICHELOUD ALDO RUBEN", "provincia": "Santa Fe", "ciudad": "Santo Tome", "email": "micheloudaldo@gmail.com", "telefono": "+54 342 485-3208", "tipo": "Credifin"}, {"id": 415, "nombre": "BERTSCHI SERGIO RUBEN", "provincia": "Santa Fe", "ciudad": "Romang", "email": "campobe2018@gmail.com", "telefono": "3482440245", "tipo": "Credifin"}, {"id": 416, "nombre": "GUSSO PELLEGRINO CRISTIAN SEBASTIAN", "provincia": "Santa Fe", "ciudad": "Rosario Norte", "email": "mr.bateria@hotmail.com", "telefono": "+54 341 325-7621", "tipo": "Credifin"}, {"id": 417, "nombre": "SARMIENTO NICOLAS RAMON", "provincia": "Santa Fe", "ciudad": "Rosario Norte", "email": "en2sruedas@gmail.com", "telefono": "3416554551", "tipo": "Credifin"}, {"id": 418, "nombre": "LUX GASTON", "provincia": "Santa Fe", "ciudad": "Rosario Norte", "email": "luxgaston@hotmail.com", "telefono": "3414023984", "tipo": "Credifin"}, {"id": 419, "nombre": "BEROY LISANDRO GABRIEL", "provincia": "Santa Fe", "ciudad": "Centeno", "email": "cuch_64@hotmail.com", "telefono": "3401529174", "tipo": "Credifin"}, {"id": 420, "nombre": "MOYANO DIEGO ARMANDO", "provincia": "Santa Fe", "ciudad": "Reconquista", "email": "diemoya29@gmail.com", "telefono": "3482654806", "tipo": "Credifin"}, {"id": 421, "nombre": "KREVISKY JOAQUIN", "provincia": "Santa Fe", "ciudad": "Santa Fe", "email": "joacokrevisky@gmail.com", "telefono": "3425206024", "tipo": "Credifin"}, {"id": 422, "nombre": "TRAVERSO JUAN MANUEL", "provincia": "Santa Fe", "ciudad": "San Javier", "email": "jmtraverso15@gmail.com", "telefono": "3405456620", "tipo": "Credifin"}, {"id": 423, "nombre": "VIANO FACUNDO", "provincia": "Santa Fe", "ciudad": "vera", "email": "Antovuckovi@gmail.com.ar", "telefono": "+54 9 3483 48-1709", "tipo": "Credifin"}, {"id": 424, "nombre": "NAGEL DIEGO NORBERTO", "provincia": "Santa Fe", "ciudad": "Esperanza", "email": "dnbikes@hotmail.com", "telefono": "3496542886", "tipo": "Credifin"}, {"id": 425, "nombre": "GONZALEZ LEONARDO ARIEL", "provincia": "Santa Fe", "ciudad": "Susana", "email": "leo_gonzalez9@hotmail.com", "telefono": "+54 3492 52-2187", "tipo": "Credifin"}, {"id": 426, "nombre": "MAGNAGO GABRIELA YANINA", "provincia": "Santa Fe", "ciudad": "Malabrigo", "email": "fernando.masin@gmail.com", "telefono": "3482507571", "tipo": "Credifin"}, {"id": 427, "nombre": "ANZIANI DORA", "provincia": "Santa Fe", "ciudad": "Santa Fe", "email": "anzianibike@hotmail.com", "telefono": "342453978", "tipo": "Credifin"}, {"id": 428, "nombre": "TANGUSSO ROMINA FLAVIA", "provincia": "Santa Fe", "ciudad": "Rosario Norte", "email": "tomasromanos1977@gmail.com", "telefono": "3416750199", "tipo": "Credifin"}, {"id": 429, "nombre": "MELION SILVINA ANALIA", "provincia": "Santa Fe", "ciudad": "San Gregorio", "email": "ivimelion@hotmail.com", "telefono": "3382440378", "tipo": "Credifin"}, {"id": 430, "nombre": "MONTEVERDE SILVANA ELIANA", "provincia": "Santa Fe", "ciudad": "Santa Fe", "email": "silvana-19@live.com.ar", "telefono": "3425272819", "tipo": "Credifin"}, {"id": 431, "nombre": "BASUALDO CLAUDIA ESTEFANIA", "provincia": "Santa Fe", "ciudad": "Sunchales", "email": "juancruzronchi17@gmail.com", "telefono": "3408675191", "tipo": "Credifin"}, {"id": 432, "nombre": "VUCKOVIC ANTONELLA GABRIELA", "provincia": "Santa Fe", "ciudad": "Vera", "email": "Antovuckovic14@gmail.com", "telefono": "+54 9 3483 48-1709", "tipo": "Credifin"}, {"id": 433, "nombre": "RODAS S A", "provincia": "Santa Fe", "ciudad": "Rosario Norte", "email": "jbitar@rodassrl.com.ar", "telefono": "3415643488", "tipo": "Credifin"}, {"id": 434, "nombre": "RODADOS RICARD'S DE PAYA RICARDO, ANDRES Y GERARDO S.H.", "provincia": "Santa Fe", "ciudad": "Santa Fe", "email": "ricardsproveedores@gmail.com", "telefono": "3426157774", "tipo": "Credifin"}, {"id": 435, "nombre": "ROSSO JUAN PABLO Y DI BIAGGIO MARCELO N. R. SOCIEDAD DE LA SECCION IV LGS", "provincia": "Santa Fe", "ciudad": "San Lorenzo", "email": "rodadoslanueva@hotmail.com", "telefono": "3476634588", "tipo": "Credifin"}, {"id": 436, "nombre": "OLIVEIRA CARLOS", "provincia": "Santa Fe", "ciudad": "Villa Gobernador Galvez", "email": "narolcycles@hotmail.com.ar", "telefono": "+54 9 341 545-6724", "tipo": "Credifin"}, {"id": 437, "nombre": "TOMEI GERMAN ALBERTO ADRIAN", "provincia": "Santa Fe", "ciudad": "Arroyo Seco", "email": "mateo.tomei@hotmail.com", "telefono": "+54 3402 52-1950", "tipo": "Credifin"}, {"id": 438, "nombre": "DI RICO MARTIN EDUARDO", "provincia": "Santa Fe", "ciudad": "Rosario Norte", "email": "speedwayrosario3@gmail.com", "telefono": "+54 9 341 508-6006", "tipo": "Credifin"}, {"id": 439, "nombre": "LOPEZ DIEGO NORBERTO", "provincia": "Santa Fe", "ciudad": "Rosario Sud", "email": "bicicletaselrayito@hotmail.com", "telefono": "+54 341 431-3163", "tipo": "Credifin"}, {"id": 440, "nombre": "GARETTO LEONARDO DANIEL", "provincia": "Santa Fe", "ciudad": "Teodelina", "email": "bikesleo@live.com.ar", "telefono": "+54 3462 30-5463", "tipo": "Credifin"}, {"id": 441, "nombre": "VILLANUEVA DAVID ALBERTO", "provincia": "Santa Fe", "ciudad": "Santa Fe", "email": "davillanueva1977@gmail.com", "telefono": "+54 342 615-5406", "tipo": "Credifin"}, {"id": 442, "nombre": "RONDA LUCAS EZEQUIEL", "provincia": "Santa Fe", "ciudad": "Rosario Norte", "email": "lucasronda@hotmail.com", "telefono": "+54 341 502-1117", "tipo": "Credifin"}, {"id": 443, "nombre": "VILLALBA RAUL OSCAR", "provincia": "Santa Fe", "ciudad": "Laguna Paiva", "email": "mrbikes.lp@gmail.com", "telefono": "+54 342 422-3413", "tipo": "Credifin"}, {"id": 444, "nombre": "BARNI JAVIER ALFREDO", "provincia": "Santa Fe", "ciudad": "Gobernador Crespo", "email": "sprintel_sg@hotmail.com", "telefono": "+54 9 3498 43-9439", "tipo": "Credifin"}, {"id": 445, "nombre": "GONZALEZ MARIA DE LOS ANGELES", "provincia": "Santa Fe", "ciudad": "Villa Constitucion", "email": "bicicleteriabregant@gmail.com", "telefono": "+54 9 3400 66-0822", "tipo": "Credifin"}, {"id": 446, "nombre": "BRAIDOT MARISA ROSANA", "provincia": "Santa Fe", "ciudad": "Reconquista", "email": "marisarbraidot@gmail.com", "telefono": "+54 9 3482 63-3422", "tipo": "Credifin"}, {"id": 447, "nombre": "SOLIS MARIA LAURA", "provincia": "Santa Fe", "ciudad": "Las Toscas", "email": "marcostoma9@hotmail.com", "telefono": "+54 3482 65-9908", "tipo": "Credifin"}, {"id": 448, "nombre": "RIVERO DAIANA BELEN", "provincia": "Santa Fe", "ciudad": "Romang", "email": "daiabr.dr@gmail.com", "telefono": "+54 3482 52-5820", "tipo": "Credifin"}, {"id": 449, "nombre": "PRO-RAM S.R.L.", "provincia": "Santa Fe", "ciudad": "Avellaneda", "email": "proramvanina@gmail.com", "telefono": "3482303290", "tipo": "Credifin"}];
+        const CLIENTES_SIN = [{"id": 450, "nombre": "SPAGOLLA LUIS ALBERTO", "provincia": "Trelew", "ciudad": "Chubut", "email": "Luistito1503@gmail.com", "telefono": "+54 9 280 467-2942", "tipo": "Sin Credifin"}, {"id": 451, "nombre": "CERDA PABLO ALEJANDRO", "provincia": "Comodoro Rivadavia", "ciudad": "Chubut", "email": "pablocerda2205@gmail.com", "telefono": "+54 9 297 418-8479", "tipo": "Sin Credifin"}, {"id": 452, "nombre": "GOMEZ EDUARDO EZEQUIEL", "provincia": "Comodoro Rivadavia", "ciudad": "Chubut", "email": "edu222gomez@gmail.com", "telefono": "2975278495", "tipo": "Sin Credifin"}, {"id": 453, "nombre": "DELGADO NATHALIA AURORA", "provincia": "Esquel", "ciudad": "Chubut", "email": "rutaandina22@hotmail.com", "telefono": "2945688230", "tipo": "Sin Credifin"}, {"id": 454, "nombre": "SCARANO DEMIAN", "provincia": "Trelew", "ciudad": "Chubut", "email": "scaranomtb@gmail.com", "telefono": "2804211784", "tipo": "Sin Credifin"}, {"id": 455, "nombre": "LLOYD JOHN WILLIAM", "provincia": "Trelew", "ciudad": "Chubut", "email": "lloyd_john_william@hotmail.com", "telefono": "+54 9 280 462-4985", "tipo": "Sin Credifin"}, {"id": 456, "nombre": "ORDENES STELLA MARIS", "provincia": "Comodoro Rivadavia", "ciudad": "Chubut", "email": "stella_cabibbo@hotmail.com", "telefono": "+54 297 423-7440", "tipo": "Sin Credifin"}, {"id": 457, "nombre": "LOZA GIRLI TAMARA", "provincia": "Rawson", "ciudad": "Chubut", "email": "angelo.m@live.com.ar", "telefono": "2804715414", "tipo": "Sin Credifin"}, {"id": 458, "nombre": "ANAGUA FELIPE DANIEL EDUA", "provincia": "Tilcara", "ciudad": "Jujuy", "email": "felipeanagua26@gmail.com", "telefono": "+54 9 388 521-9966", "tipo": "Sin Credifin"}, {"id": 459, "nombre": "BONAVENTURA SANTIAGO IGNACIO", "provincia": "San Salvador De Jujuy", "ciudad": "Jujuy", "email": "labicicletajujuy@gmail.com", "telefono": "3884372100", "tipo": "Sin Credifin"}, {"id": 460, "nombre": "CRUMART S. R. L.", "provincia": "San Salvador De Jujuy", "ciudad": "Jujuy", "email": "pablobike.arg@gmail.com", "telefono": "+54 388 477-2434", "tipo": "Sin Credifin"}, {"id": 461, "nombre": "BESI JUAN JOSE LUIS", "provincia": "Santa Rosa", "ciudad": "La Pampa", "email": "juanjobesi@yahoo.com", "telefono": "2954594763", "tipo": "Sin Credifin"}, {"id": 462, "nombre": "PRADO SERGIO MARTIN", "provincia": "Macachin", "ciudad": "La Pampa", "email": "Sergiomprado2017@gmail.com", "telefono": "+54 2954 44-8387", "tipo": "Sin Credifin"}, {"id": 463, "nombre": "HERRERA ANA MARIA", "provincia": "General Pico", "ciudad": "La Pampa", "email": "mito_hito@yahoo.com.ar", "telefono": "2302432532", "tipo": "Sin Credifin"}, {"id": 464, "nombre": "MORA MARIA VANESA", "provincia": "25 De Mayo", "ciudad": "La Pampa", "email": "vanesamora@live.com.ar", "telefono": "+54 299 515-8474", "tipo": "Sin Credifin"}, {"id": 465, "nombre": "CAPPELLO MARIA MARTA", "provincia": "Toay", "ciudad": "La Pampa", "email": "mariacappello988@gmail.com", "telefono": "+54 2954 29-0861", "tipo": "Sin Credifin"}, {"id": 466, "nombre": "MALDONADO FLORENCIA NOELY", "provincia": "Victorica", "ciudad": "La Pampa", "email": "eliasrubin@hotmail.com", "telefono": "+54 2954 22-2127", "tipo": "Sin Credifin"}, {"id": 467, "nombre": "SHALOM LIBROS SAS", "provincia": "Eduardo Castex", "ciudad": "La Pampa", "email": "shalomlibros1@hotmail.com", "telefono": "+54 3537 66-0762", "tipo": "Sin Credifin"}, {"id": 468, "nombre": "GOMAR GUSTAVO ADRIAN", "provincia": "Villa La Angostura", "ciudad": "Neuquén", "email": "bike@proshopaventura.com", "telefono": "+54 9 11 3470-1936", "tipo": "Sin Credifin"}, {"id": 469, "nombre": "ATENCIO JORGE ANTONIO", "provincia": "Centenario", "ciudad": "Neuquén", "email": "jorgeatencio20@hotmail.com.ar", "telefono": "2995155994", "tipo": "Sin Credifin"}, {"id": 470, "nombre": "QUIDEL RUBEN IGNACIO", "provincia": "Piedra Del Aguila", "ciudad": "Neuquén", "email": "OSIRISPDA@HOTMAIL.COM", "telefono": "+54 2942 69-1004", "tipo": "Sin Credifin"}, {"id": 471, "nombre": "QUINTANA ARIEL EDUARDO", "provincia": "Centenario", "ciudad": "Neuquén", "email": "arielequintana81@gmail.com", "telefono": "2994551524", "tipo": "Sin Credifin"}, {"id": 472, "nombre": "ADANJO CARLOS DANIEL", "provincia": "Plottier", "ciudad": "Neuquén", "email": "c_daniel_2009@hotmail.com", "telefono": "+54 9 299 471-3844", "tipo": "Sin Credifin"}, {"id": 473, "nombre": "DORHMANN GERMAN", "provincia": "Neuquen", "ciudad": "Neuquén", "email": "dorhmann@hotmail.com", "telefono": "2604414455", "tipo": "Sin Credifin"}, {"id": 474, "nombre": "SILKA MIGUEL ANGEL", "provincia": "Cutral Co", "ciudad": "Neuquén", "email": "miguel_silka@hotmail.com", "telefono": "2994616065", "tipo": "Sin Credifin"}, {"id": 475, "nombre": "AMARANTE DAMARIS LUCIA", "provincia": "Junin De Los Andes", "ciudad": "Neuquén", "email": "orlandogerman@hotmail.com", "telefono": "+54 294 455-7937", "tipo": "Sin Credifin"}, {"id": 476, "nombre": "SISTEMAS PB SRL", "provincia": "Neuquen", "ciudad": "Neuquén", "email": "planetbike@hotmail.com", "telefono": "2994384934", "tipo": "Sin Credifin"}, {"id": 477, "nombre": "KANDO SRL", "provincia": "Neuquen", "ciudad": "Neuquén", "email": "joaquindaniel.h@kando.com.ar", "telefono": "2995755731", "tipo": "Sin Credifin"}, {"id": 478, "nombre": "MARTIN HECTOR RAUL", "provincia": "Cipolletti", "ciudad": "Río Negro", "email": "bicicleteriamartin@yahoo.com.ar", "telefono": "+54 299 635-4826", "tipo": "Sin Credifin"}, {"id": 479, "nombre": "MANGE EDUARDO OSCAR", "provincia": "General Conesa", "ciudad": "Río Negro", "email": "bicisantos@hotmail.com", "telefono": "2920612564", "tipo": "Sin Credifin"}, {"id": 480, "nombre": "BONFANTI ENRIQUE DANIEL", "provincia": "Luis Beltran", "ciudad": "Río Negro", "email": "deporteaventurabeltran@yahoo.com.ar", "telefono": "2984580542", "tipo": "Sin Credifin"}, {"id": 481, "nombre": "FURLAN JOSE LUIS", "provincia": "Ingeniero Huergo", "ciudad": "Río Negro", "email": "vhenriquez264@yahoo.com", "telefono": "+54 9 298 458-3529", "tipo": "Sin Credifin"}, {"id": 482, "nombre": "TULA PEDRO RAMON", "provincia": "San Antonio Oeste", "ciudad": "Río Negro", "email": "todomusicasao@hotmail.com", "telefono": "+54 2920 51-1122", "tipo": "Sin Credifin"}, {"id": 483, "nombre": "ARIAS JUAN MARIA", "provincia": "Allen", "ciudad": "Río Negro", "email": "ariasjuan@gmail.com", "telefono": "+54 9 298 419-1018", "tipo": "Sin Credifin"}, {"id": 484, "nombre": "ROA FARINELLI LEANDRO", "provincia": "Choele Choel", "ciudad": "Río Negro", "email": "leandroroa103@gmail.com", "telefono": "2984574406", "tipo": "Sin Credifin"}, {"id": 485, "nombre": "MARTIN SEBASTIAN NICOLAS", "provincia": "Cipolletti", "ciudad": "Río Negro", "email": "bicicleteriamartin2018@gmail.com", "telefono": "+54 9 299 635-4826", "tipo": "Sin Credifin"}, {"id": 486, "nombre": "FERNANDEZ JOSE ANTONIO", "provincia": "Choele Choel", "ciudad": "Río Negro", "email": "tonybike_arg@hotmail.com", "telefono": "+54 9 298 455-9966", "tipo": "Sin Credifin"}, {"id": 487, "nombre": "SEGON MARTIN NICOLAS", "provincia": "Villa Regina", "ciudad": "Río Negro", "email": "segmar_arg@hotmail.com", "telefono": "2984907086", "tipo": "Sin Credifin"}, {"id": 488, "nombre": "VARGAZ VEIMAR TOMAS", "provincia": "Cipolletti", "ciudad": "Río Negro", "email": "veimar.varga@gmail.com", "telefono": "+54 299 655-8385", "tipo": "Sin Credifin"}, {"id": 489, "nombre": "HUINCAMAN FRANCIS AGUSTIN", "provincia": "Cinco Saltos", "ciudad": "Río Negro", "email": "5bike.ok@gmail.com", "telefono": "2942469627// +54 9 2942 46-9627", "tipo": "Sin Credifin"}, {"id": 490, "nombre": "KELLER DAVID ALEJANDRO", "provincia": "El Bolson", "ciudad": "Río Negro", "email": "piltribike@gmail.com", "telefono": "+54 294 421-5665", "tipo": "Sin Credifin"}, {"id": 491, "nombre": "INTRIERI ALEJO GASTON", "provincia": "Las Grutas", "ciudad": "Río Negro", "email": "intrierialejo@hotmail.com", "telefono": "+54 9 2920 54-3051", "tipo": "Sin Credifin"}, {"id": 492, "nombre": "BURGOS LUIS ALEJANDRO", "provincia": "General Roca", "ciudad": "Río Negro", "email": "luisburgos_7@hotmail.com", "telefono": "2984344810", "tipo": "Sin Credifin"}, {"id": 493, "nombre": "ALVAREZ MALPICA CESAR DANIEL", "provincia": "General Roca", "ciudad": "Río Negro", "email": "Cesardanielalvarezm@gmail.com ", "telefono": "+54 299 518-6909", "tipo": "Sin Credifin"}, {"id": 494, "nombre": "MINICUOTAS SUR DOS", "provincia": "Viedma", "ciudad": "Río Negro", "email": "minicuotassur@gmail.com", "telefono": "+54 2920 42-1154", "tipo": "Sin Credifin"}, {"id": 495, "nombre": "SL COLLECTION S.R.L.", "provincia": "Neuquen", "ciudad": "Río Negro", "email": "slaumannqn@yahoo.com.ar", "telefono": "+54 299 460-6666", "tipo": "Sin Credifin"}, {"id": 496, "nombre": "BICICLETERIA MEDINA SAS", "provincia": "General Roca", "ciudad": "Río Negro", "email": "bicicleteriaavenida@gmail.com", "telefono": "+54 298 464-1505", "tipo": "Sin Credifin"}, {"id": 497, "nombre": "PARRA FLORENCIO", "provincia": "Salta", "ciudad": "Salta", "email": "ciclesparra@hotmail.com ", "telefono": "+54 9 387 252-8888", "tipo": "Sin Credifin"}, {"id": 498, "nombre": "LOPEZ DARIO RENE", "provincia": "Salta", "ciudad": "Salta", "email": "reneelopez04@hotmail.com", "telefono": "3874150707", "tipo": "Sin Credifin"}, {"id": 499, "nombre": "ORTIZ JOSE ANTONIO HUGO", "provincia": "General Güemes", "ciudad": "Salta", "email": "compuhouse.jose@gmail.com", "telefono": "+54 387 685-4134", "tipo": "Sin Credifin"}, {"id": 500, "nombre": "MACIAS JAVIER ERNESTO", "provincia": "Salta", "ciudad": "Salta", "email": "maciasjavier@gmail.com", "telefono": "3874821323", "tipo": "Sin Credifin"}, {"id": 501, "nombre": "POLICHE HUERGA JAVIER ALEJANDRO", "provincia": "Rosario De La Frontera", "ciudad": "Salta", "email": "polichebike@hotmail.com", "telefono": "+54 3876 55-3939", "tipo": "Sin Credifin"}, {"id": 502, "nombre": "SARMIENTO CARLOS RAFAEL", "provincia": "Salta", "ciudad": "Salta", "email": "romi_guady11@hotmail.com", "telefono": "+54 387 459-5541", "tipo": "Sin Credifin"}, {"id": 503, "nombre": "GRIFASI PABLO JOSE", "provincia": "Las Lajitas", "ciudad": "Salta", "email": "grifasiperformance@gmail.com", "telefono": "+54 387 487-6186", "tipo": "Sin Credifin"}, {"id": 504, "nombre": "LOPEZ JUAN PABLO", "provincia": "Cafayate", "ciudad": "Salta", "email": "oxigenodeporte@hotmail.com", "telefono": "+54 387 605-2519", "tipo": "Sin Credifin"}, {"id": 505, "nombre": "DELGADO ANACHURI JORGE DANIEL", "provincia": "Salta", "ciudad": "Salta", "email": "jdbikesalta@gmail.com", "telefono": "+54 387 519-0938", "tipo": "Sin Credifin"}, {"id": 506, "nombre": "POSTIGO FRANCISCO RUBEN", "provincia": "SALTA", "ciudad": "Salta", "email": "francisco@dorsporthouse.com.ar", "telefono": "3874825825", "tipo": "Sin Credifin"}, {"id": 507, "nombre": "LAGUNA ARMELLA ISMAEL FERNANDO", "provincia": "El Carril", "ciudad": "Salta", "email": "armellalaguna94@gmail.com", "telefono": "+54 9 387 453-8444", "tipo": "Sin Credifin"}, {"id": 508, "nombre": "VISICH TOMAS ROBERTO", "provincia": "Chicoana", "ciudad": "Salta", "email": "tomi342011@hotmail.com", "telefono": "+54 9 387 597-2225", "tipo": "Sin Credifin"}, {"id": 509, "nombre": "SOSA FACUNDO DANIEL", "provincia": "Aguaray", "ciudad": "Salta", "email": "facusosacontacto@gmail.com", "telefono": "+54 9 387 212-5047", "tipo": "Sin Credifin"}, {"id": 510, "nombre": "MORALES JORGE EZEQUIAS", "provincia": "Rosario De Lerma", "ciudad": "Salta", "email": "brotherssbike@gmail.com", "telefono": "+54 387 415-6387", "tipo": "Sin Credifin"}, {"id": 511, "nombre": "PEREZ JORGE ROBERTO", "provincia": "Salta", "ciudad": "Salta", "email": "coqui.perez@hotmail.com", "telefono": "+54 387 403-8400", "tipo": "Sin Credifin"}, {"id": 512, "nombre": "GAUVRON GABRIEL JULIO CARLOS", "provincia": "El Carril", "ciudad": "Salta", "email": "juliogauvron@hotmail.com", "telefono": "+54 9 387 597-1808", "tipo": "Sin Credifin"}, {"id": 513, "nombre": "SILVA NATALY MERCEDES", "provincia": "Tartagal", "ciudad": "Salta", "email": "gcayetano117@gmail.com", "telefono": "+54 9 3873 34-2275", "tipo": "Sin Credifin"}, {"id": 514, "nombre": "LUCENA TORFE VALERIA NAHIR", "provincia": "Salta", "ciudad": "Salta", "email": "facusosacontacto@gmail.com", "telefono": "+54 9 387 212-5047", "tipo": "Sin Credifin"}, {"id": 515, "nombre": "BICICLETERIA MANRESA S.R.L.", "provincia": "Salta", "ciudad": "Salta", "email": "ana.maria@bicicleteriamanresa.com.ar", "telefono": "+54 387 531-4428", "tipo": "Sin Credifin"}, {"id": 516, "nombre": "BICMAS S.R.L", "provincia": "Salta", "ciudad": "Salta", "email": "postigomatias@gmail.com", "telefono": "3874676095", "tipo": "Sin Credifin"}, {"id": 517, "nombre": "LEYENDA ADRIAN BERNANDO", "provincia": "Puerto Santa Cruz", "ciudad": "Santa Cruz", "email": "adrianley125@gmail.com", "telefono": "2966446007", "tipo": "Sin Credifin"}, {"id": 518, "nombre": "RAMOS ANA MARIA", "provincia": "Pico Truncado", "ciudad": "Santa Cruz", "email": "rollertruncado@hotmail.es", "telefono": "+54 9 297 411-7518", "tipo": "Sin Credifin"}, {"id": 519, "nombre": "ARAMAYO ROSA MARY", "provincia": "Caleta Olivia", "ciudad": "Santa Cruz", "email": "comprasroller_center@hotmail.com", "telefono": "+54 297 494-1173", "tipo": "Sin Credifin"}, {"id": 520, "nombre": "BERNALES MACIAS JUAN ANTONIO", "provincia": "Ushuaia", "ciudad": "Tierra del Fuego", "email": "bernalesemanuel@gmail.com", "telefono": "2901411985", "tipo": "Sin Credifin"}, {"id": 521, "nombre": "LOVERA ELIGIO", "provincia": "Rio Grande", "ciudad": "Tierra del Fuego", "email": "administracion1@enjoytdf.com.ar", "telefono": "2964421960", "tipo": "Sin Credifin"}, {"id": 522, "nombre": "FERREIRA VERA CESAR DANIEL", "provincia": "Rio Grande", "ciudad": "Tierra del Fuego", "email": "fuegobikes@hotmail.com", "telefono": "2964691773", "tipo": "Sin Credifin"}, {"id": 523, "nombre": "GENTA ADRIAN FERNANDO", "provincia": "Ushuaia", "ciudad": "Tierra del Fuego", "email": "genta-adrian@hotmail.com", "telefono": "+54 9 2901 47-1468", "tipo": "Sin Credifin"}, {"id": 524, "nombre": "IMPORTADORA COMERCIAL FUEGUINA S R L", "provincia": "Ushuaia", "ciudad": "Tierra del Fuego", "email": "pagos@imcofue.com.ar", "telefono": "+54 9 2901 58-5703", "tipo": "Sin Credifin"}];
+
+        // Cargar scripts guardados
+        function cargarScriptsGuardados() {
+            const guardados = JSON.parse(localStorage.getItem('scripts-editados') || '{}');
+            Object.keys(guardados).forEach(tipo => {
+                if (scripts[tipo]) {
+                    scripts[tipo] = { ...scripts[tipo], ...guardados[tipo] };
+                }
+            });
+        }
+
+        function mostrarScript(tipo) {
+            if (!scripts || !scripts[tipo]) {
+                alert('Script no encontrado');
+                return;
+            }
+            
+            scriptTipoActual = tipo;
+            scriptActualObj = scripts[tipo];
+            
+            const clienteDiv = document.getElementById('script-cliente-display');
+            if (scriptActualObj.cliente) {
+                clienteDiv.innerHTML = scriptActualObj.cliente;
+                clienteDiv.style.display = 'block';
+            } else {
+                clienteDiv.style.display = 'none';
+            }
+            
+            document.getElementById('script-content').textContent = scriptActualObj.texto;
+            
+            const tipsDiv = document.getElementById('script-tips-display');
+            if (scriptActualObj.tips) {
+                tipsDiv.innerHTML = scriptActualObj.tips;
+                tipsDiv.style.display = 'block';
+            } else {
+                tipsDiv.style.display = 'none';
+            }
+            
+            document.querySelectorAll('.btn-script').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function copiarScript() {
+            if (!scriptActualObj) return alert('Selecciona un script');
+            navigator.clipboard.writeText(scriptActualObj.texto);
+            alert('✓ Script copiado al portapapeles');
+        }
+
+        function abrirEditorScript() {
+            if (!scriptTipoActual) return alert('Selecciona un script primero');
+            
+            document.getElementById('editor-titulo').textContent = 'Editar: ' + scriptTipoActual;
+            document.getElementById('editor-cliente').value = scriptActualObj.cliente || '';
+            document.getElementById('editor-texto').value = scriptActualObj.texto || '';
+            document.getElementById('editor-tips').value = (scriptActualObj.tips || '').replace(/<[^>]*>/g, '');
+            document.getElementById('editor-modal').style.display = 'flex';
+        }
+
+        function cerrarEditorScript() {
+            document.getElementById('editor-modal').style.display = 'none';
+        }
+
+        function guardarScriptEditado() {
+            const cliente = document.getElementById('editor-cliente').value.trim();
+            const texto = document.getElementById('editor-texto').value.trim();
+            const tips = document.getElementById('editor-tips').value.trim();
+            
+            if (!texto) return alert('El script no puede estar vacío');
+            
+            scripts[scriptTipoActual].cliente = cliente;
+            scripts[scriptTipoActual].texto = texto;
+            scripts[scriptTipoActual].tips = tips ? '💡 ' + tips : '';
+            
+            const guardados = JSON.parse(localStorage.getItem('scripts-editados') || '{}');
+            guardados[scriptTipoActual] = { cliente, texto, tips: scripts[scriptTipoActual].tips };
+            localStorage.setItem('scripts-editados', JSON.stringify(guardados));
+            
+            mostrarScript(scriptTipoActual);
+            cerrarEditorScript();
+            alert('✅ Script guardado correctamente');
+        }
+
+        function cambiarTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // ============================================================
+        // FILTROS - Funcionan PERFECTAMENTE con ambos tipos
+        // ============================================================
+        
+        function filtrarCredifin() {
+            let clientes = CLIENTES_CREDIFIN;
+            const nombre = document.getElementById('filtro-cred-nombre').value.toLowerCase();
+            const provincia = document.getElementById('filtro-cred-provincia').value;
+            const ciudad = document.getElementById('filtro-cred-ciudad').value.toLowerCase();
+            const telefono = document.getElementById('filtro-cred-telefono').value;
+
+            clientes = clientes.filter(c =>
+                c.nombre.toLowerCase().includes(nombre) &&
+                (provincia === '' || c.provincia.toLowerCase() === provincia.toLowerCase()) &&
+                c.ciudad.toLowerCase().includes(ciudad) &&
+                c.telefono.includes(telefono)
+            );
+            
+            const clientesLS = JSON.parse(localStorage.getItem('-clientes') || '[]');
+            
+            const html = clientes.map(c => {
+                const Entry = clientesLS.find(x => x.id == c.id);
+                const asignadoAOtro = Entry && Entry.vendedorId && Entry.vendedorId != vendedorActivo;
+                const baIcon = c.provincia === 'Buenos Aires' ? '<span class="ba-badge">🔵 BA</span>' : '';
+                const asignadoLabel = asignadoAOtro ? '<span style="font-size:9px;color:#dc3545;font-weight:700;">🔒 Asignado</span>' : '';
+                return `
+                    <tr style="${asignadoAOtro ? 'opacity:0.5;' : ''}">
+                        <td><input type="checkbox" class="check-cred-cliente" data-id="${c.id}" onchange="actualizarBtn()" ${asignadoAOtro ? 'disabled' : ''} style="width: auto;"></td>
+                        <td>${baIcon}${c.nombre} ${asignadoLabel}</td>
+                        <td>${c.provincia}</td>
+                        <td>${c.ciudad}</td>
+                        <td>${c.telefono}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('tabla-cred').innerHTML = html || '<tr><td colspan="5" style="text-align: center; color: #999; padding: 20px;">No hay clientes que coincidan con los filtros</td></tr>';
+        }
+
+        function filtrarSin() {
+            let clientes = CLIENTES_SIN;
+            const nombre = document.getElementById('filtro-sin-nombre').value.toLowerCase();
+            const provincia = document.getElementById('filtro-sin-provincia').value;
+            const ciudad = document.getElementById('filtro-sin-ciudad').value.toLowerCase();
+            const telefono = document.getElementById('filtro-sin-telefono').value;
+
+            clientes = clientes.filter(c =>
+                c.nombre.toLowerCase().includes(nombre) &&
+                (provincia === '' || c.provincia.toLowerCase() === provincia.toLowerCase()) &&
+                c.ciudad.toLowerCase().includes(ciudad) &&
+                c.telefono.includes(telefono)
+            );
+            
+            const clientesLS = JSON.parse(localStorage.getItem('-clientes') || '[]');
+            
+            const html = clientes.map(c => {
+                const Entry = clientesLS.find(x => x.id == c.id);
+                const asignadoAOtro = Entry && Entry.vendedorId && Entry.vendedorId != vendedorActivo;
+                const sinIcon = '<span class="sin-badge">🟡 SIN</span>';
+                const asignadoLabel = asignadoAOtro ? '<span style="font-size:9px;color:#dc3545;font-weight:700;">🔒 Asignado</span>' : '';
+                return `
+                    <tr style="${asignadoAOtro ? 'opacity:0.5;' : ''}">
+                        <td><input type="checkbox" class="check-sin-cliente" data-id="${c.id}" onchange="actualizarBtn()" ${asignadoAOtro ? 'disabled' : ''} style="width: auto;"></td>
+                        <td>${sinIcon}${c.nombre} ${asignadoLabel}</td>
+                        <td>${c.provincia}</td>
+                        <td>${c.ciudad}</td>
+                        <td>${c.telefono}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('tabla-sin').innerHTML = html || '<tr><td colspan="5" style="text-align: center; color: #999; padding: 20px;">No hay clientes que coincidan con los filtros</td></tr>';
+        }
+
+        function actualizarBtn() {
+            const selec = document.querySelectorAll('.check-cred-cliente:checked').length + document.querySelectorAll('.check-sin-cliente:checked').length;
+            document.getElementById('btn-asignar').disabled = selec === 0 || vendedorActivo === '';
+        }
+
+        function cambiarTodosCred() {
+            const todos = document.getElementById('check-cred').checked;
+            document.querySelectorAll('.check-cred-cliente:not(:disabled)').forEach(c => c.checked = todos);
+            actualizarBtn();
+        }
+
+        function cambiarTodosSin() {
+            const todos = document.getElementById('check-sin').checked;
+            document.querySelectorAll('.check-sin-cliente:not(:disabled)').forEach(c => c.checked = todos);
+            actualizarBtn();
+        }
+
+        function deselTodosCred() {
+            document.querySelectorAll('.check-cred-cliente').forEach(c => c.checked = false);
+            document.getElementById('check-cred').checked = false;
+            actualizarBtn();
+        }
+
+        function deselTodosSin() {
+            document.querySelectorAll('.check-sin-cliente').forEach(c => c.checked = false);
+            document.getElementById('check-sin').checked = false;
+            actualizarBtn();
+        }
+
+        function asignarClientes() {
+            if (!vendedorActivo) {
+                alert('Por favor selecciona un vendedor');
+                return;
+            }
+
+            const credifin = [...document.querySelectorAll('.check-cred-cliente:checked')];
+            const sin = [...document.querySelectorAll('.check-sin-cliente:checked')];
+            const seleccionados = [...credifin, ...sin];
+            
+            if (seleccionados.length === 0) return alert('Selecciona clientes');
+            
+            let clientesLS = JSON.parse(localStorage.getItem('-clientes') || '[]');
+            let asignados = 0;
+            let errores = 0;
+            
+            seleccionados.forEach(check => {
+                const id = parseInt(check.dataset.id);
+                
+                // ⚠️ VALIDACIÓN CRÍTICA
+                let cliente = null;
+                let tipoDetectado = null;
+                
+                // BUSCAR EN CREDIFIN PRIMERO
+                cliente = CLIENTES_CREDIFIN.find(c => c.id === id);
+                if (cliente) {
+                    tipoDetectado = 'Credifin'; // ← TIPO FIJO SEGÚN ARRAY
+                    if (cliente.tipo !== 'Credifin') {
+                        console.error(`⚠️ Cliente ${id} está en CREDIFIN pero tipo es "${cliente.tipo}"`);
+                        cliente.tipo = 'Credifin'; // ← FORZAR TIPO CORRECTO
+                    }
+                } 
+                // SI NO, BUSCAR EN SIN CREDIFIN
+                else {
+                    cliente = CLIENTES_SIN.find(c => c.id === id);
+                    if (cliente) {
+                        tipoDetectado = 'Sin Credifin'; // ← TIPO FIJO SEGÚN ARRAY
+                        if (cliente.tipo !== 'Sin Credifin') {
+                            console.error(`⚠️ Cliente ${id} está en SIN CREDIFIN pero tipo es "${cliente.tipo}"`);
+                            cliente.tipo = 'Sin Credifin'; // ← FORZAR TIPO CORRECTO
+                        }
+                    }
+                }
+                
+                if (!cliente) {
+                    console.error(`❌ Cliente ${id} NO ENCONTRADO en ningún array`);
+                    errores++;
+                    return;
+                }
+                
+                if (!tipoDetectado) {
+                    console.error(`❌ No se detectó tipo para cliente ${id}`);
+                    errores++;
+                    return;
+                }
+                
+                // CREAR ENTRADA EN 
+                let Entry = clientesLS.find(c => c.id === id);
+                if (!Entry) {
+                    Entry = {
+                        id: cliente.id,
+                        nombre: cliente.nombre,
+                        telefono: cliente.telefono,
+                        email: cliente.email || '',
+                        ciudad: cliente.ciudad,
+                        provincia: cliente.provincia,
+                        tipo: tipoDetectado, // ← TIPO PROTEGIDO DESDE VALIDACIÓN
+                        vendedorId: vendedorActivo,
+                        estado: 'Contactado',
+                        notas: '',
+                        fechaAsignacion: new Date().toLocaleString('es-AR')
+                    };
+                    clientesLS.push(Entry);
+                    asignados++;
+                    
+                    console.log(`✅ Cliente asignado: ${cliente.nombre} (ID:${id}) Tipo:${tipoDetectado} → ${vendedorActivo}`);
+                } else {
+                    Entry.vendedorId = vendedorActivo;
+                    Entry.tipo = tipoDetectado; // ← ASEGURAR TIPO CORRECTO
+                    asignados++;
+                }
+            });
+            
+            localStorage.setItem('-clientes', JSON.stringify(clientesLS));
+            
+            if (errores > 0) {
+                alert(`⚠️ ${asignados} cliente(s) asignado(s) a ${vendedorActivo}\n❌ ${errores} error(es) en validación`);
+            } else {
+                alert(`✅ ${asignados} cliente(s) asignado(s) correctamente a ${vendedorActivo}`);
+            }
+            
+            deselTodosCred();
+            deselTodosSin();
+            filtrarCredifin();
+            filtrarSin();
+            cargarVendedores();
+            actualizarEstadisticas();
+        }
+
+        function agregarVendedor() {
+            const nombre = document.getElementById('nuevo-vendedor').value.trim();
+            if (!nombre) return alert('Escribe el nombre del vendedor');
+            
+            let vendedores = JSON.parse(localStorage.getItem('vendedores') || '[]');
+            if (vendedores.find(v => v.nombre === nombre)) {
+                return alert('Ya existe un vendedor con ese nombre');
+            }
+            
+            vendedores.push({id: Date.now(), nombre: nombre});
+            localStorage.setItem('vendedores', JSON.stringify(vendedores));
+            
+            document.getElementById('nuevo-vendedor').value = '';
+            cargarVendedores();
+            actualizarEstadisticas();
+            alert('✓ Vendedor agregado');
+        }
+
+        function cargarVendedores() {
+            let vendedores = JSON.parse(localStorage.getItem('vendedores') || '[]');
+            const clientesLS = JSON.parse(localStorage.getItem('-clientes') || '[]');
+            
+            const html = vendedores.map(v => {
+                const count = clientesLS.filter(c => c.vendedorId === v.nombre).length;
+                return `
+                    <div class="vendedor-card ${vendedorActivo === v.nombre ? 'selected' : ''}" onclick="seleccionarVendedor('${v.nombre}')">
+                        <div class="nombre">${v.nombre}</div>
+                        <div class="count">${count}</div>
+                        <button class="btn-delete-vendedor" onclick="event.stopPropagation(); eliminarVendedor('${v.nombre}')">🗑️</button>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('vendedores-list').innerHTML = html || '<p style="text-align:center;color:#999;padding:20px;">Sin vendedores creados aún</p>';
+            document.getElementById('total-vendedores').textContent = vendedores.length;
+        }
+
+        function seleccionarVendedor(nombre) {
+            vendedorActivo = nombre;
+            cargarVendedores();
+            filtrarCredifin();
+            filtrarSin();
+            cargar();
+            actualizarBtn();
+        }
+
+        function eliminarVendedor(nombre) {
+            if (!confirm('¿Eliminar vendedor y liberar sus clientes?')) return;
+            
+            let vendedores = JSON.parse(localStorage.getItem('vendedores') || '[]');
+            vendedores = vendedores.filter(v => v.nombre !== nombre);
+            localStorage.setItem('vendedores', JSON.stringify(vendedores));
+            
+            let clientesLS = JSON.parse(localStorage.getItem('-clientes') || '[]');
+             clientesLS = clientesLS.map(c => {
+                if (c.vendedorId === nombre) c.vendedorId = '';
+                return c;
+            });
+            localStorage.setItem('-clientes', JSON.stringify(clientesLS));
+            
+            vendedorActivo = '';
+            cargarVendedores();
+            cargar();
+            filtrarCredifin();
+            filtrarSin();
+            actualizarEstadisticas();
+        }
+
+        function cargar() {
+            if (!vendedorActivo) {
+                document.getElementById('sin-vendedor-').style.display = 'block';
+                document.getElementById('con-vendedor-').style.display = 'none';
+                return;
+            }
+            
+            let clientesLS = JSON.parse(localStorage.getItem('-clientes') || '[]');
+            clienteActualesList = clientesLS.filter(c => c.vendedorId === vendedorActivo);
+            
+            const html = clienteActualesList.map(c => {
+                const typeIcon = c.tipo === 'Credifin' ? '🟢' : '🟡';
+                return `
+                    <div class="cliente-item ${clienteSeleccionado?.id === c.id ? 'selected' : ''}" onclick="seleccionarCliente(${c.id})">
+                        <div class="cliente-item-info">
+                            <div class="cliente-item-nombre">${typeIcon} ${c.nombre}</div>
+                            <div class="cliente-item-datos">${c.ciudad}, ${c.provincia} • ${c.telefono}</div>
+                        </div>
+                        <span style="font-size: 11px; font-weight: 600; color: ${c.estado === 'Cerrado' ? '#28a745' : c.estado === 'Interesado' ? '#ffc107' : '#6c757d'}">${c.estado}</span>
+                        <button class="btn-delete" onclick="event.stopPropagation(); eliminarCliente(${c.id})">🗑️</button>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('-clientes-list').innerHTML = html;
+            
+            if (clienteActualesList.length > 0) {
+                document.getElementById('sin-vendedor-').style.display = 'none';
+                document.getElementById('con-vendedor-').style.display = 'block';
+                document.getElementById('vendedor--nombre').textContent = ` de ${vendedorActivo} (${clienteActualesList.length} clientes)`;
+            } else {
+                document.getElementById('sin-vendedor-').style.display = 'block';
+                document.getElementById('sin-vendedor-').innerHTML = `<p>⚠️ ${vendedorActivo} no tiene clientes asignados aún</p>`;
+                document.getElementById('con-vendedor-').style.display = 'none';
+            }
+            
+            actualizarEstadisticas();
+        }
+
+        function filtrar() {
+            const busqueda = document.getElementById('filtro-').value.toLowerCase();
+            
+            const items = document.querySelectorAll('.cliente-item');
+            items.forEach(item => {
+                const nombre = item.querySelector('.cliente-item-nombre').textContent.toLowerCase();
+                const datos = item.querySelector('.cliente-item-datos').textContent.toLowerCase();
+                const mostrar = nombre.includes(busqueda) || datos.includes(busqueda);
+                item.style.display = mostrar ? 'flex' : 'none';
+            });
+        }
+
+        function seleccionarCliente(id) {
+            clienteSeleccionado = clienteActualesList.find(c => c.id == id);
+            cargar();
+            mostrarDetalle();
+        }
+
+        function eliminarCliente(id) {
+            if (!confirm('¿Eliminar cliente de tu ?')) return;
+            
+            let clientesLS = JSON.parse(localStorage.getItem('-clientes') || '[]');
+            const idx = clientesLS.findIndex(c => c.id == id);
+            if (idx >= 0) {
+                .splice(idx, 1);
+            }
+            localStorage.setItem('-clientes', JSON.stringify(clientesLS));
+            
+            if (clienteSeleccionado?.id === id) {
+                clienteSeleccionado = null;
+                document.getElementById('-detail').innerHTML = '';
+            }
+            
+            cargar();
+        }
+
+        function mostrarDetalle() {
+            if (!clienteSeleccionado) return;
+            
+            const c = clienteSeleccionado;
+            const baIcon = c.provincia === 'Buenos Aires' ? '🔵 Buenos Aires' : c.provincia;
+            const tipoTexto = c.tipo === 'Credifin' ? '🟢 CREDIFIN' : '🟡 SIN CREDIFIN';
+            
+            const html = `
+                <div class="cliente-detalle">
+                    <h3>${c.nombre}</h3>
+                    <div style="margin-bottom: 12px; font-size: 11px; color: #0066cc; font-weight: 600;">
+                        ${baIcon} • ${tipoTexto}
+                    </div>
+                    <div class="cliente-info">
+                        <div class="info-field"><div class="label">Teléfono</div><div class="valor">${c.telefono}</div></div>
+                        <div class="info-field"><div class="label">Email</div><div class="valor">${c.email || '-'}</div></div>
+                        <div class="info-field"><div class="label">Ciudad</div><div class="valor">${c.ciudad}</div></div>
+                        <div class="info-field"><div class="label">Provincia</div><div class="valor">${c.provincia}</div></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <div class="btn-states">
+                            <button class="btn-state ${c.estado === 'Contactado' ? 'active' : ''}" onclick="cambiarEstado('Contactado')">📞 Contactado</button>
+                            <button class="btn-state ${c.estado === 'Interesado' ? 'active' : ''}" onclick="cambiarEstado('Interesado')">⭐ Interesado</button>
+                            <button class="btn-state ${c.estado === 'Cerrado' ? 'active' : ''}" onclick="cambiarEstado('Cerrado')">✓ Cerrado</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="text" value="${c.telefono}" onchange="actualizarCliente('telefono', this.value)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" value="${c.email}" onchange="actualizarCliente('email', this.value)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Notas</label>
+                        <textarea style="min-height: 100px;" onchange="actualizarCliente('notas', this.value)">${c.notas}</textarea>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('-detail').innerHTML = html;
+        }
+
+        function cambiarEstado(estado) {
+            if (!clienteSeleccionado) return;
+            
+            let clientesLS = JSON.parse(localStorage.getItem('-clientes') || '[]');
+            const cliente = clientesLS.find(c => c.id == clienteSeleccionado.id);
+            if (cliente) {
+                cliente.estado = estado;
+                localStorage.setItem('-clientes', JSON.stringify(clientesLS));
+                clienteSeleccionado.estado = estado;
+                mostrarDetalle();
+                cargar();
+            }
+        }
+
+        function actualizarCliente(campo, valor) {
+            if (!clienteSeleccionado) return;
+            
+            let clientesLS = JSON.parse(localStorage.getItem('-clientes') || '[]');
+            const cliente = clientesLS.find(c => c.id == clienteSeleccionado.id);
+            if (cliente) {
+                cliente[campo] = valor;
+                localStorage.setItem('-clientes', JSON.stringify(clientesLS));
+                clienteSeleccionado[campo] = valor;
+            }
+        }
+
+        function actualizarEstadisticas() {
+            const clientesLS = JSON.parse(localStorage.getItem('-clientes') || '[]');
+            document.getElementById('total-asignados').textContent = clientesLS.length;
+        }
+
+        function actualizarEstadisticas() {
+            const clientesLS = JSON.parse(localStorage.getItem('-clientes') || '[]');
+            const credifin = clientesLS.filter(c => c.tipo === 'Credifin').length;
+            const sin = clientesLS.filter(c => c.tipo === 'Sin Credifin').length;
+            
+            document.getElementById('-total').textContent = clientesLS.length;
+            document.getElementById('-credifin').textContent = credifin;
+            document.getElementById('-sin').textContent = sin;
+        }
+
+        // ============================================================
+        // EXPORTAR A EXCEL
+        // ============================================================
+
+        function exportarCredifin() {
+            const data = CLIENTES_CREDIFIN.map(c => ({
+                'Nombre': c.nombre,
+                'Provincia': c.provincia,
+                'Ciudad': c.ciudad,
+                'Email': c.email,
+                'Teléfono': c.telefono,
+                'Tipo': c.tipo
+            }));
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Credifin');
+            XLSX.writeFile(wb, 'Credifin_450.xlsx');
+        }
+
+        function exportarSinCredifin() {
+            const data = CLIENTES_SIN.map(c => ({
+                'Nombre': c.nombre,
+                'Provincia': c.provincia,
+                'Ciudad': c.ciudad,
+                'Email': c.email,
+                'Teléfono': c.telefono,
+                'Tipo': c.tipo
+            }));
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Sin Credifin');
+            XLSX.writeFile(wb, 'SinCredifin_75.xlsx');
+        }
+
+        function exportarTodos() {
+            const todos = [...CLIENTES_CREDIFIN, ...CLIENTES_SIN].map(c => ({
+                'Nombre': c.nombre,
+                'Provincia': c.provincia,
+                'Ciudad': c.ciudad,
+                'Email': c.email,
+                'Teléfono': c.telefono,
+                'Tipo': c.tipo
+            }));
+            
+            const ws = XLSX.utils.json_to_sheet(todos);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Todos');
+            XLSX.writeFile(wb, 'Todos_los_Clientes_525.xlsx');
+        }
+
+        function exportarAExcel() {
+            if (!vendedorActivo) {
+                alert('Selecciona un vendedor primero');
+                return;
+            }
+            
+            const clientesLS = JSON.parse(localStorage.getItem('-clientes') || '[]');
+            const mis = clientesLS.filter(c => c.vendedorId === vendedorActivo);
+            
+            if (mis.length === 0) {
+                alert('No tienes clientes asignados');
+                return;
+            }
+            
+            const data = mis.map(c => ({
+                'Nombre': c.nombre,
+                'Provincia': c.provincia,
+                'Ciudad': c.ciudad,
+                'Teléfono': c.telefono,
+                'Email': c.email,
+                'Tipo': c.tipo,
+                'Estado': c.estado,
+                'Notas': c.notas
+            }));
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Mi ');
+            XLSX.writeFile(wb, `_${vendedorActivo.replace(/\s+/g, '_')}.xlsx`);
+        }
+
+        function exportarTodos() {
+            const clientesLS = JSON.parse(localStorage.getItem('-clientes') || '[]');
+            
+            if (.length === 0) {
+                alert('No hay clientes en el ');
+                return;
+            }
+            
+            const data = clientesLS.map(c => ({
+                'Vendedor': c.vendedorId,
+                'Nombre': c.nombre,
+                'Provincia': c.provincia,
+                'Ciudad': c.ciudad,
+                'Teléfono': c.telefono,
+                'Email': c.email,
+                'Tipo': c.tipo,
+                'Estado': c.estado,
+                'Notas': c.notas
+            }));
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, ' Completo');
+            XLSX.writeFile(wb, '_Completo_Todos_Vendedores.xlsx');
+        }
+
+        function exportarVendedores() {
+            const vendedores = JSON.parse(localStorage.getItem('vendedores') || '[]');
+            const clientesLS = JSON.parse(localStorage.getItem('-clientes') || '[]');
+            
+            const data = vendedores.map(v => ({
+                'Vendedor': v.nombre,
+                'Clientes Asignados': .filter(c => c.vendedorId === v.nombre).length,
+                'Credifin': .filter(c => c.vendedorId === v.nombre && c.tipo === 'Credifin').length,
+                'Sin Credifin': .filter(c => c.vendedorId === v.nombre && c.tipo === 'Sin Credifin').length,
+                'Contactados': .filter(c => c.vendedorId === v.nombre && c.estado === 'Contactado').length,
+                'Interesados': .filter(c => c.vendedorId === v.nombre && c.estado === 'Interesado').length,
+                'Cerrados': .filter(c => c.vendedorId === v.nombre && c.estado === 'Cerrado').length
+            }));
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Vendedores');
+            XLSX.writeFile(wb, 'Estadisticas_Vendedores.xlsx');
+        }
+
+        function exportarScripts() {
+            const guardados = JSON.parse(localStorage.getItem('scripts-editados') || '{}');
+            const dataStr = JSON.stringify({ scripts, editados: guardados }, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Scripts_Respaldo.json';
+            link.click();
+        }
+
+        // ============================================================
+        // CARGAR EXCEL NUEVO
+        // ============================================================
+        
+        function cargarExcel() {
+            const fileInput = document.getElementById('excel-input');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Por favor selecciona un archivo');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                    
+                    let nuevosClientes = 0;
+                    let maxId = Math.max(...CLIENTES_CREDIFIN.map(c => c.id), ...CLIENTES_SIN.map(c => c.id));
+                    
+                    jsonData.forEach(row => {
+                        if (row.Nombre) {
+                            const clienteNuevo = {
+                                id: ++maxId,
+                                nombre: row.Nombre || '',
+                                provincia: row.Provincia || '',
+                                ciudad: row.Ciudad || '',
+                                email: row.Email || '',
+                                telefono: row.Teléfono || row.Telefono || '',
+                                tipo: 'Credifin'
+                            };
+                            
+                            // Verificar que no exista
+                            const existe = CLIENTES_CREDIFIN.find(c => c.nombre.toLowerCase() === clienteNuevo.nombre.toLowerCase());
+                            if (!existe) {
+                                CLIENTES_CREDIFIN.push(clienteNuevo);
+                                nuevosClientes++;
+                            }
+                        }
+                    });
+                    
+                    localStorage.setItem('clientes-cargados', JSON.stringify(CLIENTES_CREDIFIN));
+                    document.getElementById('excel-status').innerHTML = `✅ ${nuevosClientes} nuevo(s) cliente(s) cargado(s)`;
+                    document.getElementById('count-credifin').textContent = CLIENTES_CREDIFIN.length;
+                    document.getElementById('count-total').textContent = CLIENTES_CREDIFIN.length + CLIENTES_SIN.length;
+                    document.getElementById('total-clientes').textContent = CLIENTES_CREDIFIN.length + CLIENTES_SIN.length;
+                    
+                    setTimeout(() => {
+                        fileInput.value = '';
+                        filtrarCredifin();
+                    }, 1000);
+                } catch (error) {
+                    alert('Error al leer el Excel: ' + error.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function inicializarFiltrosProvincias() {
+            const PROVINCIAS_ARGENTINA = [
+                'Buenos Aires',
+                'Catamarca',
+                'Chaco',
+                'Chubut',
+                'Ciudad Autónoma de Buenos Aires',
+                'Córdoba',
+                'Corrientes',
+                'Entre Ríos',
+                'Formosa',
+                'Jujuy',
+                'La Pampa',
+                'La Rioja',
+                'Mendoza',
+                'Misiones',
+                'Neuquén',
+                'Río Negro',
+                'Salta',
+                'San Juan',
+                'San Luis',
+                'Santa Cruz',
+                'Santa Fe',
+                'Santiago del Estero',
+                'Tierra del Fuego',
+                'Tucumán'
+            ];
+
+            const buildOptions = (provincias) =>
+                '<option value="">Todas las provincias</option>' +
+                provincias.map(p => `<option value="${p}">${p}</option>`).join('');
+
+            const optionsHtml = buildOptions(PROVINCIAS_ARGENTINA);
+            document.getElementById('filtro-cred-provincia').innerHTML = optionsHtml;
+            document.getElementById('filtro-sin-provincia').innerHTML = optionsHtml;
+        }
+
+        // Inicialización
+        window.addEventListener('DOMContentLoaded', () => {
+            cargarScriptsGuardados();
+            cargarVendedores();
+            inicializarFiltrosProvincias();
+            filtrarCredifin();
+            filtrarSin();
+            mostrarScript('presentacion');
+            actualizarEstadisticas();
+            actualizarEstadisticas();
+        });
+    </script>
+</body>
+</html>
