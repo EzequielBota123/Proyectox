@@ -1,0 +1,21 @@
+# Dependencias (no se usan, las libs se cargan por CDN)
+node_modules/
+package.json
+package-lock.json
+
+# Archivos de servidor / utilidades de desarrollo
+server.js
+encriptar_crm.js
+
+# Base de datos (solo para configuración local)
+setup_database.sql
+
+# Versiones antiguas / archivos de respaldo
+crm_original.html
+crm_supabase.html/
+
+# Archivos comprimidos
+netlifytunas-main (2).zip
+
+# Documentación interna
+README.md
