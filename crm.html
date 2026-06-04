@@ -1395,7 +1395,14 @@ function renderCRM() {
     const busq   = (document.getElementById('f-crm')?.value||'').toLowerCase();
     const filtrados = todos.filter(c => {
         const okEst   = crmFiltroEstado === 'todos' || c.estado === crmFiltroEstado;
-        const okBusq  = !busq || c.nombre.toLowerCase().includes(busq) || (c.telefono||'').includes(busq) || (c.ciudad||'').toLowerCase().includes(busq);
+        const okBusq  = !busq ||
+            c.nombre.toLowerCase().includes(busq) ||
+            (c.telefono||'').includes(busq) ||
+            (c.telefono2||'').includes(busq) ||
+            (c.ciudad||'').toLowerCase().includes(busq) ||
+            (c.provincia||'').toLowerCase().includes(busq) ||
+            (c.rubro||'').toLowerCase().includes(busq) ||
+            (c.cuit||'').includes(busq);
         const okFecha = !crmFiltroFecha || (c.fecha_contacto && mismodia(c.fecha_contacto, crmFiltroFecha));
         return okEst && okBusq && okFecha;
     });
