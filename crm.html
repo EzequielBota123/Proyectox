@@ -372,14 +372,14 @@
                     </div>
                     <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
                         <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;">
-                            <input type="checkbox" id="sel-todo-cred" onchange="selTodoCred()" style="width:auto;"> Sel. todo
+                            <input type="checkbox" id="sel-todo-cred" onchange="selTodoCred(this.checked)" style="width:auto;"> Sel. todo
                         </label>
                         <button class="btn btn-gray" style="padding:4px 10px;font-size:11px;" onclick="deselCred()">Deseleccionar</button>
                     </div>
                     <div class="tabla-wrap">
                         <table>
                             <thead><tr>
-                                <th style="width:28px;"><input type="checkbox" id="sel-todo-cred-h" onchange="selTodoCred()" style="width:auto;"></th>
+                                <th style="width:28px;"><input type="checkbox" id="sel-todo-cred-h" onchange="selTodoCred(this.checked)" style="width:auto;"></th>
                                 <th>Nombre</th><th>CUIT</th><th>Rubro</th><th>Provincia</th><th>Ciudad</th><th>Teléfono</th><th></th>
                             </tr></thead>
                             <tbody id="tbody-cred"></tbody>
@@ -400,14 +400,14 @@
                     </div>
                     <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
                         <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;">
-                            <input type="checkbox" id="sel-todo-sin" onchange="selTodoSin()" style="width:auto;"> Sel. todo
+                            <input type="checkbox" id="sel-todo-sin" onchange="selTodoSin(this.checked)" style="width:auto;"> Sel. todo
                         </label>
                         <button class="btn btn-gray" style="padding:4px 10px;font-size:11px;" onclick="deselSin()">Deseleccionar</button>
                     </div>
                     <div class="tabla-wrap">
                         <table>
                             <thead><tr>
-                                <th style="width:28px;"><input type="checkbox" id="sel-todo-sin-h" onchange="selTodoSin()" style="width:auto;"></th>
+                                <th style="width:28px;"><input type="checkbox" id="sel-todo-sin-h" onchange="selTodoSin(this.checked)" style="width:auto;"></th>
                                 <th>Nombre</th><th>CUIT</th><th>Rubro</th><th>Provincia</th><th>Ciudad</th><th>Teléfono</th><th></th>
                             </tr></thead>
                             <tbody id="tbody-sin"></tbody>
@@ -428,14 +428,14 @@
                     </div>
                     <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
                         <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;">
-                            <input type="checkbox" id="sel-todo-retail" onchange="selTodoRetail()" style="width:auto;"> Sel. todo
+                            <input type="checkbox" id="sel-todo-retail" onchange="selTodoRetail(this.checked)" style="width:auto;"> Sel. todo
                         </label>
                         <button class="btn btn-gray" style="padding:4px 10px;font-size:11px;" onclick="deselRetail()">Deseleccionar</button>
                     </div>
                     <div class="tabla-wrap">
                         <table>
                             <thead><tr>
-                                <th style="width:28px;"><input type="checkbox" id="sel-todo-retail-h" onchange="selTodoRetail()" style="width:auto;"></th>
+                                <th style="width:28px;"><input type="checkbox" id="sel-todo-retail-h" onchange="selTodoRetail(this.checked)" style="width:auto;"></th>
                                 <th>Nombre</th><th>CUIT</th><th>Rubro</th><th>Provincia</th><th>Ciudad</th><th>Teléfono</th><th></th>
                             </tr></thead>
                             <tbody id="tbody-retail"></tbody>
@@ -1172,6 +1172,9 @@ function seleccionarVendedor(nombre) {
 
 function selTodosLosClientes() {
     document.querySelectorAll('.chk-cred, .chk-sin, .chk-retail').forEach(c => c.checked = true);
+    ['sel-todo-cred','sel-todo-cred-h','sel-todo-sin','sel-todo-sin-h','sel-todo-retail','sel-todo-retail-h'].forEach(id => {
+        const el = document.getElementById(id); if(el) el.checked = true;
+    });
     actualizarContadorSel();
 }
 
@@ -1181,7 +1184,7 @@ function selTodosLosClientes() {
 function poblarFiltroProvincias() {
     const cargados = getClientesCargados();
     const provs = [...new Set(cargados.map(c=>c.provincia).filter(Boolean))].sort();
-    ['f-cred-prov','f-sin-prov'].forEach(id => {
+    ['f-cred-prov','f-sin-prov','f-retail-prov'].forEach(id => {
         const sel = document.getElementById(id); if(!sel) return;
         const v = sel.value;
         sel.innerHTML = '<option value="">Todas las provincias</option>' + provs.map(p=>`<option value="${p}">${p}</option>`).join('');
@@ -1241,22 +1244,22 @@ function filtrarCredifin() { _filtrarPorTipo('Credifin',     'cred',   'tbody-cr
 function filtrarSin()      { _filtrarPorTipo('Sin Credifin', 'sin',    'tbody-sin',    'count-sin'); }
 function filtrarRetail()   { _filtrarPorTipo('Retail',       'retail', 'tbody-retail', 'count-retail'); }
 
-function selTodoCred() {
-    const ch = document.getElementById('sel-todo-cred').checked;
-    document.querySelectorAll('.chk-cred').forEach(c=>c.checked=ch);
-    document.getElementById('sel-todo-cred-h').checked=ch;
+function selTodoCred(checked) {
+    document.querySelectorAll('.chk-cred').forEach(c=>c.checked=checked);
+    const a = document.getElementById('sel-todo-cred');    if(a) a.checked=checked;
+    const b = document.getElementById('sel-todo-cred-h'); if(b) b.checked=checked;
     actualizarContadorSel();
 }
-function selTodoSin() {
-    const ch = document.getElementById('sel-todo-sin').checked;
-    document.querySelectorAll('.chk-sin').forEach(c=>c.checked=ch);
-    document.getElementById('sel-todo-sin-h').checked=ch;
+function selTodoSin(checked) {
+    document.querySelectorAll('.chk-sin').forEach(c=>c.checked=checked);
+    const a = document.getElementById('sel-todo-sin');    if(a) a.checked=checked;
+    const b = document.getElementById('sel-todo-sin-h'); if(b) b.checked=checked;
     actualizarContadorSel();
 }
-function selTodoRetail() {
-    const ch = document.getElementById('sel-todo-retail').checked;
-    document.querySelectorAll('.chk-retail').forEach(c=>c.checked=ch);
-    document.getElementById('sel-todo-retail-h').checked=ch;
+function selTodoRetail(checked) {
+    document.querySelectorAll('.chk-retail').forEach(c=>c.checked=checked);
+    const a = document.getElementById('sel-todo-retail');    if(a) a.checked=checked;
+    const b = document.getElementById('sel-todo-retail-h'); if(b) b.checked=checked;
     actualizarContadorSel();
 }
 function deselCred()   { document.querySelectorAll('.chk-cred').forEach(c=>c.checked=false);   document.getElementById('sel-todo-cred').checked=false;   document.getElementById('sel-todo-cred-h').checked=false;   actualizarContadorSel(); }
