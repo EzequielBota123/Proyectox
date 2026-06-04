@@ -932,14 +932,42 @@ function getEst(key) { return ESTADOS.find(e => e.key === key) || ESTADOS[0]; }
 // SCRIPTS
 // ============================================================
 const SCRIPTS_DEFAULT = {
-    'presentacion': { label:'Presentación', cliente:'', texto:'Buenos días/tardes, hablo con [Nombre del comercio]? Soy [Tu nombre] de Distribuidora Samurai & Bowie. Somos distribuidores mayoristas de bicicletas de las marcas Samurai y Bowie.\n\nTe llamo porque estamos haciendo un relevamiento de negocios de la zona que puedan sumar nuestras marcas. Son marcas con muy buena rotación y trabajo con zona protegida.\n\n¿Tenés 2 minutos para que te cuente cómo trabajamos?', tips:'💡 Hablá con confianza. Si preguntan "¿de qué empresa?", respondé de inmediato con nombre completo y propósito.' },
-    'objecion-a': { label:'Obj. A — No vendo bicis', cliente:'❌ "No vendemos bicicletas / No es nuestro rubro"', texto:'Entiendo, [Nombre]. Por eso mismo te llamo. No te pido que te conviertas en una bicicletería. Lo que hacemos es sumar una categoría que ya tiene demanda en tu zona.\n\nUna o dos bicis estratégicamente ubicadas en tu local generan tráfico de clientes nuevos. Y con nuestro sistema de zona protegida, tu competencia directa no va a tener la misma marca.\n\n¿Puedo enviarte el catálogo digital para que lo veas sin compromiso?', tips:'💡 No insistas. Dejá abierta la puerta con el catálogo.' },
-    'objecion-b': { label:'Obj. B — Ya tengo stock', cliente:'❌ "Ya tengo cubierto el stock con otras marcas"', texto:'Buenísimo que estés stockeado, habla muy bien de tu negocio. Esas son marcas instaladas, pero hoy tenés un problema: te compiten directo al público en la web.\n\nLo que te propongo con Samurai y Bowie no es que dejes lo que tenés, sino que sumes una alternativa donde vos manejás el precio y tenés la zona asegurada.\n\nSi vos me comprás a mí, tu competencia no va a tener la misma bici. ¿Te mando el catálogo digital?', tips:'💡 No compitás en precio, compitá en exclusividad.' },
-    'objecion-c': { label:'Obj. C — Flete caro', cliente:'❌ "El flete al interior me mata el costo"', texto:'Olvidate de eso, ese costo corre por nuestra cuenta. Nosotros tenemos envío gratuito a casi todo el país a través de Credifin.\n\nLa bici te llega a la puerta de tu local y el renglón de flete en tu costo es cero. El precio que ves es el precio final.\n\n¿En qué zona exacta estás así te confirmo la frecuencia de entrega?', tips:'💡 Cierra la objeción logística. Reconfirma que el flete está 100% cubierto.' },
-    'objecion-d': { label:'Obj. D — Muy caro', cliente:'❌ "Está muy caro, la competencia me da más barato"', texto:'Entiendo, [Nombre]. Pero fijate bien en qué estamos comparando. Si ves un precio más bajo en la web, es porque ese proveedor le vende directo al público. Vos estás pagando mayorista.\n\nCon nosotros ganás:\n• Margen protegido: Tu competencia no tiene la misma bici.\n• Rotación rápida: La estética de Samurai se vende sola.\n• Financiación flexible: Cheques a 30, 60, 90 días.\n\nNo es "más caro", es mejor negocio. ¿Armamos un pedido pequeño para que compruebes?', tips:'💡 No bajes precio, sube valor.' },
-    'objecion-e': { label:'Obj. E — Sin tiempo', cliente:'❌ "Ahora no tengo tiempo / Llamame otro día"', texto:'Claro, [Nombre], te entiendo. No te robo más tiempo ahora. Solo una cosa rápida antes de colgar: ¿te puedo enviar el catálogo digital por WhatsApp así lo mirás cuando tengas un momento?\n\nAsí cuando hablemos ya tenés una idea y el tiempo que usamos es el tuyo. ¿Cuál es tu número de WhatsApp?', tips:'💡 No cierres sin al menos conseguir el WhatsApp.' },
-    'objecion-f': { label:'Obj. F — No hay plata', cliente:'❌ "Estamos mal económicamente / No hay plata"', texto:'Te entiendo perfectamente, [Nombre]. Por eso tenemos condiciones de financiación que se adaptan: podés arrancar con pedidos pequeños y pagar con cheques a 30, 60 o 90 días.\n\nNo necesitás invertir fuerte desde el principio. Un pedido mínimo te permite probar la rotación sin comprometer tu flujo de caja.\n\n¿Cuántas unidades necesitarías para arrancar y que no te genere presión?', tips:'💡 Ofrece la puerta chica. Pedido mínimo + financiación = barrera de entrada baja.' },
-    'cierre': { label:'Cierre', cliente:'', texto:'Perfecto, [Nombre]. Entonces quedamos así: te paso el catálogo digital con precios mayoristas y condiciones de pago. Cualquier duda me escribís directo.\n\nPara confirmar el pedido solo necesito que me digas qué modelos te interesan y en qué cantidad aproximada. Yo me encargo del resto: logística, plazos, documentación.\n\n¿Empezamos con algo chico para que veas cómo funciona?', tips:'💡 El cierre no es el fin, es el inicio de la relación.' },
+    'apertura': {
+        label: '1. Apertura',
+        cliente: '',
+        texto: 'Hola, ¿qué tal? Hablo con [Nombre del dueño/encargado]?\n\nQué tal, [Nombre], te saluda [Nombre del vendedor] de las marcas Samurai. Te llamaba cinco minutos porque estamos expandiendo nuestra red de distribución oficial en tu zona.\n\nVi tu local, sé que trabajás muy bien el rubro, y nosotros nos dedicamos exclusivamente a abastecer a bicicleterías con stock real, sin competirles nunca al público.\n\n¿Cómo te trata la temporada por allá?',
+        tips: '💡 El objetivo no es vender la bici en el segundo uno: es generar confianza, detectar quién decide y marcar la cancha con el valor mayorista. Escuchá la respuesta sobre la temporada antes de seguir.'
+    },
+    'presentacion': {
+        label: '2. Presentación',
+        cliente: '',
+        texto: '[Nombre], te cuento brevemente cómo trabajamos porque nuestro foco es ser socios de tu negocio, no clavarte con mercadería. Nosotros manejamos la línea Samurai: son bicicletas con una estética impecable, entran por los ojos y salen rápido del mostrador, que es lo que hoy buscás.\n\nPero lo fuerte nuestro es el servicio detrás:\n\n🔒 Cero competencia: No le vendemos jamás al consumidor final. Ahora que con el Hot Sale ves a todos los importadores reventando precios al público al mismo valor que te venden a vos, nosotros te protegemos el margen.\n\n📍 Exclusividad de zona: Si armamos la cuenta con vos, respetamos tu radio. No le abrimos la marca a tu competencia de la vuelta.\n\n🚚 Logística bonificada: Te la dejamos puesta en la puerta de tu local sin costo de envío (cubrimos casi todo el país por la ruta de Credifin).',
+        tips: '💡 Pausá después de cada punto clave. Si el cliente interrumpe con una objeción, es buena señal: está escuchando. No atropelles, dejá que procese.'
+    },
+    'obj-mostrador': {
+        label: 'Obj. A — Mostrador parado',
+        cliente: '❌ "No estoy vendiendo nada, el mostrador está parado, no voy a reponer."',
+        texto: 'Te entiendo perfectamente, [Nombre], el consumo en general bajó y es la realidad de todos hoy. Justamente por eso te llamo.\n\nCuando el mostrador está más tranquilo, el secreto no es dejar vacía la bicicletería —porque el cliente que entra ve siempre lo mismo y se va—, sino rotar con productos que llamen la atención por estética y precio, y que no te saquen liquidez.\n\nNosotros te resolvemos eso: te mandamos las bicis con envío gratis para que no gastes un peso de flete, y te doy plazos con cheques a 30, 60, 90 y hasta 120 días según el volumen. Básicamente, ponés las bicis en la vidriera, las vendés, y después las pagás.\n\n¿Qué modelos te están faltando hoy para darle movimiento a la entrada?',
+        tips: '💡 Estrategia: Rotación + Financiamiento. No vendas la bici, vendé el flujo de caja positivo. El cierre de la objeción es una pregunta que abre la conversación sobre modelos.'
+    },
+    'obj-stock': {
+        label: 'Obj. B — Ya tengo stock',
+        cliente: '❌ "Ya tengo cubierto el stock con otras marcas (Topmega, Volta, etc.)."',
+        texto: 'Buenísimo que estés stockeado, habla muy bien de tu negocio. Esas son marcas instaladas, pero hoy tenés un problema con la mayoría de ellas: te compiten directo al público en la web o te abren una cuenta en la otra cuadra y te canibalizan el precio.\n\nLo que te propongo con Samurai no es que dejes lo que tenés, sino que sumes una alternativa de alta rotación donde vos manejás el precio y tenés la zona asegurada.\n\nSi vos me comprás a mí, tu competencia no va a tener la misma bici para reventarte el margen.\n\n¿Te sirve que te mande el catálogo digital para que veas las estéticas y compares?',
+        tips: '💡 Estrategia: Exclusividad y cuidado del margen. No atacues las marcas que ya tiene. El diferencial es la zona protegida y que no competimos al público.'
+    },
+    'obj-flete': {
+        label: 'Obj. C — Flete caro',
+        cliente: '❌ "El flete al interior me mata el costo, prefiero comprar en mi provincia."',
+        texto: 'Olvidate de eso, ese costo corre por nuestra cuenta. Nosotros tenemos envío gratuito a casi todo el país a través de la ruta de Credifin.\n\nLa bici te llega a la puerta de tu local y el renglón de flete en tu costo es cero. El precio de lista que ves es el precio final puesta en tu negocio.\n\n¿En qué zona exacta estás así te confirmo la frecuencia de entrega?',
+        tips: '💡 Derribá el costo logístico de inmediato y cerrá con una pregunta que confirme la zona. Eso te da info para la siguiente llamada y muestra que tenés sistema real de distribución.'
+    },
+    'cierre': {
+        label: '4. Cierre',
+        cliente: '',
+        texto: 'Bueno [Nombre], para arrancar y que pruebes cómo responden las marcas en tu vidriera, armemos un pedido inicial chico con los modelos que más están saliendo (por ejemplo, Gozen o Shonen).\n\nComo queremos que veas que somos socios flexibles, te puedo abrir la jugada con la financiación: lo armamos con pago combinado o me estiro a los cheques a 30 y 60 días para que calces el pago con las ventas del mes.\n\n¿Te armo la nota de pedido con 5 o con 10 unidades para aprovechar el camión de esta semana?',
+        tips: '💡 Ofrecé dos opciones concretas (5 o 10 unidades), nunca preguntes "¿querés comprar?" — eso cierra la puerta. El foco es que elija entre dos versiones del sí.'
+    },
 };
 let scriptActivo = null;
 
