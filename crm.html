@@ -403,13 +403,13 @@
         <button class="tab-btn active" onclick="cambiarTab('scripts',this)">📋 Scripts</button>
         <button class="tab-btn" onclick="cambiarTab('asignar',this)">🎯 Asignar Clientes</button>
         <button class="tab-btn" onclick="cambiarTab('crm',this)">📊 CRM</button>
+        <button class="tab-btn admin-only" onclick="cambiarTab('admin',this)" style="display:none;">📊 Panel Admin</button>
         <button class="tab-btn" onclick="cambiarTab('exportar',this)">📥 Exportar</button>
         <button class="tab-btn" onclick="cambiarTab('cargar',this)">📁 Cargar Excel</button>
         <button class="tab-btn" onclick="cambiarTab('calendario',this)">📅 Calendario</button>
         <button class="tab-btn" onclick="cambiarTab('crm2',this)">🗺️ CRM 2 - Provincias</button>
         <button class="tab-btn" onclick="cambiarTab('admcrm2',this)">📈 Admin CRM 2</button>
         <button class="tab-btn admin-only" onclick="cambiarTab('usuarios',this)" style="display:none;">👥 Usuarios</button>
-        <button class="tab-btn admin-only" onclick="cambiarTab('admin',this)" style="display:none;">📊 Panel Admin</button>
     </div>
 
     <!-- ===== SCRIPTS ===== -->
@@ -589,6 +589,21 @@
                 </div>
                 <div id="crm-detalle"><div class="aviso-msg" style="margin:0;">← Seleccioná un cliente de la lista</div></div>
             </div>
+        </div>
+    </div>
+
+    <!-- ===== PANEL ADMIN (solo lectura) ===== -->
+    <div id="tab-admin" class="tab-content">
+        <div class="admin-panel-header">
+            <div>
+                <h2>📊 Panel de Administrador</h2>
+                <p>Vista global de todos los vendedores — solo lectura</p>
+            </div>
+            <span class="admin-readonly-badge" style="background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);">🔒 Solo lectura</span>
+        </div>
+        <div class="stats-row" id="admin-stats-globales"></div>
+        <div class="admin-vend-grid" id="admin-vend-grid">
+            <div class="aviso-msg">Cargando...</div>
         </div>
     </div>
 
@@ -891,24 +906,6 @@
         </div>
     </div>
 
-    <!-- ===== PANEL ADMIN (solo lectura) ===== -->
-    <div id="tab-admin" class="tab-content">
-        <div class="admin-panel-header">
-            <div>
-                <h2>📊 Panel de Administrador</h2>
-                <p>Vista global de todos los vendedores — solo lectura</p>
-            </div>
-            <span class="admin-readonly-badge" style="background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);">🔒 Solo lectura</span>
-        </div>
-
-        <!-- Totales globales -->
-        <div class="stats-row" id="admin-stats-globales"></div>
-
-        <!-- Tarjetas por vendedor -->
-        <div class="admin-vend-grid" id="admin-vend-grid">
-            <div class="aviso-msg">Cargando...</div>
-        </div>
-    </div>
 </div>
 
     <!-- ===== CALENDARIO ===== -->
