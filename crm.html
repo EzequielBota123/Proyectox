@@ -369,6 +369,8 @@
         .a2-modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
         @media(max-width:600px) { .a2-modal-grid { grid-template-columns:1fr; } }
         .a2-sort-arrow { font-size:10px; color:#0066cc; margin-left:4px; }
+        .wa-link { cursor:pointer; color:#25d366; font-weight:600; text-decoration:underline; transition:opacity 0.2s; white-space:nowrap; }
+        .wa-link:hover { opacity:0.7; }
     </style>
 </head>
 <body>
@@ -1525,7 +1527,7 @@ function renderTabla(tbodyId, cargados, asignados, tipo) {
         return `<tr>
             <td><input type="checkbox" class="${cls}" data-c="${enc}" style="width:auto;" onchange="actualizarContadorSel()"></td>
             <td>${c.nombre}${asigInfo}</td>
-            <td>${c.cuit||'-'}</td><td>${c.rubro||'-'}</td><td>${c.provincia||'-'}</td><td>${c.ciudad||'-'}</td><td>${c.telefono||'-'}</td>
+            <td>${c.cuit||'-'}</td><td>${c.rubro||'-'}</td><td>${c.provincia||'-'}</td><td>${c.ciudad||'-'}</td><td>${c.telefono ? waTel(c.telefono) : '-'}</td>
             <td style="white-space:nowrap;">
                 <button class="btn-accion btn-accion-edit" onclick="event.stopPropagation();editarClienteAsignar('${c.id}')" title="Editar">✏️</button>
                 <button class="btn-accion btn-accion-del"  onclick="event.stopPropagation();eliminarClienteAsignar('${c.id}','${escNom}')" title="Eliminar">🗑️</button>
@@ -1793,7 +1795,7 @@ function mostrarDetalleCRM() {
     const est    = getEst(c.estado);
     const esAdmin = CURRENT_USER.rol === 'admin';
 
-    const campo = (lbl, val, link) => val ? `<div class="det-field"><div class="lbl">${lbl}</div><div class="val">${link?`<a href="${link}${val}">${val}</a>`:val}</div></div>` : '';
+    const campo = (lbl, val, link) => val ? `<div class="det-field"><div class="lbl">${lbl}</div><div class="val">${link === 'tel:' ? waTel(val) : link ? `<a href="${link}${val}">${val}</a>` : val}</div></div>` : '';
 
     // ── Estado section ──
     let estadoHTML;
@@ -3253,7 +3255,7 @@ function crm2RenderDetalle() {
 
         <div class="det-info-grid" style="margin-bottom:16px;">
             <div class="det-field"><div class="lbl">Dirección</div><div class="val">${bic.direccion || '—'}</div></div>
-            <div class="det-field"><div class="lbl">Teléfono</div><div class="val">${bic.telefono ? `<a href="tel:${bic.telefono}">${bic.telefono}</a>` : '—'}</div></div>
+            <div class="det-field"><div class="lbl">Teléfono</div><div class="val">${bic.telefono ? waTel(bic.telefono) : '—'}</div></div>
             <div class="det-field"><div class="lbl">Puntuación</div><div class="val">${bic.puntuacion ? '⭐ ' + bic.puntuacion : '—'}</div></div>
             <div class="det-field"><div class="lbl">Especialidad</div><div class="val">${bic.especialidad || '—'}</div></div>
         </div>
@@ -3647,7 +3649,8 @@ function a2RenderTabla() {
 
     tbody.innerHTML = bics.map(b => {
         const s    = crm2EstadoStyle(b.estado);
-        const tel  = b.telefono ? b.telefono.substring(0,13) + (b.telefono.length > 13 ? '…' : '') : '—';
+        const telDisplay = b.telefono ? b.telefono.substring(0,13) + (b.telefono.length > 13 ? '…' : '') : '';
+        const tel  = b.telefono ? waTel(b.telefono, telDisplay) : '—';
         const frel = a2FechRelativa(b.fecha_ultima_actualizacion);
         const cont = b.contacto_nombre
             ? `${b.contacto_nombre}${b.contacto_puesto ? ` <span style="color:#aaa;font-size:11px;">(${b.contacto_puesto})</span>` : ''}`
@@ -3745,7 +3748,7 @@ function a2RenderListado() {
             </div>
             <div class="a2-list-body" id="a2-body-${b.id}">
                 <div class="a2-list-grid">
-                    <div class="a2-list-field"><div class="lbl">Teléfono</div><div class="val">${b.telefono ? `<a href="tel:${b.telefono}">${b.telefono}</a>` : '—'}</div></div>
+                    <div class="a2-list-field"><div class="lbl">Teléfono</div><div class="val">${b.telefono ? waTel(b.telefono) : '—'}</div></div>
                     <div class="a2-list-field"><div class="lbl">Email</div><div class="val">${b.email || '—'}</div></div>
                     <div class="a2-list-field"><div class="lbl">Contacto</div><div class="val">${b.contacto_nombre || '—'}</div></div>
                     <div class="a2-list-field"><div class="lbl">Puesto</div><div class="val">${b.contacto_puesto || '—'}</div></div>
@@ -3822,7 +3825,7 @@ function a2AbrirDetalle(bicId) {
         <div class="a2-modal-grid">
             <div class="det-field"><div class="lbl">Ranking</div><div class="val">${bic.ranking ? '#' + bic.ranking : '—'}</div></div>
             <div class="det-field"><div class="lbl">Puntuación</div><div class="val">${bic.puntuacion ? '⭐ ' + bic.puntuacion : '—'}</div></div>
-            <div class="det-field"><div class="lbl">Teléfono</div><div class="val">${bic.telefono ? `<a href="tel:${bic.telefono}">${bic.telefono}</a>` : '—'}</div></div>
+            <div class="det-field"><div class="lbl">Teléfono</div><div class="val">${bic.telefono ? waTel(bic.telefono) : '—'}</div></div>
             <div class="det-field"><div class="lbl">Email</div><div class="val">${bic.email || '—'}</div></div>
             <div class="det-field"><div class="lbl">Contacto</div><div class="val">${bic.contacto_nombre || '—'}</div></div>
             <div class="det-field"><div class="lbl">Puesto</div><div class="val">${bic.contacto_puesto || '—'}</div></div>
@@ -3961,6 +3964,25 @@ function a2IniciarSync() {
 }
 
 setTimeout(a2Init, 1000);
+
+// ============================================================
+// WHATSAPP
+// ============================================================
+
+function abrirWhatsApp(num) {
+    if (!num) return;
+    const limpio = num.replace(/[\s\-\(\)\.]/g, '');
+    const conPlus = limpio.startsWith('+') ? limpio : '+' + limpio;
+    if (conPlus.length < 6) return;
+    window.open(`https://wa.me/${conPlus}`, '_blank');
+}
+
+function waTel(num, display) {
+    if (!num) return '—';
+    const safe = (num + '').replace(/'/g, "\\'");
+    const txt  = display || num;
+    return `<span class="wa-link" onclick="abrirWhatsApp('${safe}')" title="Abrir en WhatsApp">📱 ${txt}</span>`;
+}
 </script>
 </body>
 </html>
