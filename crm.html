@@ -317,6 +317,58 @@
         .crm2-stat-box h3 { font-size:22px; font-weight:800; }
         .crm2-stat-box p { font-size:10px; color:#888; margin-top:2px; font-weight:600; text-transform:uppercase; }
         .crm2-sync-dot { width:10px; height:10px; border-radius:50%; background:#28a745; display:inline-block; flex-shrink:0; }
+
+        /* ===================== ADMIN CRM 2 ===================== */
+        .a2-topbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
+        .a2-topbar select { min-width:220px; font-size:14px; font-weight:700; border:2px solid #0066cc; }
+        .a2-view-btns { display:flex; gap:6px; flex-wrap:wrap; }
+        .a2-view-btn { padding:8px 14px; border:1.5px solid #e0e0e0; background:white; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700; color:#555; transition:all 0.2s; }
+        .a2-view-btn:hover { border-color:#0066cc; color:#0066cc; }
+        .a2-view-btn.on { background:#0066cc; color:white; border-color:#0066cc; }
+        .a2-sync-info { font-size:11px; color:#aaa; margin-left:auto; white-space:nowrap; }
+        .a2-kpis { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:12px; margin-bottom:16px; }
+        .a2-kpi { background:white; border-radius:10px; border:1px solid #e0e0e0; padding:14px 16px; text-align:center; }
+        .a2-kpi-num { font-size:26px; font-weight:800; }
+        .a2-kpi-pct { font-size:12px; color:#888; font-weight:600; margin-top:2px; }
+        .a2-kpi-lbl { font-size:10px; color:#888; text-transform:uppercase; font-weight:700; letter-spacing:0.4px; margin-top:3px; }
+        .a2-tabla-wrap { overflow-x:auto; border:1px solid #e0e0e0; border-radius:10px; background:white; margin-bottom:16px; }
+        .a2-tabla { width:100%; border-collapse:collapse; font-size:13px; }
+        .a2-tabla thead { background:#f8fafc; position:sticky; top:0; z-index:5; }
+        .a2-tabla th { padding:10px 12px; text-align:left; font-weight:700; border-bottom:2px solid #0066cc; color:#1a1a2e; white-space:nowrap; cursor:pointer; user-select:none; }
+        .a2-tabla th:hover { background:#f0f5ff; }
+        .a2-tabla td { padding:10px 12px; border-bottom:1px solid #f0f0f0; vertical-align:middle; }
+        .a2-tabla tr:hover td { background:#f8fafc; cursor:pointer; }
+        .a2-tabla tr.a2-row-dist td { background:#f0f7ff; }
+        .a2-list-item { background:white; border:1px solid #e0e0e0; border-radius:10px; margin-bottom:8px; overflow:hidden; transition:box-shadow 0.2s; }
+        .a2-list-item:hover { box-shadow:0 2px 8px rgba(0,102,204,0.1); }
+        .a2-list-header { padding:14px 16px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+        .a2-list-header:hover { background:#f8fafc; }
+        .a2-list-body { border-top:1px solid #f0f0f0; padding:14px 16px; background:#f8fafc; display:none; }
+        .a2-list-body.open { display:block; }
+        .a2-list-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; margin-bottom:10px; }
+        .a2-list-field .lbl { font-size:10px; font-weight:700; color:#888; text-transform:uppercase; letter-spacing:0.4px; }
+        .a2-list-field .val { font-size:13px; color:#1a1a2e; margin-top:1px; }
+        .a2-charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+        @media(max-width:800px) { .a2-charts-grid { grid-template-columns:1fr; } }
+        .a2-chart-card { background:white; border-radius:10px; border:1px solid #e0e0e0; padding:18px; }
+        .a2-chart-title { font-size:13px; font-weight:800; color:#1a1a2e; margin-bottom:14px; }
+        .a2-pie-wrap { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
+        .a2-bar-item { display:flex; align-items:center; gap:8px; margin-bottom:10px; font-size:12px; }
+        .a2-bar-label { min-width:110px; font-weight:600; color:#555; }
+        .a2-bar-track { flex:1; background:#f0f0f0; border-radius:4px; height:22px; overflow:hidden; }
+        .a2-bar-fill { height:100%; border-radius:4px; transition:width 0.6s; display:flex; align-items:center; padding-left:8px; font-size:11px; font-weight:700; color:white; min-width:2px; }
+        .a2-legend { display:flex; flex-direction:column; gap:7px; }
+        .a2-legend-item { display:flex; align-items:center; gap:7px; font-size:12px; color:#555; }
+        .a2-legend-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+        .a2-stats-footer { background:white; border:1px solid #e0e0e0; border-radius:10px; padding:16px 18px; margin-top:4px; }
+        .a2-stats-footer h4 { font-size:11px; font-weight:800; color:#888; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }
+        .a2-stats-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; }
+        .a2-stat-item { font-size:12px; color:#555; }
+        .a2-stat-item .a2-stat-lbl { font-size:10px; font-weight:700; color:#aaa; text-transform:uppercase; letter-spacing:0.4px; display:block; margin-bottom:2px; }
+        .a2-badge-urg { background:#fee2e2; color:#991b1b; font-size:10px; font-weight:800; padding:2px 7px; border-radius:4px; margin-left:6px; }
+        .a2-modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+        @media(max-width:600px) { .a2-modal-grid { grid-template-columns:1fr; } }
+        .a2-sort-arrow { font-size:10px; color:#0066cc; margin-left:4px; }
     </style>
 </head>
 <body>
@@ -355,6 +407,7 @@
         <button class="tab-btn" onclick="cambiarTab('cargar',this)">📁 Cargar Excel</button>
         <button class="tab-btn" onclick="cambiarTab('calendario',this)">📅 Calendario</button>
         <button class="tab-btn" onclick="cambiarTab('crm2',this)">🗺️ CRM 2 - Provincias</button>
+        <button class="tab-btn" onclick="cambiarTab('admcrm2',this)">📈 Admin CRM 2</button>
         <button class="tab-btn admin-only" onclick="cambiarTab('usuarios',this)" style="display:none;">👥 Usuarios</button>
         <button class="tab-btn admin-only" onclick="cambiarTab('admin',this)" style="display:none;">📊 Panel Admin</button>
     </div>
@@ -642,6 +695,95 @@
                 <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
                     <button class="btn btn-gray" onclick="crm2CerrarModal('modal-crm2-bic')">Cancelar</button>
                     <button class="btn btn-green" onclick="crm2GuardarNuevaBic()">Agregar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ADMIN CRM 2 ===== -->
+    <div id="tab-admcrm2" class="tab-content">
+
+        <!-- Top bar -->
+        <div class="a2-topbar">
+            <div style="font-size:15px;font-weight:800;color:#1a1a2e;">📈 Admin CRM 2 — Resultados por Provincia</div>
+            <select id="a2-sel-prov" onchange="a2SeleccionarProv(this.value)">
+                <option value="">— Seleccioná una provincia —</option>
+            </select>
+            <div class="a2-view-btns">
+                <button class="a2-view-btn on" id="a2-btn-tabla"    onclick="a2CambiarVista('tabla')">📊 Tabla</button>
+                <button class="a2-view-btn"    id="a2-btn-graficos" onclick="a2CambiarVista('graficos')">📈 Gráficos</button>
+                <button class="a2-view-btn"    id="a2-btn-listado"  onclick="a2CambiarVista('listado')">📋 Listado</button>
+                <button class="a2-view-btn"    onclick="a2ExportarExcel()">📥 Excel</button>
+            </div>
+            <span class="a2-sync-info" id="a2-sync-info">—</span>
+        </div>
+
+        <!-- No province selected -->
+        <div id="a2-sin-prov" class="aviso-msg">📈 Seleccioná una provincia para ver su análisis detallado</div>
+
+        <!-- Main content -->
+        <div id="a2-main" style="display:none;">
+
+            <!-- KPIs -->
+            <div class="a2-kpis" id="a2-kpis"></div>
+
+            <!-- Vista: TABLA -->
+            <div id="a2-vista-tabla">
+                <div class="a2-tabla-wrap">
+                    <table class="a2-tabla">
+                        <thead>
+                            <tr>
+                                <th onclick="a2OrdenarTabla('ranking')">#<span class="a2-sort-arrow" id="a2-sort-ranking"></span></th>
+                                <th onclick="a2OrdenarTabla('nombre')">Nombre<span class="a2-sort-arrow" id="a2-sort-nombre"></span></th>
+                                <th>Teléfono</th>
+                                <th onclick="a2OrdenarTabla('estado')">Estado<span class="a2-sort-arrow" id="a2-sort-estado"></span></th>
+                                <th onclick="a2OrdenarTabla('fecha')">Última actividad<span class="a2-sort-arrow" id="a2-sort-fecha"></span></th>
+                                <th>Contacto</th>
+                                <th>Próx. seguimiento</th>
+                            </tr>
+                        </thead>
+                        <tbody id="a2-tabla-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Vista: GRÁFICOS -->
+            <div id="a2-vista-graficos" style="display:none;">
+                <div class="a2-charts-grid">
+                    <div class="a2-chart-card">
+                        <div class="a2-chart-title">🥧 Distribución por estado</div>
+                        <div id="a2-chart-pie"></div>
+                    </div>
+                    <div class="a2-chart-card">
+                        <div class="a2-chart-title">📊 Progreso por estado</div>
+                        <div id="a2-chart-bars"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista: LISTADO -->
+            <div id="a2-vista-listado" style="display:none;">
+                <div id="a2-listado-wrap"></div>
+            </div>
+
+            <!-- Stats footer -->
+            <div class="a2-stats-footer">
+                <h4>📊 Estadísticas</h4>
+                <div class="a2-stats-list" id="a2-stats-footer"></div>
+            </div>
+        </div>
+
+        <!-- Modal: Detalle bicicletería -->
+        <div id="modal-a2-detalle" class="modal">
+            <div class="modal-box" style="max-width:640px;">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:16px;">
+                    <div id="a2-modal-titulo" style="font-size:16px;font-weight:800;color:#1a1a2e;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"></div>
+                    <button onclick="crm2CerrarModal('modal-a2-detalle')" style="background:none;border:none;font-size:22px;cursor:pointer;color:#aaa;line-height:1;flex-shrink:0;">×</button>
+                </div>
+                <div id="a2-modal-body"></div>
+                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;">
+                    <button class="btn btn-blue" onclick="a2IrACRM2()">✏️ Editar en CRM 2</button>
+                    <button class="btn btn-gray" onclick="crm2CerrarModal('modal-a2-detalle')">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -3363,6 +3505,465 @@ function crm2Init() {
 }
 
 setTimeout(crm2Init, 600);
+
+// ============================================================
+// ADMIN CRM 2 — Panel de Resultados por Provincia
+// ============================================================
+
+let a2ProvActual  = null;
+let a2VistaActual = 'tabla';
+let a2OrdenCol    = 'ranking';
+let a2OrdenAsc    = true;
+let a2SyncTimer2  = null;
+let a2BicModalId  = null;
+let a2LastRaw     = '';
+
+const A2_ESTADOS = [
+    {key:'sin-contactar', label:'Sin contactar', color:'#6c757d'},
+    {key:'contactado',    label:'Contactado',    color:'#28a745'},
+    {key:'interesado',    label:'Interesado',    color:'#ffc107'},
+    {key:'rechazo',       label:'Rechazó',       color:'#dc3545'},
+    {key:'distribuidor',  label:'Distribuidor',  color:'#0066cc'},
+];
+
+function a2FechRelativa(fechStr) {
+    if (!fechStr) return '—';
+    let d;
+    if (fechStr.includes('/')) {
+        const parts = fechStr.split(', ');
+        const dp    = parts[0].split('/');
+        const tp    = (parts[1] || '0:0:0').split(':');
+        d = new Date(+dp[2], +dp[1]-1, +dp[0], +tp[0], +tp[1], +tp[2]||0);
+    } else {
+        d = new Date(fechStr);
+    }
+    if (isNaN(d)) return fechStr;
+    const diff = Math.floor((Date.now() - d.getTime()) / 86400000);
+    if (diff <= 0) return 'Hoy';
+    if (diff === 1) return 'Ayer';
+    if (diff < 7)   return `Hace ${diff} días`;
+    if (diff < 30)  return `Hace ${Math.floor(diff/7)} sem.`;
+    return `Hace ${Math.floor(diff/30)} mes.`;
+}
+
+function a2Init() {
+    if (!crm2Data) { setTimeout(a2Init, 400); return; }
+    a2RenderSelector();
+    a2IniciarSync();
+}
+
+function a2RenderSelector() {
+    const sel = document.getElementById('a2-sel-prov');
+    if (!sel || !crm2Data) return;
+    sel.innerHTML = '<option value="">— Seleccioná una provincia —</option>' +
+        crm2Data.provincias.map(p =>
+            `<option value="${p.id}" ${p.id === a2ProvActual ? 'selected' : ''}>${p.nombre} (${p.biciclerias.length})</option>`
+        ).join('');
+}
+
+function a2SeleccionarProv(id) {
+    a2ProvActual = id || null;
+    const main = document.getElementById('a2-main');
+    const sinP = document.getElementById('a2-sin-prov');
+    if (!id) { main.style.display = 'none'; sinP.style.display = ''; return; }
+    main.style.display = '';
+    sinP.style.display = 'none';
+    a2Renderizar();
+}
+
+function a2GetProv() {
+    if (!crm2Data || !a2ProvActual) return null;
+    return crm2Data.provincias.find(p => p.id === a2ProvActual) || null;
+}
+
+function a2Renderizar() {
+    a2RenderKPIs();
+    a2CambiarVista(a2VistaActual);
+    a2RenderStatsFooter();
+}
+
+// ---- KPIs ----
+
+function a2RenderKPIs() {
+    const prov = a2GetProv();
+    if (!prov) return;
+    const bics  = prov.biciclerias;
+    const total = bics.length;
+    document.getElementById('a2-kpis').innerHTML =
+        `<div class="a2-kpi"><div class="a2-kpi-num" style="color:#0066cc">${total}</div><div class="a2-kpi-lbl">Total</div></div>` +
+        A2_ESTADOS.map(e => {
+            const c = bics.filter(b => b.estado === e.key).length;
+            return `<div class="a2-kpi">
+                <div class="a2-kpi-num" style="color:${e.color}">${c}</div>
+                <div class="a2-kpi-pct">${total ? Math.round(c/total*100) : 0}%</div>
+                <div class="a2-kpi-lbl">${e.label}</div>
+            </div>`;
+        }).join('');
+}
+
+// ---- VISTAS ----
+
+function a2CambiarVista(vista) {
+    a2VistaActual = vista;
+    ['tabla','graficos','listado'].forEach(v => {
+        const el  = document.getElementById(`a2-vista-${v}`);
+        const btn = document.getElementById(`a2-btn-${v}`);
+        if (el)  el.style.display = v === vista ? '' : 'none';
+        if (btn) btn.classList.toggle('on', v === vista);
+    });
+    if (vista === 'tabla')    a2RenderTabla();
+    if (vista === 'graficos') a2RenderGraficos();
+    if (vista === 'listado')  a2RenderListado();
+}
+
+// ---- TABLA ----
+
+function a2OrdenarTabla(col) {
+    if (a2OrdenCol === col) a2OrdenAsc = !a2OrdenAsc;
+    else { a2OrdenCol = col; a2OrdenAsc = true; }
+    // Update sort arrows
+    ['ranking','nombre','estado','fecha'].forEach(c => {
+        const el = document.getElementById(`a2-sort-${c}`);
+        if (!el) return;
+        if (c === a2OrdenCol) el.textContent = a2OrdenAsc ? ' ↑' : ' ↓';
+        else el.textContent = '';
+    });
+    a2RenderTabla();
+}
+
+function a2RenderTabla() {
+    const prov  = a2GetProv();
+    const tbody = document.getElementById('a2-tabla-body');
+    if (!prov || !tbody) return;
+
+    let bics = [...prov.biciclerias];
+    const asc = a2OrdenAsc ? 1 : -1;
+    if      (a2OrdenCol === 'ranking') bics.sort((a,b) => asc * ((a.ranking||999) - (b.ranking||999)));
+    else if (a2OrdenCol === 'nombre')  bics.sort((a,b) => asc * a.nombre.localeCompare(b.nombre));
+    else if (a2OrdenCol === 'estado')  bics.sort((a,b) => asc * a.estado.localeCompare(b.estado));
+    else if (a2OrdenCol === 'fecha')   bics.sort((a,b) => asc * ((a.fecha_ultima_actualizacion||'').localeCompare(b.fecha_ultima_actualizacion||'')));
+
+    if (!bics.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px;">Sin biciclerías en esta provincia</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = bics.map(b => {
+        const s    = crm2EstadoStyle(b.estado);
+        const tel  = b.telefono ? b.telefono.substring(0,13) + (b.telefono.length > 13 ? '…' : '') : '—';
+        const frel = a2FechRelativa(b.fecha_ultima_actualizacion);
+        const cont = b.contacto_nombre
+            ? `${b.contacto_nombre}${b.contacto_puesto ? ` <span style="color:#aaa;font-size:11px;">(${b.contacto_puesto})</span>` : ''}`
+            : '<span style="color:#ccc;">—</span>';
+        const seg = b.fecha_proximo_seguimiento
+            ? `<span style="color:#0066cc;">${new Date(b.fecha_proximo_seguimiento + 'T12:00:00').toLocaleDateString('es-AR')}</span>`
+            : '<span style="color:#ccc;">—</span>';
+        const urgBadge = (b.estado === 'sin-contactar' && !b.fecha_ultima_actualizacion)
+            ? '<span class="a2-badge-urg">PENDIENTE</span>' : '';
+        return `<tr onclick="a2AbrirDetalle('${b.id}')" class="${b.estado === 'distribuidor' ? 'a2-row-dist' : ''}">
+            <td style="font-weight:800;color:#0066cc;">${b.ranking || '—'}</td>
+            <td style="font-weight:700;">${b.nombre}${urgBadge}</td>
+            <td style="color:#555;font-size:12px;">${tel}</td>
+            <td><span class="crm2-eb" style="background:${s.bg};color:${s.color};">${s.icon}</span></td>
+            <td style="color:#888;font-size:12px;">${frel}</td>
+            <td style="font-size:12px;">${cont}</td>
+            <td style="font-size:12px;">${seg}</td>
+        </tr>`;
+    }).join('');
+}
+
+// ---- GRÁFICOS ----
+
+function a2RenderGraficos() {
+    const prov = a2GetProv();
+    if (!prov) return;
+    const bics  = prov.biciclerias;
+    const total = bics.length || 1;
+    const counts = A2_ESTADOS.map(e => ({ ...e, count: bics.filter(b => b.estado === e.key).length }));
+
+    // Pie via CSS conic-gradient
+    const pieEl = document.getElementById('a2-chart-pie');
+    if (pieEl) {
+        let cum = 0;
+        const segs = counts.map(e => {
+            const pct = e.count / total * 100;
+            const seg = `${e.color} ${cum.toFixed(1)}% ${(cum+pct).toFixed(1)}%`;
+            cum += pct;
+            return seg;
+        });
+        const pie = `<div style="width:160px;height:160px;border-radius:50%;background:conic-gradient(${segs.join(',')});flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.12);"></div>`;
+        const legend = `<div class="a2-legend">${counts.map(e => `
+            <div class="a2-legend-item">
+                <div class="a2-legend-dot" style="background:${e.color}"></div>
+                <span>${e.label}: <strong>${e.count}</strong> (${total ? Math.round(e.count/total*100) : 0}%)</span>
+            </div>`).join('')}</div>`;
+        pieEl.innerHTML = `<div class="a2-pie-wrap">${pie}${legend}</div>`;
+    }
+
+    // Horizontal bars
+    const barsEl = document.getElementById('a2-chart-bars');
+    if (barsEl) {
+        barsEl.innerHTML = counts.map(e => {
+            const pct = total ? Math.round(e.count / total * 100) : 0;
+            return `<div class="a2-bar-item">
+                <span class="a2-bar-label">${e.label}</span>
+                <div class="a2-bar-track">
+                    <div class="a2-bar-fill" style="width:${pct}%;background:${e.color};">${e.count > 0 ? e.count : ''}</div>
+                </div>
+                <span style="font-size:11px;color:#888;min-width:32px;text-align:right;">${pct}%</span>
+            </div>`;
+        }).join('');
+    }
+}
+
+// ---- LISTADO ----
+
+function a2RenderListado() {
+    const prov = a2GetProv();
+    const wrap = document.getElementById('a2-listado-wrap');
+    if (!prov || !wrap) return;
+
+    const bics = [...prov.biciclerias].sort((a,b) => (a.ranking||999) - (b.ranking||999));
+    if (!bics.length) {
+        wrap.innerHTML = '<div class="aviso-msg">Sin biciclerías en esta provincia</div>';
+        return;
+    }
+    wrap.innerHTML = bics.map(b => {
+        const s    = crm2EstadoStyle(b.estado);
+        const frel = a2FechRelativa(b.fecha_ultima_actualizacion);
+        const notasHtml = b.notas
+            ? `<div style="font-size:13px;color:#333;background:white;border:1px solid #e0e0e0;border-radius:6px;padding:10px;white-space:pre-wrap;line-height:1.6;">${b.notas}</div>`
+            : '<div style="color:#aaa;font-size:12px;font-style:italic;">Sin notas registradas</div>';
+        return `<div class="a2-list-item">
+            <div class="a2-list-header" onclick="a2ToggleListItem('${b.id}')">
+                <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                    ${b.ranking ? `<span style="font-size:11px;color:#aaa;font-weight:700;min-width:22px;">[${b.ranking}]</span>` : ''}
+                    <span style="font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b.nombre}</span>
+                    <span class="crm2-eb" style="background:${s.bg};color:${s.color};">${s.icon}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+                    <span style="font-size:11px;color:#aaa;">${frel}</span>
+                    <span style="font-size:16px;color:#ccc;transition:transform 0.2s;display:inline-block;" id="a2-arrow-${b.id}">▶</span>
+                </div>
+            </div>
+            <div class="a2-list-body" id="a2-body-${b.id}">
+                <div class="a2-list-grid">
+                    <div class="a2-list-field"><div class="lbl">Teléfono</div><div class="val">${b.telefono ? `<a href="tel:${b.telefono}">${b.telefono}</a>` : '—'}</div></div>
+                    <div class="a2-list-field"><div class="lbl">Email</div><div class="val">${b.email || '—'}</div></div>
+                    <div class="a2-list-field"><div class="lbl">Contacto</div><div class="val">${b.contacto_nombre || '—'}</div></div>
+                    <div class="a2-list-field"><div class="lbl">Puesto</div><div class="val">${b.contacto_puesto || '—'}</div></div>
+                    <div class="a2-list-field"><div class="lbl">Primer contacto</div><div class="val">${b.fecha_primer_contacto ? new Date(b.fecha_primer_contacto + 'T12:00:00').toLocaleDateString('es-AR') : '—'}</div></div>
+                    <div class="a2-list-field"><div class="lbl">Próximo seguimiento</div><div class="val" style="color:${b.fecha_proximo_seguimiento ? '#0066cc' : 'inherit'};">${b.fecha_proximo_seguimiento ? new Date(b.fecha_proximo_seguimiento + 'T12:00:00').toLocaleDateString('es-AR') : '—'}</div></div>
+                    <div class="a2-list-field"><div class="lbl">Puntuación</div><div class="val">${b.puntuacion ? '⭐ ' + b.puntuacion : '—'}</div></div>
+                    <div class="a2-list-field"><div class="lbl">Última actualización</div><div class="val" style="color:#888;font-size:12px;">${b.fecha_ultima_actualizacion || '—'}</div></div>
+                </div>
+                ${b.especialidad ? `<div style="margin-bottom:10px;"><span class="lbl" style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;">Especialidad</span><div style="font-size:13px;margin-top:2px;">${b.especialidad}</div></div>` : ''}
+                <div style="margin-bottom:10px;"><span style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;display:block;margin-bottom:4px;">Notas</span>${notasHtml}</div>
+                <button class="btn btn-blue" style="font-size:11px;padding:5px 12px;" onclick="a2IrACRM2FromBic('${b.id}')">✏️ Editar en CRM 2</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function a2ToggleListItem(bicId) {
+    const body  = document.getElementById(`a2-body-${bicId}`);
+    const arrow = document.getElementById(`a2-arrow-${bicId}`);
+    if (!body) return;
+    const open = body.classList.toggle('open');
+    if (arrow) arrow.style.transform = open ? 'rotate(90deg)' : '';
+}
+
+// ---- STATS FOOTER ----
+
+function a2RenderStatsFooter() {
+    const prov = a2GetProv();
+    const el   = document.getElementById('a2-stats-footer');
+    if (!prov || !el) return;
+    const bics  = prov.biciclerias;
+    const total = bics.length;
+    const dist  = bics.filter(b => b.estado === 'distribuidor').length;
+    const conv  = total ? Math.round(dist / total * 100) : 0;
+
+    const conFecha = bics.filter(b => b.fecha_ultima_actualizacion)
+        .sort((a,b) => b.fecha_ultima_actualizacion.localeCompare(a.fecha_ultima_actualizacion));
+    const ultimaAct = conFecha.length
+        ? `${conFecha[0].nombre} — ${a2FechRelativa(conFecha[0].fecha_ultima_actualizacion)}`
+        : '—';
+
+    const hoy = new Date().toISOString().split('T')[0];
+    const conSeg = bics.filter(b => b.fecha_proximo_seguimiento && b.fecha_proximo_seguimiento >= hoy)
+        .sort((a,b) => a.fecha_proximo_seguimiento.localeCompare(b.fecha_proximo_seguimiento));
+    const proxSeg = conSeg.length
+        ? `${conSeg[0].nombre} — ${new Date(conSeg[0].fecha_proximo_seguimiento + 'T12:00:00').toLocaleDateString('es-AR')}`
+        : '—';
+
+    const urgentes = bics.filter(b => b.estado === 'sin-contactar' && !b.fecha_ultima_actualizacion).length;
+    const conNotas = bics.filter(b => b.notas).length;
+
+    el.innerHTML = [
+        {lbl:'Tasa de conversión',        val:`${conv}% — ${dist} de ${total} son distribuidores`},
+        {lbl:'Última actividad',          val:ultimaAct},
+        {lbl:'Próximo seguimiento',       val:proxSeg},
+        {lbl:'Pendientes de iniciar',     val:urgentes ? `${urgentes} sin ningún contacto aún` : 'Ninguna ✅'},
+        {lbl:'Con notas registradas',     val:`${conNotas} de ${total} biciclerías`},
+        {lbl:'Con seguimiento programado',val:`${conSeg.length} biciclerías`},
+    ].map(s => `<div class="a2-stat-item"><span class="a2-stat-lbl">${s.lbl}</span><strong>${s.val}</strong></div>`).join('');
+}
+
+// ---- MODAL DETALLE ----
+
+function a2AbrirDetalle(bicId) {
+    const prov = a2GetProv();
+    if (!prov) return;
+    const bic = prov.biciclerias.find(b => b.id === bicId);
+    if (!bic) return;
+    a2BicModalId = bicId;
+    const s = crm2EstadoStyle(bic.estado);
+    document.getElementById('a2-modal-titulo').innerHTML =
+        `${bic.nombre} <span class="crm2-eb" style="background:${s.bg};color:${s.color};font-size:12px;padding:3px 9px;">${s.icon}</span>`;
+    document.getElementById('a2-modal-body').innerHTML = `
+        <div class="a2-modal-grid">
+            <div class="det-field"><div class="lbl">Ranking</div><div class="val">${bic.ranking ? '#' + bic.ranking : '—'}</div></div>
+            <div class="det-field"><div class="lbl">Puntuación</div><div class="val">${bic.puntuacion ? '⭐ ' + bic.puntuacion : '—'}</div></div>
+            <div class="det-field"><div class="lbl">Teléfono</div><div class="val">${bic.telefono ? `<a href="tel:${bic.telefono}">${bic.telefono}</a>` : '—'}</div></div>
+            <div class="det-field"><div class="lbl">Email</div><div class="val">${bic.email || '—'}</div></div>
+            <div class="det-field"><div class="lbl">Contacto</div><div class="val">${bic.contacto_nombre || '—'}</div></div>
+            <div class="det-field"><div class="lbl">Puesto</div><div class="val">${bic.contacto_puesto || '—'}</div></div>
+            <div class="det-field"><div class="lbl">Primer contacto</div><div class="val">${bic.fecha_primer_contacto ? new Date(bic.fecha_primer_contacto + 'T12:00:00').toLocaleDateString('es-AR') : '—'}</div></div>
+            <div class="det-field"><div class="lbl">Próximo seguimiento</div><div class="val" style="color:#0066cc;">${bic.fecha_proximo_seguimiento ? new Date(bic.fecha_proximo_seguimiento + 'T12:00:00').toLocaleDateString('es-AR') : '—'}</div></div>
+        </div>
+        <div style="margin-bottom:12px;">
+            <div class="lbl" style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px;">Dirección</div>
+            <div style="font-size:13px;">${bic.direccion || '—'}</div>
+        </div>
+        <div style="margin-bottom:12px;">
+            <div class="lbl" style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px;">Especialidad</div>
+            <div style="font-size:13px;">${bic.especialidad || '—'}</div>
+        </div>
+        <div>
+            <div class="lbl" style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:6px;">Notas</div>
+            <div style="font-size:13px;background:#f8fafc;border:1px solid #e0e0e0;border-radius:8px;padding:12px;min-height:60px;white-space:pre-wrap;line-height:1.6;">${bic.notas || '<span style="color:#ccc;font-style:italic;">Sin notas</span>'}</div>
+        </div>
+        <div style="font-size:11px;color:#aaa;margin-top:10px;">Última actualización: ${bic.fecha_ultima_actualizacion || '—'}</div>`;
+    document.getElementById('modal-a2-detalle').classList.add('open');
+}
+
+function a2IrACRM2() {
+    crm2CerrarModal('modal-a2-detalle');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        if (b.getAttribute('onclick')?.includes("'crm2'")) b.classList.add('active');
+    });
+    const tab = document.getElementById('tab-crm2');
+    if (tab) tab.classList.add('active');
+    if (a2ProvActual) {
+        const sel = document.getElementById('crm2-sel-provincia');
+        if (sel) sel.value = a2ProvActual;
+        crm2SeleccionarProvincia(a2ProvActual);
+        if (a2BicModalId) setTimeout(() => crm2SeleccionarBic(a2BicModalId), 80);
+    }
+}
+
+function a2IrACRM2FromBic(bicId) {
+    a2BicModalId = bicId;
+    a2IrACRM2();
+}
+
+// ---- EXPORT EXCEL ----
+
+function a2ExportarExcel() {
+    const prov = a2GetProv();
+    if (!prov) { mostrarToast('⚠️ Seleccioná una provincia primero'); return; }
+    if (typeof XLSX === 'undefined') { mostrarToast('⚠️ Librería XLSX no disponible'); return; }
+
+    const wb    = XLSX.utils.book_new();
+    const bics  = prov.biciclerias;
+    const total = bics.length;
+    const hoy   = new Date().toLocaleDateString('es-AR');
+    const dist  = bics.filter(b => b.estado === 'distribuidor').length;
+    const conv  = total ? (dist/total*100).toFixed(1) : '0';
+
+    // Hoja 1: Resumen
+    const resumen = [
+        ['CRM 2 — Resumen de Provincia', '', ''],
+        ['Provincia', prov.nombre, ''],
+        ['Fecha de exportación', hoy, ''],
+        ['Total biciclerías', total, ''],
+        ['', '', ''],
+        ['Estado', 'Cantidad', 'Porcentaje'],
+        ...A2_ESTADOS.map(e => {
+            const c = bics.filter(b => b.estado === e.key).length;
+            return [e.label, c, total ? (c/total*100).toFixed(1) + '%' : '0%'];
+        }),
+        ['', '', ''],
+        ['Tasa de conversión', `${conv}%`, `${dist} distribuidores de ${total}`],
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(resumen), 'Resumen');
+
+    // Hoja 2: Biciclerías
+    const headers = ['Ranking','Nombre','Teléfono','Email','Contacto','Puesto','Estado','Especialidad','Notas','Primer Contacto','Próx. Seguimiento','Última Actualización'];
+    const rows = [...bics].sort((a,b) => (a.ranking||999)-(b.ranking||999)).map(b => [
+        b.ranking || '',
+        b.nombre,
+        b.telefono    || '',
+        b.email       || '',
+        b.contacto_nombre  || '',
+        b.contacto_puesto  || '',
+        A2_ESTADOS.find(e => e.key === b.estado)?.label || b.estado,
+        b.especialidad || '',
+        b.notas        || '',
+        b.fecha_primer_contacto       || '',
+        b.fecha_proximo_seguimiento   || '',
+        b.fecha_ultima_actualizacion  || ''
+    ]);
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([headers, ...rows]), 'Biciclerías');
+
+    // Hoja 3: Análisis
+    const hoyISO = new Date().toISOString().split('T')[0];
+    const conSeg = bics.filter(b => b.fecha_proximo_seguimiento && b.fecha_proximo_seguimiento >= hoyISO)
+        .sort((a,b) => a.fecha_proximo_seguimiento.localeCompare(b.fecha_proximo_seguimiento));
+    const urgentes = bics.filter(b => b.estado === 'sin-contactar' && !b.fecha_ultima_actualizacion);
+    const analisis = [
+        ['Análisis — ' + prov.nombre, '', ''],
+        [],
+        ['Próximos seguimientos programados', '', ''],
+        conSeg.length ? ['Nombre', 'Fecha', 'Estado'] : ['(ninguno programado)', '', ''],
+        ...conSeg.map(b => [b.nombre, b.fecha_proximo_seguimiento, A2_ESTADOS.find(e=>e.key===b.estado)?.label||b.estado]),
+        [],
+        ['Sin ningún contacto iniciado (urgentes)', '', ''],
+        urgentes.length ? ['Nombre', 'Teléfono', ''] : ['(ninguna pendiente)', '', ''],
+        ...urgentes.map(b => [b.nombre, b.telefono||'', '']),
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(analisis), 'Análisis');
+
+    const nombre = `CRM2_${prov.nombre.replace(/\s+/g,'_')}_${hoy.replace(/\//g,'-')}.xlsx`;
+    XLSX.writeFile(wb, nombre);
+    mostrarToast('📥 Excel descargado: ' + nombre);
+}
+
+// ---- SYNC ----
+
+function a2IniciarSync() {
+    a2SyncTimer2 = setInterval(() => {
+        try {
+            const raw = localStorage.getItem(CRM2_KEY);
+            if (!raw || raw === a2LastRaw) {
+                const syncEl = document.getElementById('a2-sync-info');
+                if (syncEl && a2LastRaw) syncEl.textContent = `Actualizado: ${new Date().toLocaleTimeString('es-AR')}`;
+                return;
+            }
+            a2LastRaw = raw;
+            crm2Data  = JSON.parse(raw);
+            a2RenderSelector();
+            if (a2ProvActual) a2Renderizar();
+            const syncEl = document.getElementById('a2-sync-info');
+            if (syncEl) syncEl.textContent = `Actualizado: ${new Date().toLocaleTimeString('es-AR')}`;
+        } catch(e) {}
+    }, 3000);
+}
+
+setTimeout(a2Init, 1000);
 </script>
 </body>
 </html>
