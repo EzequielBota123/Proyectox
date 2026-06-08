@@ -275,6 +275,48 @@
         .vend-asignado-box { background:#fef9c3; border:1.5px solid #fde68a; border-radius:8px; padding:12px; margin-bottom:12px; }
         .btn-pasar-vendedor { background:#7c3aed; color:white; }
         .btn-pasar-vendedor:hover { background:#6d28d9; }
+
+        /* ===================== PANEL ADMIN ===================== */
+        .admin-panel-header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 14px 18px; border-radius: 10px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .admin-panel-header h2 { font-size: 16px; font-weight: 800; margin: 0; }
+        .admin-panel-header p  { font-size: 11px; opacity: 0.65; margin: 2px 0 0; }
+        .admin-vend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-top: 16px; }
+        .admin-vend-card { background: white; border-radius: 10px; border: 1px solid #e0e0e0; padding: 16px; }
+        .admin-vend-nombre { font-size: 15px; font-weight: 800; color: #1a1a2e; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .admin-vend-total { font-size: 26px; font-weight: 800; color: #0066cc; }
+        .admin-estados-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; margin-top: 10px; }
+        .admin-estado-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+        .admin-estado-lbl { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; min-width: 150px; white-space: nowrap; }
+        .admin-bar-wrap { flex: 1; background: #f0f0f0; border-radius: 4px; height: 8px; overflow: hidden; }
+        .admin-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s; }
+        .admin-bar-n { font-size: 11px; font-weight: 700; color: #333; min-width: 24px; text-align: right; }
+        .admin-bar-pct { font-size: 10px; color: #aaa; min-width: 34px; }
+        .admin-tipos-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; }
+        .admin-readonly-badge { background: #f0f0f0; color: #888; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+
+        /* ===================== CRM 2 — PROVINCIAS ===================== */
+        .crm2-topbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+        .crm2-topbar select { min-width:220px; flex:1; max-width:320px; font-size:14px; font-weight:700; border:2px solid #0066cc; }
+        .crm2-filtros-bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
+        .crm2-filtros-bar select { max-width:190px; }
+        .crm2-filtros-bar input { max-width:200px; }
+        .crm2-grid { display:grid; grid-template-columns:320px 1fr; gap:16px; align-items:start; }
+        @media(max-width:900px) { .crm2-grid { grid-template-columns:1fr; } }
+        .crm2-list-wrap { border:1px solid #e0e0e0; border-radius:10px; overflow:hidden; background:white; max-height:620px; overflow-y:auto; }
+        .crm2-item { padding:12px 14px; border-bottom:1px solid #f0f0f0; cursor:pointer; transition:background 0.15s; }
+        .crm2-item:last-child { border-bottom:none; }
+        .crm2-item:hover { background:#f8fafc; }
+        .crm2-item.sel { background:#eff6ff; border-left:4px solid #0066cc; }
+        .crm2-eb { display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; white-space:nowrap; }
+        .crm2-detalle-card { background:white; border-radius:10px; border:1px solid #e0e0e0; padding:20px; position:sticky; top:16px; max-height:85vh; overflow-y:auto; }
+        .crm2-est-btns { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; margin-bottom:18px; }
+        .crm2-est-btn { padding:9px 8px; border:2px solid; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700; transition:all 0.2s; text-align:center; }
+        .crm2-est-btn:hover { transform:translateY(-1px); opacity:0.9; }
+        .crm2-stats-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+        .crm2-stat-box { background:white; border-radius:8px; padding:10px 14px; flex:1; min-width:90px; border:1px solid #e0e0e0; text-align:center; }
+        .crm2-stat-box h3 { font-size:22px; font-weight:800; }
+        .crm2-stat-box p { font-size:10px; color:#888; margin-top:2px; font-weight:600; text-transform:uppercase; }
+        .crm2-sync-dot { width:10px; height:10px; border-radius:50%; background:#28a745; display:inline-block; flex-shrink:0; }
     </style>
 </head>
 <body>
@@ -312,7 +354,9 @@
         <button class="tab-btn" onclick="cambiarTab('exportar',this)">📥 Exportar</button>
         <button class="tab-btn" onclick="cambiarTab('cargar',this)">📁 Cargar Excel</button>
         <button class="tab-btn" onclick="cambiarTab('calendario',this)">📅 Calendario</button>
+        <button class="tab-btn" onclick="cambiarTab('crm2',this)">🗺️ CRM 2 - Provincias</button>
         <button class="tab-btn admin-only" onclick="cambiarTab('usuarios',this)" style="display:none;">👥 Usuarios</button>
+        <button class="tab-btn admin-only" onclick="cambiarTab('admin',this)" style="display:none;">📊 Panel Admin</button>
     </div>
 
     <!-- ===== SCRIPTS ===== -->
@@ -495,6 +539,114 @@
         </div>
     </div>
 
+    <!-- ===== CRM 2 — PROVINCIAS ===== -->
+    <div id="tab-crm2" class="tab-content">
+
+        <!-- Top bar -->
+        <div class="crm2-topbar">
+            <div style="font-size:15px;font-weight:800;color:#1a1a2e;">🗺️ CRM 2 — Provincias</div>
+            <select id="crm2-sel-provincia" onchange="crm2SeleccionarProvincia(this.value)">
+                <option value="">— Seleccionar Provincia —</option>
+            </select>
+            <button class="btn btn-blue" onclick="crm2AbrirModalProvincia()" style="font-size:12px;padding:8px 14px;white-space:nowrap;">+ Agregar Provincia</button>
+            <div class="crm2-sync-dot" id="crm2-sync-dot" title="Sincronizado"></div>
+        </div>
+
+        <!-- No province selected -->
+        <div id="crm2-sin-provincia" class="aviso-msg">🗺️ Seleccioná o creá una provincia para empezar</div>
+
+        <!-- Main content (shown when a province is selected) -->
+        <div id="crm2-main" style="display:none;">
+
+            <!-- Stats bar -->
+            <div class="crm2-stats-bar" id="crm2-stats"></div>
+
+            <!-- Filters -->
+            <div class="crm2-filtros-bar">
+                <input type="text" id="crm2-buscar" placeholder="🔍 Buscar bicicletería..." onkeyup="crm2RenderLista()" style="max-width:220px;">
+                <select id="crm2-filtro-estado" onchange="crm2RenderLista()">
+                    <option value="">Todos los estados</option>
+                    <option value="sin-contactar">⭕ Sin contactar</option>
+                    <option value="contactado">🟢 Contactado</option>
+                    <option value="interesado">🟡 Interesado</option>
+                    <option value="rechazo">🔴 Rechazó</option>
+                    <option value="distribuidor">✅ Distribuidor</option>
+                </select>
+                <select id="crm2-ordenar" onchange="crm2RenderLista()">
+                    <option value="ranking">Ranking</option>
+                    <option value="puntuacion-desc">Puntuación ↓</option>
+                    <option value="puntuacion-asc">Puntuación ↑</option>
+                    <option value="nombre">Nombre A-Z</option>
+                </select>
+                <button class="btn btn-green" onclick="crm2AbrirModalAgregarBic()" style="font-size:12px;padding:8px 14px;white-space:nowrap;">+ Agregar Bicicletería</button>
+            </div>
+
+            <!-- Two-column grid -->
+            <div class="crm2-grid">
+                <!-- LEFT: list -->
+                <div>
+                    <div style="font-size:11px;font-weight:700;color:#888;margin-bottom:6px;" id="crm2-count-label">0 biciclerías</div>
+                    <div class="crm2-list-wrap" id="crm2-lista"></div>
+                </div>
+                <!-- RIGHT: details -->
+                <div id="crm2-detalle">
+                    <div class="aviso-msg" style="margin:0;">← Seleccioná una bicicletería de la lista</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: New Province -->
+        <div id="modal-crm2-provincia" class="modal">
+            <div class="modal-box" style="max-width:440px;">
+                <h3 style="font-size:16px;font-weight:800;color:#1a1a2e;margin-bottom:16px;">🗺️ Nueva Provincia</h3>
+                <div class="form-group">
+                    <label>Nombre de la Provincia</label>
+                    <input type="text" id="crm2-input-provincia" placeholder="Ej: Córdoba, Buenos Aires..." maxlength="60"
+                           onkeydown="if(event.key==='Enter') crm2GuardarProvincia()">
+                </div>
+                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+                    <button class="btn btn-gray" onclick="crm2CerrarModal('modal-crm2-provincia')">Cancelar</button>
+                    <button class="btn btn-blue" onclick="crm2GuardarProvincia()">Crear Provincia</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Add Bicicletería -->
+        <div id="modal-crm2-bic" class="modal">
+            <div class="modal-box" style="max-width:520px;">
+                <h3 style="font-size:16px;font-weight:800;color:#1a1a2e;margin-bottom:16px;">🚲 Agregar Bicicletería</h3>
+                <div class="form-group">
+                    <label>Nombre *</label>
+                    <input type="text" id="crm2-bic-nombre" placeholder="Nombre de la bicicletería" maxlength="80">
+                </div>
+                <div class="grid2">
+                    <div class="form-group">
+                        <label>Dirección</label>
+                        <input type="text" id="crm2-bic-dir" placeholder="Dirección">
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="text" id="crm2-bic-tel" placeholder="+54 ...">
+                    </div>
+                </div>
+                <div class="grid2">
+                    <div class="form-group">
+                        <label>Puntuación Google (1–5)</label>
+                        <input type="number" id="crm2-bic-pts" placeholder="4.5" step="0.1" min="1" max="5">
+                    </div>
+                    <div class="form-group">
+                        <label>Especialidad</label>
+                        <input type="text" id="crm2-bic-esp" placeholder="MTB, Ruta, Repuestos...">
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+                    <button class="btn btn-gray" onclick="crm2CerrarModal('modal-crm2-bic')">Cancelar</button>
+                    <button class="btn btn-green" onclick="crm2GuardarNuevaBic()">Agregar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== EXPORTAR ===== -->
     <div id="tab-exportar" class="tab-content">
         <div class="card">
@@ -594,6 +746,25 @@
                 </div>
                 <button class="btn btn-yellow" onclick="cambiarMiPassword()">💾 Guardar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ===== PANEL ADMIN (solo lectura) ===== -->
+    <div id="tab-admin" class="tab-content">
+        <div class="admin-panel-header">
+            <div>
+                <h2>📊 Panel de Administrador</h2>
+                <p>Vista global de todos los vendedores — solo lectura</p>
+            </div>
+            <span class="admin-readonly-badge" style="background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);">🔒 Solo lectura</span>
+        </div>
+
+        <!-- Totales globales -->
+        <div class="stats-row" id="admin-stats-globales"></div>
+
+        <!-- Tarjetas por vendedor -->
+        <div class="admin-vend-grid" id="admin-vend-grid">
+            <div class="aviso-msg">Cargando...</div>
         </div>
     </div>
 </div>
@@ -813,10 +984,15 @@ async function refreshFromSupabase() {
         setClientesCargados((cData||[]).map(mapClienteFromDB));
         setClientesAsignados((aData||[]).filter(a => a.clientes).map(a => {
             const { fecha, texto, notas: notasHistorial, vendedorVenta } = fcExtraer(a.notas || '');
+            // Si tiene vendedorVenta (_vv) y el DB estado es 'Interesado', en realidad
+            // es 'En manos de vendedor' (se guarda así para no violar el CHECK constraint)
+            const estadoReal = (vendedorVenta && a.estado === 'Interesado')
+                ? 'En manos de vendedor'
+                : (a.estado || 'Sin contactar');
             return {
                 ...mapClienteFromDB(a.clientes),
                 vendedorId: a.vendedor_nombre,
-                estado: a.estado || 'Sin contactar',
+                estado: estadoReal,
                 notas: texto,
                 notasHistorial,
                 vendedorVenta,
@@ -1314,10 +1490,11 @@ async function asignarClientes() {
         try { cliente = JSON.parse(decodeURIComponent(chk.dataset.c)); } catch(e) { return; }
         if (!cliente || !cliente.id) return;
         const existente = asignadosActuales.find(a => String(a.id) === String(cliente.id));
+        const estExistente = existente?.estado || 'Sin contactar';
         payload.push({
             cliente_id: cliente.id,
             vendedor_nombre: vendedor,
-            estado: existente?.estado || 'Sin contactar',
+            estado: estExistente === 'En manos de vendedor' ? 'Interesado' : estExistente,
             notas:  existente?.notas  || ''
         });
     });
@@ -1576,7 +1753,10 @@ async function cambiarEstadoCRM(estado, vendedorVenta) {
     const id = crmClienteSel.id;
     try {
         if (!sbDisponible) throw new Error('Sin conexión con Supabase');
-        const updates = { estado };
+        // 'En manos de vendedor' no está en el CHECK constraint del DB → se guarda
+        // como 'Interesado' pero se distingue porque tiene _vv en el campo notas
+        const dbEstado = estado === 'En manos de vendedor' ? 'Interesado' : estado;
+        const updates = { estado: dbEstado };
 
         // Auto-registrar fecha de contacto si no tenía
         let fc = crmClienteSel.fecha_contacto;
@@ -1697,6 +1877,8 @@ async function confirmarVendedorVenta() {
     const vendedor = sel?.value;
     if (!vendedor) { mostrarToast('⚠️ Elegí un vendedor', '#dc2626'); return; }
     document.getElementById('sel-vend-venta-wrap')?.remove();
+    // Cambiamos el filtro ANTES de actualizar para que el cliente aparezca en su nueva sección
+    crmFiltroEstado = 'En manos de vendedor';
     await cambiarEstadoCRM('En manos de vendedor', vendedor);
 }
 
@@ -1739,6 +1921,7 @@ function cambiarTab(id, btn) {
     if (id==='asignar')    { renderVendedores(); filtrarCredifin(); filtrarSin(); filtrarRetail(); actualizarDebug(); }
     if (id==='usuarios')   { cargarListaUsuarios(); }
     if (id==='calendario') { renderCalendario(); }
+    if (id==='admin')      { renderAdminPanel(); }
 }
 
 function actualizarDebug() {
@@ -2598,6 +2781,90 @@ function fcSerializar(fecha, notasArr, vendedorVenta) {
 }
 
 // ============================================================
+// PANEL ADMIN
+// ============================================================
+function renderEstadoBar(nombre, n, total, color, bg) {
+    if (!n) return '';
+    const pct = total > 0 ? Math.round(n / total * 100) : 0;
+    return `<div class="admin-estado-row">
+        <div class="admin-estado-lbl" style="background:${bg};color:${color};">${nombre}</div>
+        <div class="admin-bar-wrap"><div class="admin-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+        <div class="admin-bar-n">${n}</div>
+        <div class="admin-bar-pct">(${pct}%)</div>
+    </div>`;
+}
+
+function renderAdminPanel() {
+    if (CURRENT_USER.rol !== 'admin') return;
+
+    const vendedores = getVendedores();
+    const asignados  = getClientesAsignados();
+
+    const total       = asignados.length;
+    const cerrados    = asignados.filter(c => c.estado === 'Cerrado').length;
+    const enManos     = asignados.filter(c => c.estado === 'En manos de vendedor').length;
+    const interesados = asignados.filter(c => c.estado === 'Interesado').length;
+    const contactados = asignados.filter(c => c.estado === 'Contactado').length;
+    const sinContactar= asignados.filter(c => c.estado === 'Sin contactar').length;
+
+    const statsEl = document.getElementById('admin-stats-globales');
+    if (statsEl) {
+        statsEl.innerHTML = [
+            { label: 'Total clientes',         val: total,        color: '#0066cc' },
+            { label: 'Vendedores activos',      val: vendedores.length, color: '#1a1a2e' },
+            { label: 'Cerrados ✅',             val: cerrados,     color: '#15803d' },
+            { label: 'En manos de vendedor 🤝', val: enManos,      color: '#7c3aed' },
+            { label: 'Interesados ⭐',          val: interesados,  color: '#d97706' },
+            { label: 'Contactados 📞',          val: contactados,  color: '#1d4ed8' },
+            { label: 'Sin contactar 📵',        val: sinContactar, color: '#991b1b' },
+        ].map(s => `<div class="stat-box"><h3 style="color:${s.color}">${s.val}</h3><p>${s.label}</p></div>`).join('');
+    }
+
+    const gridEl = document.getElementById('admin-vend-grid');
+    if (!gridEl) return;
+
+    if (!vendedores.length) {
+        gridEl.innerHTML = '<div class="aviso-msg">Sin vendedores registrados</div>';
+        return;
+    }
+
+    gridEl.innerHTML = vendedores.map(nombre => {
+        const clientes   = asignados.filter(c => c.vendedorId === nombre);
+        const tot        = clientes.length;
+        const cerr       = clientes.filter(c => c.estado === 'Cerrado').length;
+        const manos      = clientes.filter(c => c.estado === 'En manos de vendedor').length;
+        const inter      = clientes.filter(c => c.estado === 'Interesado').length;
+        const cont       = clientes.filter(c => c.estado === 'Contactado').length;
+        const sinC       = clientes.filter(c => c.estado === 'Sin contactar').length;
+        const credifin   = clientes.filter(c => c.tipo === 'Credifin').length;
+        const sinCred    = clientes.filter(c => c.tipo === 'Sin Credifin').length;
+        const retail     = clientes.filter(c => c.tipo === 'Retail').length;
+
+        return `<div class="admin-vend-card">
+            <div class="admin-vend-nombre">
+                <span>👤 ${nombre}</span>
+                <span class="admin-vend-total">${tot}</span>
+            </div>
+
+            <div class="admin-estados-title">Por estado</div>
+            ${renderEstadoBar('Sin contactar',        sinC,  tot, '#991b1b', '#fee2e2')}
+            ${renderEstadoBar('Contactado',            cont,  tot, '#1d4ed8', '#dbeafe')}
+            ${renderEstadoBar('Interesado',            inter, tot, '#d97706', '#fef9c3')}
+            ${renderEstadoBar('En manos de vendedor',  manos, tot, '#7c3aed', '#f3e8ff')}
+            ${renderEstadoBar('Cerrado',               cerr,  tot, '#15803d', '#dcfce7')}
+            ${!tot ? '<div style="color:#aaa;font-size:12px;text-align:center;padding:8px;">Sin clientes asignados</div>' : ''}
+
+            <div class="admin-tipos-row">
+                ${credifin ? `<span class="badge-cred" style="font-size:11px;padding:3px 9px;">Credifin: ${credifin}</span>` : ''}
+                ${sinCred  ? `<span class="badge-sin"  style="font-size:11px;padding:3px 9px;">Sin Cred: ${sinCred}</span>` : ''}
+                ${retail   ? `<span class="badge-retail" style="font-size:11px;padding:3px 9px;">Retail: ${retail}</span>` : ''}
+                ${!tot     ? `<span style="color:#aaa;font-size:11px;">—</span>` : ''}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ============================================================
 // MISC
 // ============================================================
 async function recargarDatos() {
@@ -2614,6 +2881,488 @@ function cerrarSesion() {
 // ============================================================
 aplicarPermisos();
 inicializarDB();
+
+// ============================================================
+// CRM 2 — PROVINCIAS (localStorage independiente)
+// ============================================================
+
+const CRM2_KEY = 'crm-provincias-v2';
+let crm2Data = null;
+let crm2ProvActual = null;
+let crm2BicActual  = null;
+let crm2AutoSaveTimer = null;
+let crm2SyncTimer     = null;
+let crm2LastHash      = '';
+
+const BICICLERIAS_MDP_INICIAL = [
+  {ranking:1,  nombre:'Bicyshop',                direccion:'Av. Independencia 3565',         telefono:'+54 223 474-5100', puntuacion:4.0, especialidad:'Mountain Bike, Ruta, Indumentaria, Componentes alta gama'},
+  {ranking:2,  nombre:'Bicicletería Luro Bike',  direccion:'Av. Pedro Luro 7199',            telefono:'+54 223 477-1234', puntuacion:4.4, especialidad:'Unidades urbanas, MTB, Reparación general'},
+  {ranking:3,  nombre:'Simom Bike',              direccion:'Av. Independencia 3582',         telefono:'+54 223 474-9876', puntuacion:4.7, especialidad:'BMX Shop, Suspensiones, Frenos hidráulicos, Taller técnico'},
+  {ranking:4,  nombre:'Bicicletería Amigorena',  direccion:'Av. Colón 7199',                 telefono:'+54 223 478-4321', puntuacion:4.5, especialidad:'Mecánica tradicional, Repuestos rápidos, Urbano'},
+  {ranking:5,  nombre:"Aprea Bike's House",      direccion:'Av. Libertad 4664',              telefono:'+54 223 475-6543', puntuacion:4.5, especialidad:'Ciclismo deportivo, Trato personalizado, Servicio técnico'},
+  {ranking:6,  nombre:'DGZ Bikeshop',            direccion:'Av. Independencia 2031',         telefono:'+54 223 491-0987', puntuacion:4.3, especialidad:'Componentes de competición, Cuadros específicos, Giant Oficial'},
+  {ranking:7,  nombre:'Cycles Gross',            direccion:'San Juan 3260',                  telefono:'+54 223 472-1122', puntuacion:4.4, especialidad:'Gomería, Centrado de ruedas, Atención urbana veloz'},
+  {ranking:8,  nombre:'Bicicletería Don David',  direccion:'Alberti 3963',                   telefono:'+54 223 473-5566', puntuacion:4.4, especialidad:'Playeras, Bicicletas de inicio, Accesorios básicos'},
+  {ranking:9,  nombre:'Morán Bicicletas',        direccion:'Av. Dr. Arturo Alió 1480',      telefono:'+54 223 482-7788', puntuacion:4.2, especialidad:'Mantenimiento preventivo, Repuestos multimarca'},
+  {ranking:10, nombre:'Casa Baby',               direccion:'Av. Fortunato de la Plaza 5045', telefono:'+54 223 481-9900', puntuacion:4.4, especialidad:'Rodados infantiles, Paseo, Reparaciones familiares'}
+];
+
+// ---- DATA ----
+
+function crm2InicializarDatos() {
+    const raw = localStorage.getItem(CRM2_KEY);
+    if (raw) {
+        try { crm2Data = JSON.parse(raw); } catch(e) { crm2Data = crm2DatosDefault(); }
+    } else {
+        crm2Data = crm2DatosDefault();
+        crm2GuardarLocal();
+    }
+    crm2LastHash = JSON.stringify(crm2Data);
+}
+
+function crm2DatosDefault() {
+    return {
+        provincias: [{
+            id: 'mdp-001',
+            nombre: 'Mar del Plata',
+            creada: new Date().toISOString().split('T')[0],
+            biciclerias: BICICLERIAS_MDP_INICIAL.map((b, i) => ({
+                id: `mdp-bic-${String(i+1).padStart(3,'0')}`,
+                ranking: b.ranking,
+                nombre: b.nombre,
+                direccion: b.direccion,
+                telefono: b.telefono,
+                puntuacion: b.puntuacion,
+                especialidad: b.especialidad,
+                email: '', contacto_nombre: '', contacto_puesto: '',
+                estado: 'sin-contactar', notas: '',
+                fecha_primer_contacto: '', fecha_ultima_actualizacion: '', fecha_proximo_seguimiento: ''
+            }))
+        }]
+    };
+}
+
+function crm2GuardarLocal() {
+    if (!crm2Data) return;
+    try {
+        const str = JSON.stringify(crm2Data);
+        localStorage.setItem(CRM2_KEY, str);
+        crm2LastHash = str;
+        crm2MostrarSyncDot(true);
+    } catch(e) { crm2MostrarSyncDot(false); }
+}
+
+function crm2MostrarSyncDot(ok) {
+    const dot = document.getElementById('crm2-sync-dot');
+    if (!dot) return;
+    dot.style.background = ok ? '#28a745' : '#dc3545';
+    dot.title = ok ? 'Guardado' : 'Error al guardar';
+}
+
+// ---- PROVINCE SELECTOR ----
+
+function crm2RenderSelector() {
+    const sel = document.getElementById('crm2-sel-provincia');
+    if (!sel || !crm2Data) return;
+    sel.innerHTML = '<option value="">— Seleccionar Provincia —</option>' +
+        crm2Data.provincias.map(p =>
+            `<option value="${p.id}" ${p.id === crm2ProvActual ? 'selected' : ''}>${p.nombre} (${p.biciclerias.length})</option>`
+        ).join('');
+}
+
+function crm2SeleccionarProvincia(provinciaId) {
+    crm2ProvActual = provinciaId || null;
+    crm2BicActual  = null;
+    const main     = document.getElementById('crm2-main');
+    const sinProv  = document.getElementById('crm2-sin-provincia');
+    if (!provinciaId) {
+        main.style.display = 'none';
+        sinProv.style.display = '';
+        return;
+    }
+    main.style.display = '';
+    sinProv.style.display = 'none';
+    // Reset filters
+    const b = document.getElementById('crm2-buscar'); if (b) b.value = '';
+    const f = document.getElementById('crm2-filtro-estado'); if (f) f.value = '';
+    crm2RenderStats();
+    crm2RenderLista();
+    document.getElementById('crm2-detalle').innerHTML = '<div class="aviso-msg" style="margin:0;">← Seleccioná una bicicletería de la lista</div>';
+}
+
+function crm2GetProvincia(id) {
+    if (!crm2Data) return null;
+    return crm2Data.provincias.find(p => p.id === (id || crm2ProvActual)) || null;
+}
+
+function crm2GetBicicleteria(bicId) {
+    const prov = crm2GetProvincia();
+    if (!prov) return null;
+    return prov.biciclerias.find(b => b.id === bicId) || null;
+}
+
+// ---- STATS ----
+
+function crm2RenderStats() {
+    const prov = crm2GetProvincia();
+    if (!prov) return;
+    const bics  = prov.biciclerias;
+    const total = bics.length;
+    const sinC  = bics.filter(b => b.estado === 'sin-contactar').length;
+    const cont  = bics.filter(b => b.estado === 'contactado').length;
+    const int_  = bics.filter(b => b.estado === 'interesado').length;
+    const rech  = bics.filter(b => b.estado === 'rechazo').length;
+    const dist  = bics.filter(b => b.estado === 'distribuidor').length;
+    document.getElementById('crm2-stats').innerHTML = [
+        {l:'Total',           v:total, c:'#0066cc'},
+        {l:'Sin contactar',   v:sinC,  c:'#6c757d'},
+        {l:'Contactados',     v:cont,  c:'#28a745'},
+        {l:'Interesados',     v:int_,  c:'#c07a00'},
+        {l:'Rechazaron',      v:rech,  c:'#dc3545'},
+        {l:'Distribuidores',  v:dist,  c:'#004085'},
+    ].map(s => `<div class="crm2-stat-box"><h3 style="color:${s.c}">${s.v}</h3><p>${s.l}</p></div>`).join('');
+}
+
+// ---- LIST ----
+
+function crm2EstadoStyle(estado) {
+    const map = {
+        'sin-contactar': {bg:'#e9ecef', color:'#495057', icon:'⭕ Sin contactar'},
+        'contactado':    {bg:'#d4edda', color:'#155724', icon:'🟢 Contactado'},
+        'interesado':    {bg:'#fff3cd', color:'#856404', icon:'🟡 Interesado'},
+        'rechazo':       {bg:'#f8d7da', color:'#721c24', icon:'🔴 Rechazó'},
+        'distribuidor':  {bg:'#cce5ff', color:'#004085', icon:'✅ Distribuidor'},
+    };
+    return map[estado] || map['sin-contactar'];
+}
+
+function crm2RenderLista() {
+    const prov      = crm2GetProvincia();
+    const container = document.getElementById('crm2-lista');
+    const countLbl  = document.getElementById('crm2-count-label');
+    if (!prov || !container) return;
+
+    const buscar    = (document.getElementById('crm2-buscar')?.value || '').toLowerCase().trim();
+    const filtroEst = document.getElementById('crm2-filtro-estado')?.value || '';
+    const ordenar   = document.getElementById('crm2-ordenar')?.value || 'ranking';
+
+    let bics = [...prov.biciclerias];
+    if (buscar)    bics = bics.filter(b => b.nombre.toLowerCase().includes(buscar) || (b.especialidad||'').toLowerCase().includes(buscar));
+    if (filtroEst) bics = bics.filter(b => b.estado === filtroEst);
+
+    if (ordenar === 'ranking')         bics.sort((a,b) => (a.ranking||999) - (b.ranking||999));
+    else if (ordenar === 'puntuacion-desc') bics.sort((a,b) => b.puntuacion - a.puntuacion);
+    else if (ordenar === 'puntuacion-asc')  bics.sort((a,b) => a.puntuacion - b.puntuacion);
+    else if (ordenar === 'nombre')     bics.sort((a,b) => a.nombre.localeCompare(b.nombre));
+
+    countLbl.textContent = `${bics.length} bicicletería${bics.length !== 1 ? 's' : ''}`;
+
+    if (!bics.length) {
+        container.innerHTML = '<div style="padding:24px;text-align:center;color:#aaa;font-size:13px;">Sin resultados</div>';
+        return;
+    }
+
+    container.innerHTML = bics.map(b => {
+        const s    = crm2EstadoStyle(b.estado);
+        const rank = b.ranking ? `<span style="font-size:10px;color:#aaa;margin-right:3px;">[${b.ranking}]</span>` : '';
+        const pts  = b.puntuacion ? `⭐ ${b.puntuacion}` : '';
+        const esp  = b.especialidad ? b.especialidad.substring(0, 38) + (b.especialidad.length > 38 ? '…' : '') : '';
+        return `<div class="crm2-item${b.id === crm2BicActual ? ' sel' : ''}" onclick="crm2SeleccionarBic('${b.id}')">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+                <div style="font-weight:700;font-size:13px;flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">${rank}${b.nombre}</div>
+                <span class="crm2-eb" style="background:${s.bg};color:${s.color};">${s.icon}</span>
+            </div>
+            ${(pts || esp) ? `<div style="font-size:11px;color:#888;margin-top:2px;">${pts}${pts && esp ? ' · ' : ''}${esp}</div>` : ''}
+        </div>`;
+    }).join('');
+}
+
+// ---- DETAIL ----
+
+function crm2SeleccionarBic(bicId) {
+    crm2BicActual = bicId;
+    crm2RenderLista();
+    crm2RenderDetalle();
+}
+
+function crm2RenderDetalle() {
+    const bic       = crm2GetBicicleteria(crm2BicActual);
+    const container = document.getElementById('crm2-detalle');
+    if (!bic) {
+        container.innerHTML = '<div class="aviso-msg" style="margin:0;">← Seleccioná una bicicletería de la lista</div>';
+        return;
+    }
+
+    const s = crm2EstadoStyle(bic.estado);
+    const estadosBtns = [
+        {key:'sin-contactar', label:'⭕ Sin contactar'},
+        {key:'contactado',    label:'🟢 Contactado'},
+        {key:'interesado',    label:'🟡 Interesado'},
+        {key:'rechazo',       label:'🔴 Rechazó'},
+        {key:'distribuidor',  label:'✅ Distribuidor'},
+    ];
+
+    container.innerHTML = `
+    <div class="crm2-detalle-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px;">
+            <div>
+                <div class="det-nombre">${bic.nombre}</div>
+                ${bic.ranking ? `<div style="font-size:11px;color:#888;">Ranking #${bic.ranking}</div>` : ''}
+            </div>
+            <span class="crm2-eb" style="background:${s.bg};color:${s.color};font-size:12px;padding:4px 10px;">${s.icon}</span>
+        </div>
+
+        <div class="det-info-grid" style="margin-bottom:16px;">
+            <div class="det-field"><div class="lbl">Dirección</div><div class="val">${bic.direccion || '—'}</div></div>
+            <div class="det-field"><div class="lbl">Teléfono</div><div class="val">${bic.telefono ? `<a href="tel:${bic.telefono}">${bic.telefono}</a>` : '—'}</div></div>
+            <div class="det-field"><div class="lbl">Puntuación</div><div class="val">${bic.puntuacion ? '⭐ ' + bic.puntuacion : '—'}</div></div>
+            <div class="det-field"><div class="lbl">Especialidad</div><div class="val">${bic.especialidad || '—'}</div></div>
+        </div>
+
+        <div class="est-section-title">Estado de negociación</div>
+        <div class="crm2-est-btns">
+            ${estadosBtns.map(e => {
+                const es = crm2EstadoStyle(e.key);
+                const on = bic.estado === e.key;
+                return `<button class="crm2-est-btn" style="border-color:${es.color};background:${on ? es.color : es.bg};color:${on ? '#fff' : es.color};"
+                    onclick="crm2CambiarEstado('${bic.id}','${e.key}')">${e.label}</button>`;
+            }).join('')}
+        </div>
+
+        <div class="est-section-title">Datos de contacto</div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="crm2-det-email" value="${bic.email || ''}" placeholder="email@ejemplo.com" onblur="crm2AutoGuardarContacto()">
+        </div>
+        <div class="grid2">
+            <div class="form-group">
+                <label>Nombre del contacto</label>
+                <input type="text" id="crm2-det-cnom" value="${(bic.contacto_nombre||'').replace(/"/g,'&quot;')}" placeholder="Juan García" onblur="crm2AutoGuardarContacto()">
+            </div>
+            <div class="form-group">
+                <label>Puesto / Cargo</label>
+                <input type="text" id="crm2-det-cpues" value="${(bic.contacto_puesto||'').replace(/"/g,'&quot;')}" placeholder="Dueño, Vendedor..." onblur="crm2AutoGuardarContacto()">
+            </div>
+        </div>
+
+        <div class="est-section-title">Notas</div>
+        <div class="form-group">
+            <textarea id="crm2-det-notas" rows="5" placeholder="¿Qué les interesó? Objeciones, próximos pasos...">${bic.notas || ''}</textarea>
+        </div>
+        <button class="btn btn-blue" style="font-size:12px;padding:7px 16px;margin-bottom:18px;" onclick="crm2GuardarNotas()">💾 Guardar Notas</button>
+
+        <div class="est-section-title">Fechas</div>
+        <div class="grid2">
+            <div class="form-group">
+                <label>Primer contacto</label>
+                <input type="date" id="crm2-det-f1" value="${bic.fecha_primer_contacto || ''}">
+            </div>
+            <div class="form-group">
+                <label>Próximo seguimiento</label>
+                <input type="date" id="crm2-det-f2" value="${bic.fecha_proximo_seguimiento || ''}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Última actualización</label>
+            <input type="text" id="crm2-det-fmod" value="${bic.fecha_ultima_actualizacion || '—'}" disabled style="background:#f8fafc;color:#888;">
+        </div>
+        <button class="btn btn-green" style="font-size:12px;padding:7px 16px;margin-bottom:18px;" onclick="crm2GuardarFechas()">📅 Guardar Fechas</button>
+
+        <div style="margin-top:8px;border-top:1px solid #f0f0f0;padding-top:12px;">
+            <button class="btn btn-red" style="font-size:11px;padding:5px 12px;" onclick="crm2EliminarBic('${bic.id}')">🗑️ Eliminar bicicletería</button>
+        </div>
+    </div>`;
+}
+
+// ---- ACTIONS ----
+
+function crm2CambiarEstado(bicId, nuevoEstado) {
+    const prov = crm2GetProvincia();
+    if (!prov) return;
+    const bic = prov.biciclerias.find(b => b.id === bicId);
+    if (!bic) return;
+    bic.estado = nuevoEstado;
+    bic.fecha_ultima_actualizacion = new Date().toLocaleString('es-AR');
+    crm2GuardarLocal();
+    crm2RenderStats();
+    crm2RenderLista();
+    crm2RenderDetalle();
+    mostrarToast('✅ Estado actualizado');
+}
+
+function crm2AutoGuardarContacto() {
+    clearTimeout(crm2AutoSaveTimer);
+    crm2AutoSaveTimer = setTimeout(() => {
+        const prov = crm2GetProvincia();
+        if (!prov || !crm2BicActual) return;
+        const bic = prov.biciclerias.find(b => b.id === crm2BicActual);
+        if (!bic) return;
+        const email = document.getElementById('crm2-det-email')?.value.trim() || '';
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { mostrarToast('⚠️ Email inválido'); return; }
+        bic.email           = email;
+        bic.contacto_nombre = document.getElementById('crm2-det-cnom')?.value.trim()  || '';
+        bic.contacto_puesto = document.getElementById('crm2-det-cpues')?.value.trim() || '';
+        bic.fecha_ultima_actualizacion = new Date().toLocaleString('es-AR');
+        crm2GuardarLocal();
+        const fmod = document.getElementById('crm2-det-fmod');
+        if (fmod) fmod.value = bic.fecha_ultima_actualizacion;
+        mostrarToast('💾 Contacto guardado');
+    }, 800);
+}
+
+function crm2GuardarNotas() {
+    const prov = crm2GetProvincia();
+    if (!prov || !crm2BicActual) return;
+    const bic = prov.biciclerias.find(b => b.id === crm2BicActual);
+    if (!bic) return;
+    bic.notas = document.getElementById('crm2-det-notas')?.value || '';
+    bic.fecha_ultima_actualizacion = new Date().toLocaleString('es-AR');
+    crm2GuardarLocal();
+    const fmod = document.getElementById('crm2-det-fmod');
+    if (fmod) fmod.value = bic.fecha_ultima_actualizacion;
+    mostrarToast('💾 Notas guardadas');
+}
+
+function crm2GuardarFechas() {
+    const prov = crm2GetProvincia();
+    if (!prov || !crm2BicActual) return;
+    const bic = prov.biciclerias.find(b => b.id === crm2BicActual);
+    if (!bic) return;
+    const f1 = document.getElementById('crm2-det-f1')?.value || '';
+    const f2 = document.getElementById('crm2-det-f2')?.value || '';
+    if (f1 && f1 > new Date().toISOString().split('T')[0]) {
+        mostrarToast('⚠️ El primer contacto no puede ser una fecha futura'); return;
+    }
+    bic.fecha_primer_contacto      = f1;
+    bic.fecha_proximo_seguimiento  = f2;
+    bic.fecha_ultima_actualizacion = new Date().toLocaleString('es-AR');
+    crm2GuardarLocal();
+    const fmod = document.getElementById('crm2-det-fmod');
+    if (fmod) fmod.value = bic.fecha_ultima_actualizacion;
+    mostrarToast('📅 Fechas guardadas');
+}
+
+// ---- PROVINCE MODAL ----
+
+function crm2AbrirModalProvincia() {
+    document.getElementById('crm2-input-provincia').value = '';
+    document.getElementById('modal-crm2-provincia').classList.add('open');
+    setTimeout(() => document.getElementById('crm2-input-provincia').focus(), 100);
+}
+
+function crm2GuardarProvincia() {
+    const nombre = document.getElementById('crm2-input-provincia').value.trim();
+    if (!nombre) { mostrarToast('⚠️ Ingresá un nombre para la provincia'); return; }
+    if (crm2Data.provincias.find(p => p.nombre.toLowerCase() === nombre.toLowerCase())) {
+        mostrarToast('⚠️ Ya existe una provincia con ese nombre'); return;
+    }
+    const id = 'prov-' + Date.now();
+    crm2Data.provincias.push({id, nombre, creada: new Date().toISOString().split('T')[0], biciclerias: []});
+    crm2GuardarLocal();
+    crm2CerrarModal('modal-crm2-provincia');
+    crm2RenderSelector();
+    document.getElementById('crm2-sel-provincia').value = id;
+    crm2SeleccionarProvincia(id);
+    mostrarToast(`🗺️ Provincia "${nombre}" creada`);
+}
+
+// ---- BICICLETERÍA MODAL ----
+
+function crm2AbrirModalAgregarBic() {
+    ['crm2-bic-nombre','crm2-bic-dir','crm2-bic-tel','crm2-bic-pts','crm2-bic-esp']
+        .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('modal-crm2-bic').classList.add('open');
+    setTimeout(() => document.getElementById('crm2-bic-nombre').focus(), 100);
+}
+
+function crm2GuardarNuevaBic() {
+    const prov = crm2GetProvincia();
+    if (!prov) return;
+    const nombre = document.getElementById('crm2-bic-nombre').value.trim();
+    if (!nombre) { mostrarToast('⚠️ El nombre es requerido'); return; }
+    const pts = parseFloat(document.getElementById('crm2-bic-pts').value) || 0;
+    if (pts && (pts < 1 || pts > 5)) { mostrarToast('⚠️ La puntuación debe ser entre 1 y 5'); return; }
+    const tel = document.getElementById('crm2-bic-tel').value.trim();
+    const id  = `bic-${prov.id}-${Date.now()}`;
+    prov.biciclerias.push({
+        id, ranking: prov.biciclerias.length + 1,
+        nombre,
+        direccion:   document.getElementById('crm2-bic-dir').value.trim(),
+        telefono:    tel,
+        puntuacion:  pts,
+        especialidad: document.getElementById('crm2-bic-esp').value.trim(),
+        email: '', contacto_nombre: '', contacto_puesto: '',
+        estado: 'sin-contactar', notas: '',
+        fecha_primer_contacto: '', fecha_ultima_actualizacion: '', fecha_proximo_seguimiento: ''
+    });
+    crm2GuardarLocal();
+    crm2CerrarModal('modal-crm2-bic');
+    crm2RenderSelector();
+    crm2RenderStats();
+    crm2RenderLista();
+    mostrarToast(`🚲 "${nombre}" agregada`);
+}
+
+function crm2EliminarBic(bicId) {
+    const prov = crm2GetProvincia();
+    if (!prov) return;
+    const bic = prov.biciclerias.find(b => b.id === bicId);
+    if (!bic || !confirm(`¿Eliminar "${bic.nombre}"? Esta acción no se puede deshacer.`)) return;
+    prov.biciclerias = prov.biciclerias.filter(b => b.id !== bicId);
+    if (crm2BicActual === bicId) {
+        crm2BicActual = null;
+        document.getElementById('crm2-detalle').innerHTML = '<div class="aviso-msg" style="margin:0;">← Seleccioná una bicicletería de la lista</div>';
+    }
+    crm2GuardarLocal();
+    crm2RenderSelector();
+    crm2RenderStats();
+    crm2RenderLista();
+    mostrarToast('🗑️ Bicicletería eliminada');
+}
+
+// ---- MODAL HELPERS ----
+
+function crm2CerrarModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+    ['modal-crm2-provincia','modal-crm2-bic'].forEach(id => {
+        const modal = document.getElementById(id);
+        if (modal && e.target === modal) modal.classList.remove('open');
+    });
+});
+
+// ---- SYNC (poll localStorage every 2s for multi-tab/PC) ----
+
+function crm2IniciarSync() {
+    crm2SyncTimer = setInterval(() => {
+        try {
+            const raw = localStorage.getItem(CRM2_KEY);
+            if (!raw || raw === crm2LastHash) return;
+            crm2LastHash = raw;
+            crm2Data     = JSON.parse(raw);
+            crm2RenderSelector();
+            if (crm2ProvActual) {
+                crm2RenderStats();
+                crm2RenderLista();
+                if (crm2BicActual) crm2RenderDetalle();
+            }
+            crm2MostrarSyncDot(true);
+        } catch(e) {}
+    }, 2000);
+}
+
+// ---- INIT ----
+
+function crm2Init() {
+    crm2InicializarDatos();
+    crm2RenderSelector();
+    crm2IniciarSync();
+}
+
+setTimeout(crm2Init, 600);
 </script>
 </body>
 </html>
