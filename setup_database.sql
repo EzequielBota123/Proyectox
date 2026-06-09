@@ -24,15 +24,15 @@ CREATE TABLE IF NOT EXISTS clientes (
     direccion text DEFAULT '',
     rubro text DEFAULT '',
     vendedor_sugerido text DEFAULT '',
-    tipo text NOT NULL DEFAULT 'Credifin' CHECK (tipo IN ('Credifin', 'Sin Credifin', 'Retail')),
+    tipo text NOT NULL DEFAULT 'Credifin',
     created_at timestamptz DEFAULT now()
 );
 
--- 2b. Migración: si la tabla ya existía con el CHECK viejo (sin Retail), actualizarlo
+-- 2b. Migración: eliminar CHECK de tipo para permitir nombres de provincias como listas
 DO $$
 BEGIN
     ALTER TABLE clientes DROP CONSTRAINT IF EXISTS clientes_tipo_check;
-    ALTER TABLE clientes ADD CONSTRAINT clientes_tipo_check CHECK (tipo IN ('Credifin', 'Sin Credifin', 'Retail'));
+    -- No recreamos el CHECK: provincias y listas nuevas usan tipo libre
 END $$;
 
 -- 3. Asignaciones (cliente → vendedor, con estado y notas)
