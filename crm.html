@@ -329,6 +329,37 @@
         .crmv-conv-box { background:#fef9c3; border:1.5px solid #fde68a; border-radius:8px; padding:10px 14px; margin-bottom:12px; font-size:13px; }
         .wa-link { cursor:pointer; color:#25d366; font-weight:600; text-decoration:underline; transition:opacity 0.2s; white-space:nowrap; }
         .wa-link:hover { opacity:0.7; }
+
+        /* ===== PANEL ADMIN v2 ===== */
+        .adm2-header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 16px 20px; border-radius: 12px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .adm2-header h2 { font-size: 17px; font-weight: 800; margin: 0; }
+        .adm2-header p  { font-size: 11px; opacity: 0.65; margin: 3px 0 0; }
+        .adm2-stats-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .adm2-stat-card { background: white; border-radius: 12px; padding: 14px 18px; flex: 1; min-width: 110px; text-align: center; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .adm2-stat-card h3 { font-size: 30px; font-weight: 800; }
+        .adm2-stat-card p  { font-size: 10px; color: #888; font-weight: 600; text-transform: uppercase; margin-top: 3px; letter-spacing: 0.3px; }
+        .adm2-section-title { font-size: 12px; font-weight: 800; color: #1a1a2e; text-transform: uppercase; letter-spacing: 0.6px; margin: 20px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .adm2-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(370px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .adm2-card { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e8e8e8; }
+        .adm2-card-hdr { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+        .adm2-card-nombre { font-size: 15px; font-weight: 800; color: white; }
+        .adm2-card-sub { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+        .adm2-card-total { font-size: 30px; font-weight: 800; color: white; }
+        .adm2-card-body { padding: 16px 18px; }
+        .adm2-mini-title { font-size: 10px; font-weight: 800; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .adm2-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+        .adm2-bar-lbl { font-size: 11px; font-weight: 600; min-width: 162px; color: #555; white-space: nowrap; }
+        .adm2-bar-track { flex: 1; background: #f3f4f6; border-radius: 4px; height: 8px; overflow: hidden; }
+        .adm2-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+        .adm2-bar-num { font-size: 11px; font-weight: 700; color: #333; min-width: 22px; text-align: right; }
+        .adm2-bar-pct { font-size: 10px; color: #bbb; min-width: 38px; }
+        .adm2-chips-row { display: flex; flex-wrap: wrap; gap: 6px; }
+        .adm2-chip { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .adm2-divider { border: none; border-top: 1px solid #f0f0f0; margin: 12px 0; }
+        .adm2-vend-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f9f9f9; }
+        .adm2-vend-row:last-child { border-bottom: none; }
+        .adm2-prov-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+        .adm2-prov-item { background: #f8fafc; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 600; color: #444; }
     </style>
 </head>
 <body>
@@ -555,19 +586,23 @@
         </div>
     </div>
 
-    <!-- ===== PANEL ADMIN (solo lectura) ===== -->
+    <!-- ===== PANEL ADMIN v2 ===== -->
     <div id="tab-admin" class="tab-content">
-        <div class="admin-panel-header">
+        <div class="adm2-header">
             <div>
-                <h2>📊 Panel de Administrador</h2>
-                <p>Vista global de todos los vendedores — solo lectura</p>
+                <h2>📊 Panel Admin — Dashboard</h2>
+                <p>Vista global de telemarketers y vendedores — actualización en tiempo real</p>
             </div>
-            <span class="admin-readonly-badge" style="background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);">🔒 Solo lectura</span>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <span id="adm2-last-update" style="font-size:11px;opacity:0.6;"></span>
+                <button class="btn btn-yellow" onclick="exportarAdminExcel()" style="font-size:12px;padding:8px 14px;">📥 Exportar Excel</button>
+            </div>
         </div>
-        <div class="stats-row" id="admin-stats-globales"></div>
-        <div class="admin-vend-grid" id="admin-vend-grid">
-            <div class="aviso-msg">Cargando...</div>
-        </div>
+        <div class="adm2-stats-row" id="adm2-stats-globales"></div>
+        <div class="adm2-section-title">👥 Por Telemarketer</div>
+        <div class="adm2-grid" id="adm2-telemarketers"><div class="aviso-msg">Cargando...</div></div>
+        <div class="adm2-section-title">🤝 Por Vendedor</div>
+        <div class="adm2-grid" id="adm2-vendedores"><div class="aviso-msg">Cargando...</div></div>
     </div>
 
     <!-- ===== CRM VENDEDORES ===== -->
@@ -972,6 +1007,10 @@ function rerenderAll() {
     // Actualizar calendario si está abierto
     if (document.getElementById('tab-calendario')?.classList.contains('active')) {
         renderCalendario();
+    }
+    // Actualizar Panel Admin si está abierto
+    if (document.getElementById('tab-admin')?.classList.contains('active')) {
+        renderAdminPanel();
     }
 }
 
@@ -2739,87 +2778,264 @@ function fcSerializar(fecha, notasArr, vendedorVenta) {
 }
 
 // ============================================================
-// PANEL ADMIN
+// PANEL ADMIN v2
 // ============================================================
-function renderEstadoBar(nombre, n, total, color, bg) {
-    if (!n) return '';
-    const pct = total > 0 ? Math.round(n / total * 100) : 0;
-    return `<div class="admin-estado-row">
-        <div class="admin-estado-lbl" style="background:${bg};color:${color};">${nombre}</div>
-        <div class="admin-bar-wrap"><div class="admin-bar-fill" style="width:${pct}%;background:${color};"></div></div>
-        <div class="admin-bar-n">${n}</div>
-        <div class="admin-bar-pct">(${pct}%)</div>
-    </div>`;
+
+function svgDonut(data, size) {
+    size = size || 60;
+    const r = size * 0.33, sw = size * 0.16, cx = size / 2, cy = size / 2;
+    const C = 2 * Math.PI * r;
+    const total = data.reduce(function(s, d) { return s + d.value; }, 0);
+    if (!total) {
+        return '<svg width="' + size + '" height="' + size + '"><circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="#f0f0f0" stroke-width="' + sw + '"/><text x="' + cx + '" y="' + (cy+4) + '" text-anchor="middle" font-size="' + Math.round(size*0.2) + '" fill="#ccc" font-weight="800">—</text></svg>';
+    }
+    var cum = 0;
+    var segs = data.filter(function(d){ return d.value > 0; }).map(function(d) {
+        var pct = d.value / total, dash = pct * C, rot = cum * 360 - 90; cum += pct;
+        return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + d.color + '" stroke-width="' + sw + '" stroke-dasharray="' + dash + ' ' + (C - dash) + '" transform="rotate(' + rot + ' ' + cx + ' ' + cy + ')"/>';
+    });
+    return '<svg width="' + size + '" height="' + size + '" style="display:block"><circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="#f3f4f6" stroke-width="' + sw + '"/>' + segs.join('') + '<text x="' + cx + '" y="' + (cy+3) + '" text-anchor="middle" font-size="' + Math.round(size*0.2) + '" font-weight="800" fill="#1a1a2e">' + total + '</text></svg>';
+}
+
+function adm2Bar(label, n, total, color) {
+    var pct = total > 0 ? Math.round(n / total * 100) : 0;
+    return '<div class="adm2-bar-row"><div class="adm2-bar-lbl">' + label + '</div><div class="adm2-bar-track"><div class="adm2-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div><div class="adm2-bar-num">' + n + '</div><div class="adm2-bar-pct">(' + pct + '%)</div></div>';
 }
 
 function renderAdminPanel() {
     if (CURRENT_USER.rol !== 'admin') return;
 
-    const vendedores = getVendedores();
-    const asignados  = getClientesAsignados();
+    const asignados = getClientesAsignados();
 
-    const total       = asignados.length;
-    const cerrados    = asignados.filter(c => c.estado === 'Cerrado').length;
-    const enManos     = asignados.filter(c => c.estado === 'En manos de vendedor').length;
-    const interesados = asignados.filter(c => c.estado === 'Interesado').length;
-    const contactados = asignados.filter(c => c.estado === 'Contactado').length;
-    const sinContactar= asignados.filter(c => c.estado === 'Sin contactar').length;
+    // Telemarketers = valores únicos de vendedorId
+    const telemarketers = [...new Set(asignados.map(c => c.vendedorId).filter(Boolean))].sort();
+    // Vendedores = valores únicos de vendedorVenta (quienes recibieron interesados)
+    const vendedoresVenta = [...new Set(asignados.map(c => c.vendedorVenta).filter(Boolean))].sort();
 
-    const statsEl = document.getElementById('admin-stats-globales');
+    // Timestamp
+    const now = new Date();
+    const p2 = n => String(n).padStart(2, '0');
+    const upEl = document.getElementById('adm2-last-update');
+    if (upEl) upEl.textContent = `Actualizado: ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
+
+    // ── Stats globales ──
+    const tot = asignados.length;
+    const statsEl = document.getElementById('adm2-stats-globales');
     if (statsEl) {
         statsEl.innerHTML = [
-            { label: 'Total clientes',         val: total,        color: '#0066cc' },
-            { label: 'Vendedores activos',      val: vendedores.length, color: '#1a1a2e' },
-            { label: 'Cerrados ✅',             val: cerrados,     color: '#15803d' },
-            { label: 'En manos de vendedor 🤝', val: enManos,      color: '#7c3aed' },
-            { label: 'Interesados ⭐',          val: interesados,  color: '#d97706' },
-            { label: 'Contactados 📞',          val: contactados,  color: '#1d4ed8' },
-            { label: 'Sin contactar 📵',        val: sinContactar, color: '#991b1b' },
-        ].map(s => `<div class="stat-box"><h3 style="color:${s.color}">${s.val}</h3><p>${s.label}</p></div>`).join('');
+            { l: 'Total clientes',        v: tot,                                                                       c: '#0066cc' },
+            { l: 'Sin contactar 📵',      v: asignados.filter(c => c.estado === 'Sin contactar').length,               c: '#991b1b' },
+            { l: 'Contactados 📞',        v: asignados.filter(c => c.estado === 'Contactado').length,                  c: '#1d4ed8' },
+            { l: 'Interesados ⭐',        v: asignados.filter(c => c.estado === 'Interesado').length,                  c: '#d97706' },
+            { l: 'En manos vendedor 🤝',  v: asignados.filter(c => c.estado === 'En manos de vendedor').length,        c: '#7c3aed' },
+            { l: 'Cerrados ✅',           v: asignados.filter(c => c.estado === 'Cerrado').length,                     c: '#15803d' },
+        ].map(s => `<div class="adm2-stat-card"><h3 style="color:${s.c}">${s.v}</h3><p>${s.l}</p></div>`).join('');
     }
 
-    const gridEl = document.getElementById('admin-vend-grid');
-    if (!gridEl) return;
+    // ── Cards por telemarketer ──
+    const tmColors = ['#0066cc', '#16a34a', '#e94560', '#0891b2', '#d97706', '#6366f1'];
+    const tmEl = document.getElementById('adm2-telemarketers');
+    if (tmEl) {
+        if (!telemarketers.length) {
+            tmEl.innerHTML = '<div class="aviso-msg">Sin clientes asignados todavía</div>';
+        } else {
+            tmEl.innerHTML = telemarketers.map((tm, i) => {
+                const cl    = asignados.filter(c => c.vendedorId === tm);
+                const tot   = cl.length;
+                const sinC  = cl.filter(c => c.estado === 'Sin contactar').length;
+                const cont  = cl.filter(c => c.estado === 'Contactado').length;
+                const inter = cl.filter(c => c.estado === 'Interesado').length;
+                const manos = cl.filter(c => c.estado === 'En manos de vendedor').length;
+                const cerr  = cl.filter(c => c.estado === 'Cerrado').length;
+                const cred  = cl.filter(c => c.tipo === 'Credifin').length;
+                const sinCr = cl.filter(c => c.tipo === 'Sin Credifin').length;
+                const ret   = cl.filter(c => c.tipo === 'Retail').length;
+                const color = tmColors[i % tmColors.length];
 
-    if (!vendedores.length) {
-        gridEl.innerHTML = '<div class="aviso-msg">Sin vendedores registrados</div>';
-        return;
+                // Pasados a vendedor
+                const pasMap = {};
+                cl.filter(c => c.vendedorVenta).forEach(c => { pasMap[c.vendedorVenta] = (pasMap[c.vendedorVenta] || 0) + 1; });
+                const pasHTML = Object.keys(pasMap).length
+                    ? Object.entries(pasMap).sort((a, b) => b[1] - a[1]).map(([v, n]) =>
+                        `<div class="adm2-vend-row"><span style="font-size:12px;font-weight:700;">🤝 ${v}</span><span style="font-size:14px;font-weight:800;color:#7c3aed;">${n}</span></div>`
+                    ).join('')
+                    : '<div style="color:#aaa;font-size:12px;font-style:italic;padding:4px 0;">Sin interesados pasados aún</div>';
+
+                // Top provincias
+                const provMap = {};
+                cl.forEach(c => { if (c.provincia) provMap[c.provincia] = (provMap[c.provincia] || 0) + 1; });
+                const topProvs = Object.entries(provMap).sort((a, b) => b[1] - a[1]).slice(0, 6);
+                const provHTML = topProvs.length
+                    ? `<div class="adm2-prov-grid">${topProvs.map(([p, n]) => `<div class="adm2-prov-item">${p}: <strong>${n}</strong></div>`).join('')}</div>`
+                    : '<div style="color:#aaa;font-size:12px;font-style:italic;">Sin datos de provincia</div>';
+
+                return `<div class="adm2-card">
+                    <div class="adm2-card-hdr" style="background:linear-gradient(135deg,${color},${color}bb)">
+                        <div>
+                            <div class="adm2-card-nombre">👤 ${tm}</div>
+                            <div class="adm2-card-sub">Telemarketer</div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            ${svgDonut([{value:cred,color:'#16a34a'},{value:sinCr,color:'#d97706'},{value:ret,color:'#7c3aed'}], 58)}
+                            <div class="adm2-card-total">${tot}</div>
+                        </div>
+                    </div>
+                    <div class="adm2-card-body">
+                        <div class="adm2-mini-title">Estado de los clientes</div>
+                        ${adm2Bar('📵 Sin contactar', sinC, tot, '#991b1b')}
+                        ${adm2Bar('📞 Contactado', cont, tot, '#1d4ed8')}
+                        ${adm2Bar('⭐ Interesado', inter, tot, '#d97706')}
+                        ${adm2Bar('🤝 En manos de vendedor', manos, tot, '#7c3aed')}
+                        ${adm2Bar('✅ Cerrado', cerr, tot, '#15803d')}
+                        <hr class="adm2-divider">
+                        <div class="adm2-mini-title">Categorías</div>
+                        <div class="adm2-chips-row">
+                            ${cred  ? `<span class="adm2-chip" style="background:#dcfce7;color:#15803d;">🟢 Credifin: ${cred}</span>` : ''}
+                            ${sinCr ? `<span class="adm2-chip" style="background:#fffbeb;color:#92400e;">🟡 Sin Credifin: ${sinCr}</span>` : ''}
+                            ${ret   ? `<span class="adm2-chip" style="background:#f3e8ff;color:#6d28d9;">🟣 Retail: ${ret}</span>` : ''}
+                            ${!tot  ? '<span style="color:#aaa;font-size:12px;">—</span>' : ''}
+                        </div>
+                        <hr class="adm2-divider">
+                        <div class="adm2-mini-title">Interesados pasados a vendedor</div>
+                        ${pasHTML}
+                        <hr class="adm2-divider">
+                        <div class="adm2-mini-title">Por provincia (top ${topProvs.length})</div>
+                        ${provHTML}
+                    </div>
+                </div>`;
+            }).join('');
+        }
     }
 
-    gridEl.innerHTML = vendedores.map(nombre => {
-        const clientes   = asignados.filter(c => c.vendedorId === nombre);
-        const tot        = clientes.length;
-        const cerr       = clientes.filter(c => c.estado === 'Cerrado').length;
-        const manos      = clientes.filter(c => c.estado === 'En manos de vendedor').length;
-        const inter      = clientes.filter(c => c.estado === 'Interesado').length;
-        const cont       = clientes.filter(c => c.estado === 'Contactado').length;
-        const sinC       = clientes.filter(c => c.estado === 'Sin contactar').length;
-        const credifin   = clientes.filter(c => c.tipo === 'Credifin').length;
-        const sinCred    = clientes.filter(c => c.tipo === 'Sin Credifin').length;
-        const retail     = clientes.filter(c => c.tipo === 'Retail').length;
+    // ── Cards por vendedor ──
+    const evColors = { 'En proceso': '#1d4ed8', 'Negociando': '#d97706', 'Cerrado': '#15803d', 'No interesado': '#991b1b' };
+    const vvEl = document.getElementById('adm2-vendedores');
+    if (vvEl) {
+        if (!vendedoresVenta.length) {
+            vvEl.innerHTML = '<div class="aviso-msg">Sin vendedores con clientes asignados todavía</div>';
+        } else {
+            vvEl.innerHTML = vendedoresVenta.map(vv => {
+                const recib = asignados.filter(c => c.vendedorVenta === vv);
+                const tot   = recib.length;
+                const cred  = recib.filter(c => c.tipo === 'Credifin').length;
+                const sinCr = recib.filter(c => c.tipo === 'Sin Credifin').length;
+                const ret   = recib.filter(c => c.tipo === 'Retail').length;
 
-        return `<div class="admin-vend-card">
-            <div class="admin-vend-nombre">
-                <span>👤 ${nombre}</span>
-                <span class="admin-vend-total">${tot}</span>
-            </div>
+                // estadoVend
+                const evMap = {};
+                recib.forEach(c => { const e = c.estadoVend || 'En proceso'; evMap[e] = (evMap[e] || 0) + 1; });
 
-            <div class="admin-estados-title">Por estado</div>
-            ${renderEstadoBar('Sin contactar',        sinC,  tot, '#991b1b', '#fee2e2')}
-            ${renderEstadoBar('Contactado',            cont,  tot, '#1d4ed8', '#dbeafe')}
-            ${renderEstadoBar('Interesado',            inter, tot, '#d97706', '#fef9c3')}
-            ${renderEstadoBar('En manos de vendedor',  manos, tot, '#7c3aed', '#f3e8ff')}
-            ${renderEstadoBar('Cerrado',               cerr,  tot, '#15803d', '#dcfce7')}
-            ${!tot ? '<div style="color:#aaa;font-size:12px;text-align:center;padding:8px;">Sin clientes asignados</div>' : ''}
+                // fuente (de qué telemarketer vienen)
+                const fMap = {};
+                recib.forEach(c => { if (c.vendedorId) fMap[c.vendedorId] = (fMap[c.vendedorId] || 0) + 1; });
+                const fHTML = Object.entries(fMap).sort((a, b) => b[1] - a[1]).map(([tm, n]) =>
+                    `<span class="adm2-chip" style="background:#eff6ff;color:#1d4ed8;">📞 ${tm}: ${n}</span>`
+                ).join('') || '<span style="color:#aaa;font-size:12px;">—</span>';
 
-            <div class="admin-tipos-row">
-                ${credifin ? `<span class="badge-cred" style="font-size:11px;padding:3px 9px;">Credifin: ${credifin}</span>` : ''}
-                ${sinCred  ? `<span class="badge-sin"  style="font-size:11px;padding:3px 9px;">Sin Cred: ${sinCred}</span>` : ''}
-                ${retail   ? `<span class="badge-retail" style="font-size:11px;padding:3px 9px;">Retail: ${retail}</span>` : ''}
-                ${!tot     ? `<span style="color:#aaa;font-size:11px;">—</span>` : ''}
-            </div>
-        </div>`;
-    }).join('');
+                return `<div class="adm2-card">
+                    <div class="adm2-card-hdr" style="background:linear-gradient(135deg,#7c3aed,#5b21b6)">
+                        <div>
+                            <div class="adm2-card-nombre">🤝 ${vv}</div>
+                            <div class="adm2-card-sub">Vendedor</div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            ${svgDonut([{value:evMap['En proceso']||0,color:'#1d4ed8'},{value:evMap['Negociando']||0,color:'#d97706'},{value:evMap['Cerrado']||0,color:'#15803d'},{value:evMap['No interesado']||0,color:'#991b1b'}], 58)}
+                            <div class="adm2-card-total">${tot}</div>
+                        </div>
+                    </div>
+                    <div class="adm2-card-body">
+                        <div class="adm2-mini-title">Estado en CRM Vendedores</div>
+                        ${['En proceso','Negociando','Cerrado','No interesado'].map(e => adm2Bar(e, evMap[e]||0, tot, evColors[e])).join('')}
+                        <hr class="adm2-divider">
+                        <div class="adm2-mini-title">Categorías de los clientes</div>
+                        <div class="adm2-chips-row">
+                            ${cred  ? `<span class="adm2-chip" style="background:#dcfce7;color:#15803d;">🟢 Credifin: ${cred}</span>` : ''}
+                            ${sinCr ? `<span class="adm2-chip" style="background:#fffbeb;color:#92400e;">🟡 Sin Credifin: ${sinCr}</span>` : ''}
+                            ${ret   ? `<span class="adm2-chip" style="background:#f3e8ff;color:#6d28d9;">🟣 Retail: ${ret}</span>` : ''}
+                            ${!tot  ? '<span style="color:#aaa;font-size:12px;">—</span>' : ''}
+                        </div>
+                        <hr class="adm2-divider">
+                        <div class="adm2-mini-title">Fuente (qué telemarketer envió los clientes)</div>
+                        <div class="adm2-chips-row">${fHTML}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+    }
+}
+
+function exportarAdminExcel() {
+    const asignados = getClientesAsignados();
+    if (!asignados.length) { mostrarToast('⚠️ Sin datos para exportar', '#dc2626'); return; }
+
+    const wb = XLSX.utils.book_new();
+
+    // Hoja 1: Detalle completo
+    const detalle = asignados.map(c => ({
+        Telemarketer:         c.vendedorId || '',
+        'Nombre cliente':     c.nombre,
+        CUIT:                 c.cuit || '',
+        'Teléfono':           c.telefono || '',
+        Ciudad:               c.ciudad || '',
+        Provincia:            c.provincia || '',
+        Tipo:                 c.tipo || '',
+        Estado:               c.estado || '',
+        'Vendedor asignado':  c.vendedorVenta || '',
+        'Estado vendedor':    c.estadoVend || '',
+        'Fecha contacto':     c.fecha_contacto ? new Date(c.fecha_contacto).toLocaleDateString('es-AR') : '',
+        'Fecha asignación':   c.fechaAsignacion || '',
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(detalle), 'Detalle completo');
+
+    // Hoja 2: Resumen por telemarketer
+    const telemarketers = [...new Set(asignados.map(c => c.vendedorId).filter(Boolean))].sort();
+    if (telemarketers.length) {
+        const resTM = telemarketers.map(tm => {
+            const cl = asignados.filter(x => x.vendedorId === tm);
+            const pasMap = {};
+            cl.filter(x => x.vendedorVenta).forEach(x => { pasMap[x.vendedorVenta] = (pasMap[x.vendedorVenta] || 0) + 1; });
+            const row = {
+                Telemarketer:          tm,
+                Total:                 cl.length,
+                'Sin contactar':       cl.filter(x => x.estado === 'Sin contactar').length,
+                Contactado:            cl.filter(x => x.estado === 'Contactado').length,
+                Interesado:            cl.filter(x => x.estado === 'Interesado').length,
+                'En manos vendedor':   cl.filter(x => x.estado === 'En manos de vendedor').length,
+                Cerrado:               cl.filter(x => x.estado === 'Cerrado').length,
+                Credifin:              cl.filter(x => x.tipo === 'Credifin').length,
+                'Sin Credifin':        cl.filter(x => x.tipo === 'Sin Credifin').length,
+                Retail:                cl.filter(x => x.tipo === 'Retail').length,
+            };
+            Object.entries(pasMap).forEach(([v, n]) => { row[`→ ${v}`] = n; });
+            return row;
+        });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resTM), 'Por Telemarketer');
+    }
+
+    // Hoja 3: Resumen por vendedor
+    const vendedoresVenta = [...new Set(asignados.map(c => c.vendedorVenta).filter(Boolean))].sort();
+    if (vendedoresVenta.length) {
+        const resVV = vendedoresVenta.map(vv => {
+            const cl = asignados.filter(x => x.vendedorVenta === vv);
+            return {
+                Vendedor:               vv,
+                'Clientes recibidos':   cl.length,
+                'En proceso':           cl.filter(x => !x.estadoVend || x.estadoVend === 'En proceso').length,
+                Negociando:             cl.filter(x => x.estadoVend === 'Negociando').length,
+                Cerrado:                cl.filter(x => x.estadoVend === 'Cerrado').length,
+                'No interesado':        cl.filter(x => x.estadoVend === 'No interesado').length,
+                Credifin:               cl.filter(x => x.tipo === 'Credifin').length,
+                'Sin Credifin':         cl.filter(x => x.tipo === 'Sin Credifin').length,
+                Retail:                 cl.filter(x => x.tipo === 'Retail').length,
+            };
+        });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resVV), 'Por Vendedor');
+    }
+
+    const d = new Date();
+    const fname = `panel_admin_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.xlsx`;
+    XLSX.writeFile(wb, fname);
+    mostrarToast('📥 Excel exportado: ' + fname);
 }
 
 // ============================================================
