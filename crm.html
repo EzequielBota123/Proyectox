@@ -1948,15 +1948,15 @@ function detectarColumnas(f) {
         return ps.some(p => nk.includes(normalizeKey(p)));
     })||'';
     return {
-        nombre:   find('nombre','name','razonsocial','razon','comercio','cliente','empresa'),
+        nombre:   find('nombre','name','razonsocial','razon','comercio','cliente','empresa','local'),
         cuit:     find('cuit','cuil','dni'),
         telefono: find('telefono1','telefono','phone','cel','celular','movil','tel1','tel','whatsapp','contacto'),
         telefono2:find('telefono2','tel2','celular2','alternativo'),
         email:    find('email','mail','correo'),
         ciudad:   find('ciudad','localidad'),
         provincia:find('provincia','prov'),
-        direccion:find('direccion','domicilio','calle'),
-        rubro:    find('rubro','actividad','categoria'),
+        direccion:find('direccion','domicilio','calle','dir','domicil'),
+        rubro:    find('rubro','actividad','categoria','especialidad','perfil','giro','ramo'),
         vendedor: find('vendedor','comercial','agente'),
         tipo:     find('tipo','segmento'),
     };
@@ -3063,43 +3063,31 @@ async function cargarExcelProv(input, tipo) {
             const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
             const ws = wb.Sheets[wb.SheetNames[0]];
 
-            // Detectar fila de headers (puede estar en fila 1, 2 o 3 del Excel)
+            // Detectar fila de headers:
+            // 1. Ignorar filas con < 2 celdas (títulos/subtítulos fusionados)
+            // 2. Preferir la primera fila que contenga algún keyword de columna
+            // 3. Si ninguna coincide, usar la fila con más celdas no vacías (fallback)
             const rawRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-            let headerRowIdx = 0;
-            const headerKeywords = ['nombre','name','razón','razon','comercio','empresa','local','ranking','dirección','direccion','telefono','teléfono'];
-            for (let i = 0; i < Math.min(rawRows.length, 6); i++) {
+            const hkw = ['nombre','name','razon','comercio','empresa','local','ranking',
+                         'direccion','telefono','rubro','especialidad','cuit','email','ciudad'];
+            let headerRowIdx = -1, fallbackIdx = 0, fallbackMax = 0;
+            for (let i = 0; i < Math.min(rawRows.length, 8); i++) {
                 const nonEmpty = rawRows[i].filter(v => v !== '' && v != null).length;
-                if (nonEmpty < 2) continue; // filas título/subtítulo tienen solo 1 celda
-                const rowStr = rawRows[i].join(' ').toLowerCase();
-                if (headerKeywords.some(k => rowStr.includes(k))) { headerRowIdx = i; break; }
+                if (nonEmpty < 2) continue;
+                if (nonEmpty > fallbackMax) { fallbackMax = nonEmpty; fallbackIdx = i; }
+                const rowStr = rawRows[i].join(' ').toLowerCase()
+                    .normalize('NFD').replace(/[̀-ͯ]/g,'');
+                if (hkw.some(k => rowStr.includes(k))) { headerRowIdx = i; break; }
             }
+            if (headerRowIdx === -1) headerRowIdx = fallbackIdx;
 
             const rows = XLSX.utils.sheet_to_json(ws, { range: headerRowIdx, defval: '' });
             if (!rows.length) { mostrarToast('⚠️ Excel vacío', '#dc2626'); return; }
 
-            // Ampliar detectarColumnas con variantes de especialidad/rubro
             const cols = detectarColumnas(rows[0]);
-            // Fallback para "Especialidad / Perfil" y variantes
-            if (!cols.rubro) {
-                const keys = Object.keys(rows[0]);
-                cols.rubro = keys.find(k => normalizeKey(k).includes('especialidad') || normalizeKey(k).includes('perfil') || normalizeKey(k).includes('rubro')) || '';
-            }
-            if (!cols.nombre) {
-                const keys = Object.keys(rows[0]);
-                cols.nombre = keys.find(k => normalizeKey(k).includes('nombre') || normalizeKey(k).includes('name')) || keys[0] || '';
-            }
-            if (!cols.telefono) {
-                const keys = Object.keys(rows[0]);
-                cols.telefono = keys.find(k => normalizeKey(k).includes('tel') || normalizeKey(k).includes('contacto') || normalizeKey(k).includes('phone')) || '';
-            }
-            if (!cols.direccion) {
-                const keys = Object.keys(rows[0]);
-                cols.direccion = keys.find(k => normalizeKey(k).includes('dir') || normalizeKey(k).includes('domicilio') || normalizeKey(k).includes('calle')) || '';
-            }
-
             const nKey = cols.nombre || Object.keys(rows[0])[0] || '';
 
-            const nuevos = rows.map(r => ({
+            const candidatos = rows.map(r => ({
                 id: crypto.randomUUID(),
                 nombre: extraerCampo(r, cols.nombre, nKey),
                 cuit: extraerCampo(r, cols.cuit),
@@ -3112,7 +3100,26 @@ async function cargarExcelProv(input, tipo) {
                 rubro: extraerCampo(r, cols.rubro),
                 vendedor_sugerido: extraerCampo(r, cols.vendedor),
                 tipo
-            })).filter(c => c.nombre && isNaN(Number(c.nombre)));
+            })).filter(c => c.nombre && c.nombre.length > 1 && isNaN(Number(c.nombre)));
+
+            if (!candidatos.length) {
+                mostrarToast('⚠️ No se encontraron clientes válidos en el Excel', '#f59e0b');
+                return;
+            }
+
+            // Deduplicar: omitir nombres que ya existen en este tipo
+            const yaExisten = new Set(
+                getClientesCargados()
+                    .filter(c => c.tipo === tipo)
+                    .map(c => c.nombre.toLowerCase().trim())
+            );
+            const nuevos  = candidatos.filter(c => !yaExisten.has(c.nombre.toLowerCase().trim()));
+            const omitidos = candidatos.length - nuevos.length;
+
+            if (!nuevos.length) {
+                mostrarToast(`⚠️ Todos los clientes del Excel ya existen en "${tipo}"`, '#f59e0b');
+                return;
+            }
 
             const CHUNK = 500;
             const payload = nuevos.map(c => ({
@@ -3123,13 +3130,15 @@ async function cargarExcelProv(input, tipo) {
             }));
 
             for (let i = 0; i < payload.length; i += CHUNK) {
-                const slice = payload.slice(i, i+CHUNK);
-                const { error } = await db.from('clientes').upsert(slice, { onConflict:'id' });
+                const { error } = await db.from('clientes').upsert(payload.slice(i, i+CHUNK), { onConflict:'id' });
                 if (error) throw new Error(error.message);
             }
             await refreshFromSupabase();
             input.value = '';
-            mostrarToast(`✅ ${nuevos.length} clientes cargados en "${tipo}"`);
+            const msg = omitidos > 0
+                ? `✅ ${nuevos.length} nuevos en "${tipo}" · ${omitidos} ya existían (omitidos)`
+                : `✅ ${nuevos.length} clientes cargados en "${tipo}"`;
+            mostrarToast(msg);
         } catch(err) {
             mostrarToast(`❌ ${err.message}`, '#dc2626');
         }
