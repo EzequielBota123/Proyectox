@@ -2925,6 +2925,7 @@ function renderSeccionesProvincias() {
                 </div>
                 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                     <input type="text" id="${busqEl}" placeholder="🔍 Buscar..." style="max-width:160px;font-size:12px;" onkeyup="filtrarProv('${tipo}','${p.id}')">
+                    <button class="btn btn-green" style="font-size:11px;padding:6px 10px;" onclick="abrirModalAgregarClienteProv('${tipo}')">➕ Agregar a mano</button>
                     <label class="btn btn-blue" style="font-size:11px;padding:6px 10px;cursor:pointer;">
                         📥 Importar Excel
                         <input type="file" accept=".xlsx,.xls" style="display:none;" onchange="cargarExcelProv(this,'${tipo}')">
@@ -2994,6 +2995,57 @@ function selTodoProv(checked, provId) {
     actualizarContadorSel();
 }
 
+function abrirModalAgregarClienteProv(tipo) {
+    const m = document.getElementById('modal-agregar-cliente-prov');
+    if (!m) return;
+    document.getElementById('aprov-tipo').value = tipo;
+    document.getElementById('aprov-nombre').value = '';
+    document.getElementById('aprov-telefono').value = '';
+    document.getElementById('aprov-telefono2').value = '';
+    document.getElementById('aprov-direccion').value = '';
+    document.getElementById('aprov-rubro').value = '';
+    document.getElementById('aprov-ciudad').value = tipo;
+    document.getElementById('aprov-cuit').value = '';
+    document.getElementById('aprov-email').value = '';
+    m.classList.add('open');
+    setTimeout(() => document.getElementById('aprov-nombre').focus(), 100);
+}
+
+function cerrarModalAgregarClienteProv() {
+    const m = document.getElementById('modal-agregar-cliente-prov');
+    if (m) m.classList.remove('open');
+}
+
+async function guardarClienteProv() {
+    const nombre = document.getElementById('aprov-nombre').value.trim();
+    if (!nombre) { mostrarToast('⚠️ El nombre es obligatorio', '#dc2626'); return; }
+    const tipo = document.getElementById('aprov-tipo').value;
+    const cliente = {
+        id: crypto.randomUUID(),
+        nombre,
+        cuit:     document.getElementById('aprov-cuit').value.trim(),
+        telefono: document.getElementById('aprov-telefono').value.trim(),
+        telefono2:document.getElementById('aprov-telefono2').value.trim(),
+        email:    document.getElementById('aprov-email').value.trim(),
+        ciudad:   document.getElementById('aprov-ciudad').value.trim() || tipo,
+        provincia:tipo,
+        direccion:document.getElementById('aprov-direccion').value.trim(),
+        rubro:    document.getElementById('aprov-rubro').value.trim(),
+        vendedor_sugerido: '',
+        tipo
+    };
+    try {
+        if (!sbDisponible) throw new Error('Sin conexión con Supabase');
+        const { error } = await db.from('clientes').insert(cliente);
+        if (error) throw new Error(error.message);
+        cerrarModalAgregarClienteProv();
+        await refreshFromSupabase();
+        mostrarToast(`✅ "${nombre}" agregado a "${tipo}"`);
+    } catch(err) {
+        mostrarToast(`❌ ${err.message}`, '#dc2626');
+    }
+}
+
 function eliminarListaProv(provId, nombre) {
     if (!confirm(`¿Eliminar la lista "${nombre}"? Los clientes de Supabase NO se borran, solo la lista local.`)) return;
     const listas = getListasProvincias().filter(p => p.id !== provId);
@@ -3008,28 +3060,57 @@ async function cargarExcelProv(input, tipo) {
     reader.onload = async function(e) {
         try {
             if (!sbDisponible) throw new Error('Sin conexión con Supabase');
-            const wb   = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-            const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+            const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+            const ws = wb.Sheets[wb.SheetNames[0]];
+
+            // Detectar fila de headers (puede estar en fila 1, 2 o 3 del Excel)
+            const rawRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+            let headerRowIdx = 0;
+            const headerKeywords = ['nombre','name','razón','razon','comercio','empresa','biciclet','local'];
+            for (let i = 0; i < Math.min(rawRows.length, 5); i++) {
+                const rowStr = rawRows[i].join(' ').toLowerCase();
+                if (headerKeywords.some(k => rowStr.includes(k))) { headerRowIdx = i; break; }
+            }
+
+            const rows = XLSX.utils.sheet_to_json(ws, { range: headerRowIdx, defval: '' });
             if (!rows.length) { mostrarToast('⚠️ Excel vacío', '#dc2626'); return; }
 
+            // Ampliar detectarColumnas con variantes de especialidad/rubro
             const cols = detectarColumnas(rows[0]);
-            const allKeys = Object.keys(rows[0]);
-            const nKey = cols.nombre || allKeys[0] || '';
+            // Fallback para "Especialidad / Perfil" y variantes
+            if (!cols.rubro) {
+                const keys = Object.keys(rows[0]);
+                cols.rubro = keys.find(k => normalizeKey(k).includes('especialidad') || normalizeKey(k).includes('perfil') || normalizeKey(k).includes('rubro')) || '';
+            }
+            if (!cols.nombre) {
+                const keys = Object.keys(rows[0]);
+                cols.nombre = keys.find(k => normalizeKey(k).includes('nombre') || normalizeKey(k).includes('name')) || keys[0] || '';
+            }
+            if (!cols.telefono) {
+                const keys = Object.keys(rows[0]);
+                cols.telefono = keys.find(k => normalizeKey(k).includes('tel') || normalizeKey(k).includes('contacto') || normalizeKey(k).includes('phone')) || '';
+            }
+            if (!cols.direccion) {
+                const keys = Object.keys(rows[0]);
+                cols.direccion = keys.find(k => normalizeKey(k).includes('dir') || normalizeKey(k).includes('domicilio') || normalizeKey(k).includes('calle')) || '';
+            }
+
+            const nKey = cols.nombre || Object.keys(rows[0])[0] || '';
 
             const nuevos = rows.map(r => ({
                 id: crypto.randomUUID(),
-                nombre: cols.nombre ? extraerCampo(r, cols.nombre) : String(r[nKey]||'').trim(),
+                nombre: extraerCampo(r, cols.nombre, nKey),
                 cuit: extraerCampo(r, cols.cuit),
                 telefono: extraerCampo(r, cols.telefono),
                 telefono2: extraerCampo(r, cols.telefono2),
                 email: extraerCampo(r, cols.email),
-                ciudad: extraerCampo(r, cols.ciudad),
+                ciudad: extraerCampo(r, cols.ciudad) || tipo,
                 provincia: extraerCampo(r, cols.provincia) || tipo,
                 direccion: extraerCampo(r, cols.direccion),
                 rubro: extraerCampo(r, cols.rubro),
                 vendedor_sugerido: extraerCampo(r, cols.vendedor),
                 tipo
-            })).filter(c => c.nombre);
+            })).filter(c => c.nombre && isNaN(Number(c.nombre)));
 
             const CHUNK = 500;
             const payload = nuevos.map(c => ({
@@ -3344,6 +3425,53 @@ function waTel(num, display) {
     return `<span class="wa-link" onclick="abrirWhatsApp('${safe}')" title="Abrir en WhatsApp">📱 ${txt}</span>`;
 }
 </script>
+
+<!-- Modal: Agregar cliente a mano en provincia -->
+<div id="modal-agregar-cliente-prov" class="modal">
+    <div class="modal-box" style="max-width:520px;">
+        <h3 style="font-size:16px;font-weight:800;color:#1a1a2e;margin-bottom:16px;">➕ Agregar cliente</h3>
+        <input type="hidden" id="aprov-tipo">
+        <div class="grid2">
+            <div class="form-group" style="grid-column:1/-1;">
+                <label>Nombre *</label>
+                <input type="text" id="aprov-nombre" placeholder="Nombre del local / empresa" maxlength="120"
+                       onkeydown="if(event.key==='Enter') document.getElementById('aprov-telefono').focus()">
+            </div>
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" id="aprov-telefono" placeholder="+54 223 ...">
+            </div>
+            <div class="form-group">
+                <label>Teléfono 2</label>
+                <input type="text" id="aprov-telefono2" placeholder="Opcional">
+            </div>
+            <div class="form-group">
+                <label>Ciudad</label>
+                <input type="text" id="aprov-ciudad" placeholder="Ciudad">
+            </div>
+            <div class="form-group">
+                <label>CUIT</label>
+                <input type="text" id="aprov-cuit" placeholder="XX-XXXXXXXX-X">
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+                <label>Dirección</label>
+                <input type="text" id="aprov-direccion" placeholder="Calle y número">
+            </div>
+            <div class="form-group">
+                <label>Rubro / Especialidad</label>
+                <input type="text" id="aprov-rubro" placeholder="MTB, Urbano, Repuestos...">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="aprov-email" placeholder="correo@ejemplo.com">
+            </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+            <button class="btn btn-gray" onclick="cerrarModalAgregarClienteProv()">Cancelar</button>
+            <button class="btn btn-green" onclick="guardarClienteProv()">💾 Guardar</button>
+        </div>
+    </div>
+</div>
 
 <!-- Modal: Nueva Provincia / Lista -->
 <div id="modal-nueva-provincia" class="modal">
