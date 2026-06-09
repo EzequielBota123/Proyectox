@@ -1584,7 +1584,7 @@ function renderCRM() {
             ? `<span style="font-size:9px;color:#7c3aed;font-weight:700;background:#f3e8ff;padding:1px 6px;border-radius:4px;margin-left:4px;">👤 ${c.vendedorVenta}</span>`
             : '';
         const chk = c.estado === 'Interesado'
-            ? `<input type="checkbox" class="crm-bulk-chk" style="width:auto;margin-right:6px;flex-shrink:0;" ${crmCheckeados.has(String(c.id))?'checked':''} onchange="event.stopPropagation();toggleCRMCheck('${c.id}',this.checked)" title="Seleccionar para pasar en masa">`
+            ? `<input type="checkbox" class="crm-bulk-chk" style="width:auto;margin-right:6px;flex-shrink:0;" ${crmCheckeados.has(String(c.id))?'checked':''} onclick="event.stopPropagation()" onchange="toggleCRMCheck('${c.id}',this.checked)" title="Seleccionar para pasar en masa">`
             : '';
         return `<div class="crm-item ${sel}" style="display:flex;align-items:flex-start;gap:4px;" data-id="${c.id}" onclick="seleccionarClienteCRM(this.dataset.id)">
             ${chk}<div style="flex:1;min-width:0;">
