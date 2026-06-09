@@ -3066,8 +3066,10 @@ async function cargarExcelProv(input, tipo) {
             // Detectar fila de headers (puede estar en fila 1, 2 o 3 del Excel)
             const rawRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
             let headerRowIdx = 0;
-            const headerKeywords = ['nombre','name','razón','razon','comercio','empresa','biciclet','local'];
-            for (let i = 0; i < Math.min(rawRows.length, 5); i++) {
+            const headerKeywords = ['nombre','name','razón','razon','comercio','empresa','local','ranking','dirección','direccion','telefono','teléfono'];
+            for (let i = 0; i < Math.min(rawRows.length, 6); i++) {
+                const nonEmpty = rawRows[i].filter(v => v !== '' && v != null).length;
+                if (nonEmpty < 2) continue; // filas título/subtítulo tienen solo 1 celda
                 const rowStr = rawRows[i].join(' ').toLowerCase();
                 if (headerKeywords.some(k => rowStr.includes(k))) { headerRowIdx = i; break; }
             }
