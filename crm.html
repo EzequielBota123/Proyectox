@@ -578,8 +578,8 @@
     .prosp-subtitle { font-size:12px; color:var(--text-muted); margin-top:3px; }
     .prosp-instruccion-badge { background:color-mix(in srgb,var(--accent) 12%,var(--surface)); color:var(--accent); font-size:11px; font-weight:700; padding:6px 14px; border-radius:20px; border:1px solid color-mix(in srgb,var(--accent) 30%,var(--border)); white-space:nowrap; align-self:center; }
     .prosp-form-card { margin-bottom:12px; }
-    .prosp-form-grid { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:12px; margin-bottom:16px; }
-    @media(max-width:900px) { .prosp-form-grid { grid-template-columns:1fr 1fr; } }
+    .prosp-form-grid { display:grid; grid-template-columns:1fr 1fr auto; gap:12px; margin-bottom:16px; }
+    @media(max-width:700px) { .prosp-form-grid { grid-template-columns:1fr 1fr; } }
     @media(max-width:600px) { .prosp-form-grid { grid-template-columns:1fr; } }
     .prosp-form-grid .form-group { margin-bottom:0; }
     .prosp-status { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--accent); }
@@ -908,10 +908,6 @@
         <!-- Formulario de búsqueda -->
         <div class="card prosp-form-card">
             <div class="prosp-form-grid">
-                <div class="form-group">
-                    <label>Tipo de negocio</label>
-                    <input type="text" id="prosp-tipo" placeholder="bicicleterías, deportes, ciclismo..." value="bicicleterías">
-                </div>
                 <div class="form-group">
                     <label>Provincia</label>
                     <select id="prosp-provincia">
@@ -4119,10 +4115,10 @@ function waTel(num, display) {
 var _prospectos = [];
 
 function iniciarProspeccion() {
-  var tipo     = (document.getElementById('prosp-tipo').value.trim()) || 'bicicleterías';
   var provincia = document.getElementById('prosp-provincia').value;
   var ciudad    = document.getElementById('prosp-ciudad').value.trim();
   var cantidad  = parseInt(document.getElementById('prosp-cantidad').value) || 20;
+  /* siempre busca bicicleterías */
 
   if (!provincia && !ciudad) {
     mostrarToast('⚠️ Elegí una provincia o ingresá una ciudad', '#f59e0b');
@@ -4133,32 +4129,82 @@ function iniciarProspeccion() {
   document.getElementById('prosp-vacio').style.display = 'none';
   document.getElementById('prosp-resultados').style.display = 'none';
   st.style.display = 'flex';
-  document.getElementById('prosp-status-txt').textContent = 'Localizando ' + (ciudad || provincia) + '...';
 
-  /* Paso 1: geocodificar con Nominatim */
-  var q = ciudad ? (ciudad + ', ' + (provincia || 'Argentina') + ', Argentina') : (provincia + ', Argentina');
-  fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=1&accept-language=es', {
-    headers: { 'Accept-Language': 'es' }
-  })
-  .then(function(r){ return r.json(); })
+  var lugarBusqueda = ciudad || provincia;
+  document.getElementById('prosp-status-txt').textContent = 'Buscando en ' + lugarBusqueda + '...';
+
+  /* Construir el texto de búsqueda para Nominatim */
+  var geoQuery;
+  if (ciudad && provincia) {
+    geoQuery = ciudad + ', ' + provincia + ', Argentina';
+  } else if (ciudad) {
+    geoQuery = ciudad + ', Argentina';
+  } else {
+    geoQuery = provincia + ', Argentina';
+  }
+
+  fetch('https://nominatim.openstreetmap.org/search?' + new URLSearchParams({
+    q: geoQuery,
+    format: 'json',
+    limit: '1',
+    countrycodes: 'ar'
+  }))
+  .then(function(r) { return r.json(); })
   .then(function(geo) {
-    if (!geo || !geo.length) throw new Error('No se encontró la ubicación "' + q + '"');
-    var bb = geo[0].boundingbox; /* [sur, norte, oeste, este] */
-    document.getElementById('prosp-status-txt').textContent = 'Buscando bicicleterías en ' + (ciudad || provincia) + '...';
-    return buscarEnOverpass(bb[0], bb[2], bb[1], bb[3], cantidad);
+    if (!geo || !geo.length) {
+      /* Intentar solo provincia si la ciudad no se encontró */
+      if (ciudad && provincia) {
+        return fetch('https://nominatim.openstreetmap.org/search?' + new URLSearchParams({
+          q: provincia + ', Argentina',
+          format: 'json',
+          limit: '1',
+          countrycodes: 'ar'
+        })).then(function(r){ return r.json(); });
+      }
+      throw new Error('No se encontró "' + geoQuery + '"');
+    }
+    return geo;
   })
-  .then(function(prospectos) {
+  .then(function(geo) {
+    if (!geo || !geo.length) throw new Error('No se encontró la ubicación ingresada');
+    
+    /* Nominatim devuelve: boundingbox = [sur, norte, oeste, este] */
+    var bb = geo[0].boundingbox;
+    var sur   = parseFloat(bb[0]);
+    var norte = parseFloat(bb[1]);
+    var oeste = parseFloat(bb[2]);
+    var este  = parseFloat(bb[3]);
+
+    /* Si el bbox es muy chico (ciudad pequeña), expandirlo ~15 km */
+    var MIN_GRADO = 0.15;
+    if ((norte - sur) < MIN_GRADO) {
+      var centroLat = (sur + norte) / 2;
+      var centroLon = (oeste + este) / 2;
+      sur   = centroLat - MIN_GRADO;
+      norte = centroLat + MIN_GRADO;
+      oeste = centroLon - MIN_GRADO;
+      este  = centroLon + MIN_GRADO;
+    }
+
+    document.getElementById('prosp-status-txt').textContent = 'Consultando base de datos de negocios...';
+    return buscarBicicleterias(sur, oeste, norte, este, cantidad);
+  })
+  .then(function(lista) {
     st.style.display = 'none';
-    if (!prospectos.length) {
-      mostrarToast('Sin resultados en OpenStreetMap para esa zona. Probá con otra ciudad.', '#f59e0b');
+    if (!lista.length) {
+      document.getElementById('prosp-vacio').innerHTML =
+        '<div class="prosp-vacio-icon">🚲</div>' +
+        '<div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;">Sin resultados para "' + lugarBusqueda + '"</div>' +
+        '<div style="font-size:13px;color:var(--text-muted);">Probá con otra ciudad o el nombre de la provincia directamente.</div>';
       document.getElementById('prosp-vacio').style.display = 'block';
+      mostrarToast('Sin resultados — probá con otra ciudad', '#f59e0b');
       return;
     }
-    _prospectos = prospectos.slice(0, cantidad);
+    _prospectos = lista;
     renderTablaProspectos(_prospectos);
     document.getElementById('prosp-vacio').style.display = 'none';
     document.getElementById('prosp-resultados').style.display = 'block';
-    document.getElementById('prosp-resumen-count').textContent = _prospectos.length + ' bicicleterías encontradas';
+    document.getElementById('prosp-resumen-count').textContent = _prospectos.length + ' bicicleterías encontradas en ' + lugarBusqueda;
     var badge = document.getElementById('prosp-badge-count');
     if (badge) { badge.textContent = _prospectos.length + ' encontradas'; badge.style.display = 'flex'; }
     mostrarToast('✅ ' + _prospectos.length + ' bicicleterías encontradas', '#16a34a');
@@ -4166,22 +4212,29 @@ function iniciarProspeccion() {
   .catch(function(err) {
     st.style.display = 'none';
     document.getElementById('prosp-vacio').style.display = 'block';
-    mostrarToast('❌ ' + err.message, '#dc3545');
-    console.error(err);
+    mostrarToast('❌ ' + (err.message || 'Error de conexión'), '#dc3545');
   });
 }
 
-function buscarEnOverpass(sur, oeste, norte, este, cantidad) {
-  /* busca shop=bicycle + shop=sports en el bounding box */
+function buscarBicicleterias(sur, oeste, norte, este, cantidad) {
+  var bbox = sur + ',' + oeste + ',' + norte + ',' + este;
+
+  /*
+   * Query amplia: busca por tag shop=bicycle/sports Y por nombre
+   * que contenga "bicicl", "bike" o "cicl" — así captura negocios
+   * mal etiquetados o sin tag de tienda pero con nombre claro.
+   */
   var query =
-    '[out:json][timeout:25];\n' +
+    '[out:json][timeout:60];\n' +
     '(\n' +
-    '  node["shop"="bicycle"](' + sur + ',' + oeste + ',' + norte + ',' + este + ');\n' +
-    '  way["shop"="bicycle"](' +  sur + ',' + oeste + ',' + norte + ',' + este + ');\n' +
+    '  node["shop"="bicycle"](' + bbox + ');\n' +
+    '  way["shop"="bicycle"]('  + bbox + ');\n' +
+    '  node[name~"[Bb]icicl"](' + bbox + ');\n' +
+    '  way[name~"[Bb]icicl"]('  + bbox + ');\n' +
+    '  node[name~"[Bb]ike"]('   + bbox + ');\n' +
+    '  node[name~"[Cc]iclism"](' + bbox + ');\n' +
     ');\n' +
-    'out body;\n' +
-    '>;\n' +
-    'out skel qt;';
+    'out body;\n>;\nout skel qt;';
 
   return fetch('https://overpass-api.de/api/interpreter', {
     method: 'POST',
@@ -4189,7 +4242,7 @@ function buscarEnOverpass(sur, oeste, norte, este, cantidad) {
     body: 'data=' + encodeURIComponent(query)
   })
   .then(function(r) {
-    if (!r.ok) throw new Error('Overpass error HTTP ' + r.status);
+    if (!r.ok) throw new Error('Error al consultar la base de datos (HTTP ' + r.status + ')');
     return r.json();
   })
   .then(function(data) {
@@ -4197,33 +4250,29 @@ function buscarEnOverpass(sur, oeste, norte, este, cantidad) {
     return (data.elements || [])
       .filter(function(el) {
         if (!el.tags || !el.tags.name) return false;
-        if (visto[el.tags.name]) return false;
-        visto[el.tags.name] = true;
+        var key = el.tags.name.toLowerCase().replace(/\s+/g, '');
+        if (visto[key]) return false;
+        visto[key] = true;
         return true;
       })
+      .slice(0, cantidad)
       .map(function(el) {
         var t = el.tags || {};
-        var web = t.website || t['contact:website'] || t['url'] || null;
-        var ig  = t['contact:instagram'] || t['instagram'] || null;
-        var tel = t.phone || t['contact:phone'] || t['contact:mobile'] || '';
+        var web   = t.website || t['contact:website'] || t['url'] || null;
+        var ig    = t['contact:instagram'] || t['instagram'] || null;
+        var tel   = t.phone || t['contact:phone'] || t['contact:mobile'] || '';
         var email = t.email || t['contact:email'] || '';
-        var dir = [t['addr:street'], t['addr:housenumber']].filter(Boolean).join(' ');
-        var ciudad2 = t['addr:city'] || t['addr:suburb'] || t['addr:municipality'] || '';
-        var obs = [];
-        if (!web) obs.push('Sin web');
-        if (!ig)  obs.push('Sin Instagram');
-        if (!tel) obs.push('Sin teléfono');
-        if (t.opening_hours) obs.push('Horario: ' + t.opening_hours);
+        var dir   = [t['addr:street'], t['addr:housenumber']].filter(Boolean).join(' ');
+        var ciu   = t['addr:city'] || t['addr:suburb'] || t['addr:municipality'] || '';
         return {
-          nombre:       t.name,
-          ciudad:       ciudad2,
-          provincia:    document.getElementById('prosp-provincia').value || '',
-          direccion:    dir,
-          web:          web,
-          instagram:    ig,
-          telefono:     tel,
-          email:        email,
-          observaciones: obs.join(' · ') || 'Registrada en OpenStreetMap'
+          nombre: t.name,
+          ciudad: ciu,
+          provincia: document.getElementById('prosp-provincia').value || '',
+          direccion: dir,
+          web: web,
+          instagram: ig,
+          telefono: tel,
+          email: email
         };
       });
   });
@@ -4248,11 +4297,11 @@ function renderTablaProspectos(lista) {
     tr.innerHTML = '<td colspan="9" style="text-align:center;padding:30px;color:var(--text-muted);">Sin resultados</td>';
     tbody.appendChild(tr); return;
   }
-  lista.forEach(function(p, i) {
+  lista.forEach(function(p) {
     var realIdx = _prospectos.indexOf(p);
     var webTxt = p.web
       ? '<a class="prosp-web-link" href="'+escHTML(p.web)+'" target="_blank">🌐 Ver web</a>'
-      : '<span style="color:#dc3545;font-size:11px;font-weight:700;">✗ Sin web</span>';
+      : '<span style="color:#dc3545;font-size:11px;font-weight:700;">Sin web</span>';
     var igTxt = p.instagram
       ? '<a class="prosp-ig-link" href="'+escHTML(p.instagram)+'" target="_blank">📷 Instagram</a>'
       : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
@@ -4285,13 +4334,16 @@ function escHTML(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&l
 
 function limpiarProspeccion() {
   _prospectos = [];
-  document.getElementById('prosp-tipo').value = 'bicicleterías';
   document.getElementById('prosp-provincia').value = '';
   document.getElementById('prosp-ciudad').value = '';
   document.getElementById('prosp-cantidad').value = 20;
   var br = document.getElementById('prosp-busqueda-rapida'); if(br) br.value = '';
   document.getElementById('prosp-resultados').style.display = 'none';
   document.getElementById('prosp-status').style.display = 'none';
+  document.getElementById('prosp-vacio').innerHTML =
+    '<div class="prosp-vacio-icon">🚲</div>' +
+    '<div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;">Sin resultados todavía</div>' +
+    '<div style="font-size:13px;color:var(--text-muted);">Elegí provincia o ciudad y hacé clic en <strong>Buscar</strong></div>';
   document.getElementById('prosp-vacio').style.display = 'block';
   var badge = document.getElementById('prosp-badge-count');
   if (badge) badge.style.display = 'none';
