@@ -4314,10 +4314,10 @@ function abrirDestModal(evt, idx) {
   modal.className = 'prosp-dest-modal';
   modal.id = 'prosp-dest-modal';
   modal.innerHTML =
-    '<h4>¿A dónde agregar el cliente?</h4>' +
-    '<button class="prosp-dest-btn" onclick="confirmarImport('Sin Credifin')">🟡 Sin Credifin <span style="font-weight:400;font-size:10px;margin-left:4px;">→ Asignar Clientes</span></button>' +
-    '<button class="prosp-dest-btn" onclick="confirmarImport('Credifin')">🟢 Credifin <span style="font-weight:400;font-size:10px;margin-left:4px;">→ Asignar Clientes</span></button>' +
-    '<button class="prosp-dest-btn" onclick="confirmarImport('Retail')">🟣 Retail <span style="font-weight:400;font-size:10px;margin-left:4px;">→ Asignar Clientes</span></button>';
+    '<h4>\u00bfA d\u00f3nde agregar el cliente?</h4>' +
+    '<button class="prosp-dest-btn" onclick="confirmarImport(0)">\U0001f7e1 Sin Credifin <span style="font-weight:400;font-size:10px;margin-left:4px;">\u2192 Asignar Clientes</span></button>' +
+    '<button class="prosp-dest-btn" onclick="confirmarImport(1)">\U0001f7e2 Credifin <span style="font-weight:400;font-size:10px;margin-left:4px;">\u2192 Asignar Clientes</span></button>' +
+    '<button class="prosp-dest-btn" onclick="confirmarImport(2)">\U0001f7e3 Retail <span style="font-weight:400;font-size:10px;margin-left:4px;">\u2192 Asignar Clientes</span></button>';
 
   /* Posicionar cerca del botón */
   var rect = (evt.target || evt.currentTarget).getBoundingClientRect();
@@ -4333,9 +4333,10 @@ function cerrarDestModal() {
   if (o) o.remove();
 }
 
-function confirmarImport(destino) {
+var _DESTINOS = ['Sin Credifin', 'Credifin', 'Retail'];
+function confirmarImport(n) {
   cerrarDestModal();
-  importarProspecto(_destModalIdx, destino);
+  importarProspecto(_destModalIdx, _DESTINOS[n] || 'Sin Credifin');
 }
 
 function escHTML(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
