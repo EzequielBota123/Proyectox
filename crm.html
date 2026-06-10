@@ -4125,13 +4125,13 @@ function waTel(num, display) {
 </div>
 
 <script>
-/* ===== PROSPECCIÓN — Nominatim text search (free, no key) ===== */
+/* ===== PROSPECCIÓN — Nominatim + Overpass combinado ===== */
 var _prospectos = [];
 
 function iniciarProspeccion() {
   var provincia = document.getElementById('prosp-provincia').value;
   var ciudad    = document.getElementById('prosp-ciudad').value.trim();
-  var cantidad  = Math.min(parseInt(document.getElementById('prosp-cantidad').value) || 20, 50);
+  var cantidad  = Math.min(parseInt(document.getElementById('prosp-cantidad').value) || 20, 100);
 
   if (!provincia && !ciudad) {
     mostrarToast('⚠️ Elegí una provincia o escribí una ciudad', '#f59e0b');
@@ -4143,64 +4143,129 @@ function iniciarProspeccion() {
   document.getElementById('prosp-resultados').style.display = 'none';
   st.style.display = 'flex';
 
-  var zona = ciudad || provincia;
-  document.getElementById('prosp-status-txt').textContent = 'Buscando bicicleterías en ' + zona + '...';
+  var zona = ciudad ? ciudad + (provincia ? ', ' + provincia : '') : provincia;
+  document.getElementById('prosp-status-txt').textContent = 'Buscando en ' + zona + '...';
 
-  /* Buscar "bicicletería" + zona en Nominatim — gratis, sin key */
-  var queries = [
-    'bicicletería ' + zona + ' Argentina',
-    'bicicleta ' + zona + ' Argentina',
-    'bike shop ' + zona + ' Argentina'
-  ];
+  /* Paso 1: geocodificar para obtener bounding box */
+  var geoQ = (ciudad ? ciudad + ', ' : '') + (provincia || '') + ', Argentina';
+  fetch('https://nominatim.openstreetmap.org/search?' + new URLSearchParams({
+    q: geoQ, format: 'json', limit: '1', countrycodes: 'ar'
+  }), { headers: { 'Accept-Language': 'es' } })
+  .then(function(r){ return r.json(); })
+  .then(function(geo) {
+    if (!geo || !geo.length) throw new Error('No se encontró "' + zona + '"');
 
-  Promise.all(queries.map(function(q) {
-    return fetch('https://nominatim.openstreetmap.org/search?' + new URLSearchParams({
-      q: q,
-      format: 'json',
-      addressdetails: '1',
-      extratags: '1',
-      limit: '50',
-      countrycodes: 'ar'
-    }), { headers: { 'Accept-Language': 'es' } }).then(function(r){ return r.json(); });
-  }))
+    var bb   = geo[0].boundingbox;
+    var sur  = parseFloat(bb[0]), norte = parseFloat(bb[1]);
+    var oeste= parseFloat(bb[2]), este  = parseFloat(bb[3]);
+
+    /* Expandir bbox para ciudades chicas (~15 km mínimo) */
+    var MIN = 0.15;
+    if (norte - sur < MIN) { var cy=(sur+norte)/2, cx=(oeste+este)/2; sur=cy-MIN; norte=cy+MIN; oeste=cx-MIN; este=cx+MIN; }
+    var bbox = sur + ',' + oeste + ',' + norte + ',' + este;
+
+    document.getElementById('prosp-status-txt').textContent = 'Consultando múltiples fuentes...';
+
+    /* Paso 2: búsquedas en paralelo ─────────────────────────────── */
+
+    /* A) Nominatim text search — varios términos argentinos */
+    var terminos = ['bicicletería', 'bicicletas', 'bike', 'ciclo', 'rodado', 'bicis', 'pedal'];
+    var nominatimCalls = terminos.map(function(t) {
+      return fetch('https://nominatim.openstreetmap.org/search?' + new URLSearchParams({
+        q: t + ' ' + zona + ' Argentina',
+        format: 'json', addressdetails: '1', extratags: '1', limit: '50', countrycodes: 'ar'
+      }), { headers: { 'Accept-Language': 'es' } })
+      .then(function(r){ return r.json(); })
+      .catch(function(){ return []; });
+    });
+
+    /* B) Overpass — shop=bicycle + name regex amplia dentro del bbox */
+    var overpassQuery =
+      '[out:json][timeout:30];\n(\n' +
+      '  node["shop"="bicycle"](' + bbox + ');\n' +
+      '  way["shop"="bicycle"]('  + bbox + ');\n' +
+      '  node["shop"="sports"]('  + bbox + ');\n' +
+      '  node[name~"[Bb]icicl"](' + bbox + ');\n' +
+      '  way[name~"[Bb]icicl"]('  + bbox + ');\n' +
+      '  node[name~"[Bb]ike"]('   + bbox + ');\n' +
+      '  node[name~"[Cc]icl"]('   + bbox + ');\n' +
+      '  node[name~"[Rr]odado"](' + bbox + ');\n' +
+      '  node[name~"[Bb]icis"]('  + bbox + ');\n' +
+      '  node[name~"[Pp]edal"]('  + bbox + ');\n' +
+      ');\nout body;\n>;\nout skel qt;';
+    var overpassCall = fetch('https://overpass-api.de/api/interpreter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'data=' + encodeURIComponent(overpassQuery)
+    })
+    .then(function(r){ return r.ok ? r.json() : { elements:[] }; })
+    .catch(function(){ return { elements:[] }; });
+
+    return Promise.all(nominatimCalls.concat([overpassCall]));
+  })
   .then(function(resultados) {
     st.style.display = 'none';
 
-    /* Combinar, deduplicar por nombre */
     var visto = {};
     var lista = [];
-    resultados.forEach(function(arr) {
+
+    function addProspecto(obj) {
+      var key = (obj.nombre||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,25);
+      if (!key || key.length < 3) return;
+      if (visto[key]) return;
+      visto[key] = true;
+      lista.push(obj);
+    }
+
+    /* Procesar resultados Nominatim (primeros 7 arrays) */
+    var nominatimResults = resultados.slice(0, 7);
+    nominatimResults.forEach(function(arr) {
       (arr || []).forEach(function(item) {
-        var key = (item.name || item.display_name || '').toLowerCase().replace(/\s+/g,'').slice(0,20);
-        if (!key || visto[key]) return;
-        visto[key] = true;
+        if (!item.name && !item.display_name) return;
         var addr = item.address || {};
-        var dir = [addr.road, addr.house_number].filter(Boolean).join(' ');
-        var tel = (item.extratags && (item.extratags.phone || item.extratags['contact:phone'])) || '';
-        var web = (item.extratags && (item.extratags.website || item.extratags['contact:website'])) || null;
-        var ig  = (item.extratags && item.extratags['contact:instagram']) || null;
+        var ext  = item.extratags || {};
+        var dir  = [addr.road, addr.house_number].filter(Boolean).join(' ');
+        var tel  = ext.phone || ext['contact:phone'] || ext['contact:mobile'] || '';
+        var web  = ext.website || ext['contact:website'] || null;
+        var ig   = ext['contact:instagram'] || null;
         if (ig && ig.indexOf('http') === -1) ig = 'https://instagram.com/' + ig;
-        lista.push({
-          nombre:    item.name || item.display_name.split(',')[0] || '—',
-          ciudad:    addr.city || addr.town || addr.village || addr.municipality || ciudad || '',
-          provincia: addr.state || provincia || '',
+        addProspecto({
+          nombre:    item.name || (item.display_name||'').split(',')[0] || '—',
+          ciudad:    addr.city || addr.town || addr.village || addr.municipality || '',
+          provincia: addr.state || document.getElementById('prosp-provincia').value || '',
           direccion: dir,
-          web:       web,
-          instagram: ig,
-          telefono:  tel,
-          email:     ''
+          web: web, instagram: ig, telefono: tel, email: '', fuente: 'Nominatim'
         });
+      });
+    });
+
+    /* Procesar resultado Overpass (último elemento) */
+    var ovData = resultados[7] || { elements:[] };
+    (ovData.elements || []).forEach(function(el) {
+      if (!el.tags || !el.tags.name) return;
+      var t   = el.tags;
+      var web = t.website || t['contact:website'] || t['url'] || null;
+      var ig  = t['contact:instagram'] || t['instagram'] || null;
+      var tel = t.phone || t['contact:phone'] || t['contact:mobile'] || '';
+      var dir = [t['addr:street'], t['addr:housenumber']].filter(Boolean).join(' ');
+      if (ig && ig.indexOf('http') === -1) ig = 'https://instagram.com/' + ig;
+      addProspecto({
+        nombre:    t.name,
+        ciudad:    t['addr:city'] || t['addr:suburb'] || t['addr:municipality'] || '',
+        provincia: t['addr:state'] || document.getElementById('prosp-provincia').value || '',
+        direccion: dir,
+        web: web, instagram: ig, telefono: tel, email: '', fuente: 'OSM'
       });
     });
 
     lista = lista.slice(0, cantidad);
 
     if (!lista.length) {
+      var zona2 = document.getElementById('prosp-ciudad').value || document.getElementById('prosp-provincia').value;
       document.getElementById('prosp-vacio').innerHTML =
         '<div class="prosp-vacio-icon">🚲</div>' +
-        '<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:8px;">Sin resultados para "' + zona + '"</div>' +
+        '<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:8px;">Sin resultados para "' + zona2 + '"</div>' +
         '<div style="font-size:13px;color:var(--text-muted);line-height:1.7;">' +
-          'OpenStreetMap tiene cobertura limitada en Argentina.<br>' +
           'Probá con una ciudad grande: <strong>Córdoba</strong>, <strong>Rosario</strong>, <strong>Mendoza</strong>.' +
         '</div>';
       document.getElementById('prosp-vacio').style.display = 'block';
@@ -4218,9 +4283,9 @@ function iniciarProspeccion() {
     mostrarToast('✅ ' + _prospectos.length + ' bicicleterías encontradas', '#16a34a');
   })
   .catch(function(err) {
-    st.style.display = 'none';
+    document.getElementById('prosp-status').style.display = 'none';
     document.getElementById('prosp-vacio').style.display = 'block';
-    mostrarToast('❌ Error de conexión — revisá internet', '#dc3545');
+    mostrarToast('❌ ' + (err.message || 'Error de conexión'), '#dc3545');
   });
 }
 
@@ -4258,6 +4323,7 @@ function renderTablaProspectos(lista) {
     var tr = document.createElement('tr');
     tr.id = 'prosp-row-' + realIdx;
     tr.style.cursor = 'pointer';
+    tr.onclick = function(){ toggleExpandProsp(realIdx); };
     tr.innerHTML =
       '<td><input type="checkbox" class="prosp-chk" data-idx="'+realIdx+'" onchange="onChkProsp(this)" style="width:auto;cursor:pointer;" onclick="event.stopPropagation()"></td>' +
       '<td style="font-weight:700;color:var(--text);font-size:13px;">'+escHTML(p.nombre||'—')+'</td>' +
@@ -4270,7 +4336,6 @@ function renderTablaProspectos(lista) {
         '<button class="btn-accion btn-accion-edit" onclick="event.stopPropagation();toggleExpandProsp('+realIdx+')" style="margin-right:4px;">👁 Ver más</button>' +
         '<button class="btn-accion" onclick="event.stopPropagation();abrirDestModal(event,'+realIdx+')" style="background:var(--accent);color:#fff;border-color:var(--accent);">➕ Agregar</button>' +
       '</td>';
-    tr.onclick = function(){ toggleExpandProsp(realIdx); };
     tbody.appendChild(tr);
 
     /* Fila expandible */
@@ -4314,12 +4379,11 @@ function abrirDestModal(evt, idx) {
   modal.className = 'prosp-dest-modal';
   modal.id = 'prosp-dest-modal';
   modal.innerHTML =
-    '<h4>\u00bfA d\u00f3nde agregar el cliente?</h4>' +
-    '<button class="prosp-dest-btn" onclick="confirmarImport(0)">\U0001f7e1 Sin Credifin <span style="font-weight:400;font-size:10px;margin-left:4px;">\u2192 Asignar Clientes</span></button>' +
-    '<button class="prosp-dest-btn" onclick="confirmarImport(1)">\U0001f7e2 Credifin <span style="font-weight:400;font-size:10px;margin-left:4px;">\u2192 Asignar Clientes</span></button>' +
-    '<button class="prosp-dest-btn" onclick="confirmarImport(2)">\U0001f7e3 Retail <span style="font-weight:400;font-size:10px;margin-left:4px;">\u2192 Asignar Clientes</span></button>';
+    '<h4>¿A dónde agregar el cliente?</h4>' +
+    '<button class="prosp-dest-btn" onclick="confirmarImport(0)">\U0001f7e1 Sin Credifin <span style="font-weight:400;font-size:10px;margin-left:4px;">→ Asignar Clientes</span></button>' +
+    '<button class="prosp-dest-btn" onclick="confirmarImport(1)">\U0001f7e2 Credifin <span style="font-weight:400;font-size:10px;margin-left:4px;">→ Asignar Clientes</span></button>' +
+    '<button class="prosp-dest-btn" onclick="confirmarImport(2)">\U0001f7e3 Retail <span style="font-weight:400;font-size:10px;margin-left:4px;">→ Asignar Clientes</span></button>';
 
-  /* Posicionar cerca del botón */
   var rect = (evt.target || evt.currentTarget).getBoundingClientRect();
   modal.style.top  = Math.min(rect.bottom + 6, window.innerHeight - 200) + 'px';
   modal.style.left = Math.max(rect.left - 100, 10) + 'px';
@@ -4350,7 +4414,7 @@ function limpiarProspeccion() {
   document.getElementById('prosp-resultados').style.display = 'none';
   document.getElementById('prosp-status').style.display = 'none';
   document.getElementById('prosp-vacio').innerHTML =
-    '<div class="prosp-vacio-icon">🚲</div>' +
+    '<div class="prosp-vacio-icon">\U0001f6b2</div>' +
     '<div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;">Sin resultados todavía</div>' +
     '<div style="font-size:13px;color:var(--text-muted);">Elegí provincia o ciudad y hacé clic en <strong>Buscar</strong></div>';
   document.getElementById('prosp-vacio').style.display = 'block';
@@ -4363,7 +4427,7 @@ window.agregarProspectos = function(lista) {
   renderTablaProspectos(_prospectos);
   document.getElementById('prosp-vacio').style.display = 'none';
   document.getElementById('prosp-resultados').style.display = 'block';
-  document.getElementById('prosp-resumen-count').textContent = _prospectos.length + ' bicicleterías encontradas';
+  document.getElementById('prosp-resumen-count').textContent = _prospectos.length + ' bicicleteriías encontradas';
   mostrarToast('✅ ' + _prospectos.length + ' resultados cargados', '#16a34a');
 };
 
@@ -4385,7 +4449,7 @@ function importarProspecto(idx, destino) {
     id: 'prosp_' + Date.now() + '_' + idx,
     nombre: p.nombre||'', telefono: p.telefono||'', email: '',
     ciudad: p.ciudad||'', provincia: p.provincia||'', cuit: '',
-    rubro: 'Bicicletería', direccion: p.direccion||'',
+    rubro: 'Biciclería', direccion: p.direccion||'',
     tipo: destino, fuente: 'Prospección',
     vendedor: null, estado: 'Sin contactar', notas: []
   };
@@ -4403,17 +4467,12 @@ function importarProspecto(idx, destino) {
     if (typeof filtrarSin === 'function') filtrarSin();
   }
   mostrarToast('✅ "' + cliente.nombre + '" agregado a ' + destino + ' → Tab Asignar Clientes', '#16a34a');
-  /* Ir al tab de asignar para que lo vea */
-  setTimeout(function(){
-    var tabBtn = document.querySelector('.tab-btn[onclick*="asignar"]');
-    /* No cambiamos tab automáticamente, el toast ya indica dónde fue */
-  }, 100);
 }
 function importarSeleccionadosProspectos() {
   var checks = document.querySelectorAll('.prosp-chk:checked');
   if (!checks.length) { mostrarToast('⚠️ Seleccioná al menos un negocio', '#f59e0b'); return; }
-  checks.forEach(function(c){ importarProspecto(parseInt(c.dataset.idx)); });
-  mostrarToast('✅ ' + checks.length + ' clientes agregados', '#16a34a');
+  checks.forEach(function(c){ importarProspecto(parseInt(c.dataset.idx), 'Sin Credifin'); });
+  mostrarToast('✅ ' + checks.length + ' clientes agregados a Sin Credifin', '#16a34a');
 }
 function exportarProspectosJSON() {
   if (!_prospectos.length) return;
