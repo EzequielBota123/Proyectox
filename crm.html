@@ -584,9 +584,6 @@
     .prosp-form-grid .form-group { margin-bottom:0; }
     .prosp-status { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--accent); }
     .prosp-spinner { display:inline-block; animation:spin 0.8s linear infinite; font-size:16px; }
-    .prosp-instruccion-panel { background:color-mix(in srgb,#f59e0b 8%,var(--surface)); border:2px solid #f59e0b; border-radius:var(--radius); padding:20px; margin-bottom:16px; }
-    .prosp-instruccion-inner { max-width:800px; }
-    .prosp-prompt-box { background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; font-size:12px; line-height:1.7; color:var(--text); white-space:pre-wrap; word-wrap:break-word; }
     .prosp-vacio { text-align:center; padding:60px 20px; }
     .prosp-vacio-icon { font-size:48px; margin-bottom:12px; opacity:0.4; }
     .prosp-score { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; font-size:12px; font-weight:800; }
@@ -909,7 +906,6 @@
             </div>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                 <div id="prosp-badge-count" class="prosp-instruccion-badge" style="display:none;">0 encontrados</div>
-                <div class="prosp-instruccion-badge">💡 Claude busca en Google automáticamente</div>
             </div>
         </div>
 
@@ -989,16 +985,6 @@
                 <div id="prosp-status" class="prosp-status" style="display:none;">
                     <span class="prosp-spinner">⟳</span> <span id="prosp-status-txt">Buscando en Google...</span>
                 </div>
-            </div>
-        </div>
-
-        <!-- Panel instrucción Claude -->
-        <div id="prosp-instruccion-panel" class="prosp-instruccion-panel" style="display:none;">
-            <div class="prosp-instruccion-inner">
-                <div style="font-size:15px;font-weight:800;margin-bottom:6px;">📋 Pedile esto a Claude en el chat:</div>
-                <div id="prosp-prompt-generado" class="prosp-prompt-box"></div>
-                <button class="btn btn-blue" onclick="copiarPromptProspeccion()" style="margin-top:10px;font-size:12px;">📋 Copiar prompt</button>
-                <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">Claude busca en Google, analiza cada negocio y llama a <code>agregarProspectos([...])</code> para poblar los resultados acá.</p>
             </div>
         </div>
 
@@ -4160,257 +4146,343 @@ function waTel(num, display) {
 var _prospectos = [];
 var _prospectosFiltrados = [];
 
-function iniciarProspeccion() {
-    var tipo     = (document.getElementById('prosp-tipo').value.trim()) || 'bicicleterías';
-    var provincia = document.getElementById('prosp-provincia').value;
-    var ciudad   = document.getElementById('prosp-ciudad').value.trim();
-    var cantidad = document.getElementById('prosp-cantidad').value || 20;
+/* Mapeo nombre de provincia → área OSM (Overpass) */
+var PROV_AREA = {
+  'Buenos Aires':      'area["name"="Buenos Aires"]["admin_level"="4"]["boundary"="administrative"]',
+  'CABA':              'area["name"="Ciudad Autónoma de Buenos Aires"]["admin_level"="4"]',
+  'Córdoba':           'area["name"="Córdoba"]["admin_level"="4"]["boundary"="administrative"]',
+  'Santa Fe':          'area["name"="Santa Fe"]["admin_level"="4"]["boundary"="administrative"]',
+  'Mendoza':           'area["name"="Mendoza"]["admin_level"="4"]["boundary"="administrative"]',
+  'Tucumán':           'area["name"="Tucumán"]["admin_level"="4"]["boundary"="administrative"]',
+  'Entre Ríos':        'area["name"="Entre Ríos"]["admin_level"="4"]["boundary"="administrative"]',
+  'Salta':             'area["name"="Salta"]["admin_level"="4"]["boundary"="administrative"]',
+  'Misiones':          'area["name"="Misiones"]["admin_level"="4"]["boundary"="administrative"]',
+  'Chaco':             'area["name"="Chaco"]["admin_level"="4"]["boundary"="administrative"]',
+  'Corrientes':        'area["name"="Corrientes"]["admin_level"="4"]["boundary"="administrative"]',
+  'Santiago del Estero': 'area["name"="Santiago del Estero"]["admin_level"="4"]["boundary"="administrative"]',
+  'San Juan':          'area["name"="San Juan"]["admin_level"="4"]["boundary"="administrative"]',
+  'Jujuy':             'area["name"="Jujuy"]["admin_level"="4"]["boundary"="administrative"]',
+  'Río Negro':         'area["name"="Río Negro"]["admin_level"="4"]["boundary"="administrative"]',
+  'Neuquén':           'area["name"="Neuquén"]["admin_level"="4"]["boundary"="administrative"]',
+  'Formosa':           'area["name"="Formosa"]["admin_level"="4"]["boundary"="administrative"]',
+  'Chubut':            'area["name"="Chubut"]["admin_level"="4"]["boundary"="administrative"]',
+  'San Luis':          'area["name"="San Luis"]["admin_level"="4"]["boundary"="administrative"]',
+  'Catamarca':         'area["name"="Catamarca"]["admin_level"="4"]["boundary"="administrative"]',
+  'La Rioja':          'area["name"="La Rioja"]["admin_level"="4"]["boundary"="administrative"]',
+  'La Pampa':          'area["name"="La Pampa"]["admin_level"="4"]["boundary"="administrative"]',
+  'Santa Cruz':        'area["name"="Santa Cruz"]["admin_level"="4"]["boundary"="administrative"]',
+  'Tierra del Fuego':  'area["name"="Tierra del Fuego"]["admin_level"="4"]["boundary"="administrative"]'
+};
 
-    document.getElementById('prosp-vacio').style.display = 'none';
-    document.getElementById('prosp-resultados').style.display = 'none';
-    var st = document.getElementById('prosp-status');
-    st.style.display = 'flex';
-    document.getElementById('prosp-status-txt').textContent = 'Generando prompt de búsqueda...';
+/* Tipos de negocio → tags OSM */
+var TIPO_TAGS = {
+  'bicicleterías': '["shop"="bicycle"]',
+  'ciclismo':      '["shop"="bicycle"]',
+  'deportes':      '["shop"="sports"]',
+  'bikes':         '["shop"="bicycle"]'
+};
 
-    var zona = provincia ? provincia : (ciudad || 'Argentina');
-    if (ciudad && provincia) zona = ciudad + ', ' + provincia;
-
-    var prompt =
-        'Sos un asistente de prospección comercial. Buscá ' + cantidad + ' negocios del tipo "' + tipo + '" en ' + zona + ' que puedan estar interesados en comprar bicicletas al por mayor.
-
-' +
-        'Usá WebSearch y WebFetch para buscar en Google y en directorios argentinos (páginas amarillas, Google Maps, Mercado Libre, Facebook).
-
-' +
-        'Por cada negocio encontrado, recopilá:
-' +
-        '- nombre del negocio
-' +
-        '- provincia (texto)
-' +
-        '- ciudad
-' +
-        '- web (URL o null)
-' +
-        '- instagram (URL del perfil o null)
-' +
-        '- telefono (string o "")
-' +
-        '- score: número del 1 al 10 — cuánta oportunidad tiene de comprar bicicletas al por mayor (10 = urgente, sin proveedor claro; 1 = ya está muy abastecido)
-' +
-        '- observaciones: una línea con lo que notaste del negocio
-
-' +
-        'Al terminar, llamá a esta función con todos los resultados:
-
-' +
-        'window.agregarProspectos([
-' +
-        '  {
-' +
-        '    nombre: "Bicicletería El Pedal",
-' +
-        '    provincia: "' + (provincia || 'Buenos Aires') + '",
-' +
-        '    ciudad: "' + (ciudad || zona) + '",
-' +
-        '    web: "https://..." ,  // null si no tiene
-' +
-        '    instagram: "https://instagram.com/...",  // null si no tiene
-' +
-        '    telefono: "011 1234-5678",
-' +
-        '    score: 8,
-' +
-        '    observaciones: "Sin web propia, solo Instagram desactualizado"
-' +
-        '  },
-' +
-        '  // ... ' + cantidad + ' negocios en total
-' +
-        ']);
-
-' +
-        'IMPORTANTE: No inventes datos. Solo incluí negocios que encontraste en la búsqueda. Si no llegás a ' + cantidad + ', devolvé los que encontraste.';
-
-    document.getElementById('prosp-prompt-generado').textContent = prompt;
-    document.getElementById('prosp-instruccion-panel').style.display = 'block';
-    st.style.display = 'none';
+function getTipoTag(tipo) {
+  var lower = (tipo||'').toLowerCase();
+  for (var k in TIPO_TAGS) {
+    if (lower.indexOf(k) !== -1) return TIPO_TAGS[k];
+  }
+  return '["shop"="bicycle"]';
 }
 
-function copiarPromptProspeccion() {
-    var txt = document.getElementById('prosp-prompt-generado').textContent;
-    navigator.clipboard.writeText(txt).then(function(){
-        mostrarToast('✅ Prompt copiado — pegalo en el chat de Claude', '#16a34a');
+function iniciarProspeccion() {
+  var tipo     = (document.getElementById('prosp-tipo').value.trim()) || 'bicicleterías';
+  var provincia = document.getElementById('prosp-provincia').value;
+  var ciudad   = document.getElementById('prosp-ciudad').value.trim();
+  var cantidad = parseInt(document.getElementById('prosp-cantidad').value) || 20;
+
+  if (!provincia && !ciudad) {
+    mostrarToast('⚠️ Elegí una provincia o ingresá una ciudad', '#f59e0b');
+    return;
+  }
+
+  document.getElementById('prosp-vacio').style.display = 'none';
+  document.getElementById('prosp-resultados').style.display = 'none';
+  var st = document.getElementById('prosp-status');
+  st.style.display = 'flex';
+  document.getElementById('prosp-status-txt').textContent = ciudad
+    ? 'Buscando ' + tipo + ' en ' + ciudad + '...'
+    : 'Buscando ' + tipo + ' en ' + provincia + '...';
+
+  var tipoTag = getTipoTag(tipo);
+
+  /* Construir query Overpass */
+  var areaFilter;
+  if (ciudad) {
+    areaFilter = 'area["name"="' + ciudad + '"]->.zona;
+';
+  } else {
+    var provQuery = PROV_AREA[provincia] || ('area["name"="' + provincia + '"]["admin_level"="4"]');
+    areaFilter = provQuery + '->.zona;
+';
+  }
+
+  var query =
+    '[out:json][timeout:30];
+' +
+    areaFilter +
+    '(
+' +
+    '  node' + tipoTag + '(area.zona);
+' +
+    '  way'  + tipoTag + '(area.zona);
+' +
+    ');
+' +
+    'out body;
+' +
+    '>;
+' +
+    'out skel qt;';
+
+  fetch('https://overpass-api.de/api/interpreter', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'data=' + encodeURIComponent(query)
+  })
+  .then(function(r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  })
+  .then(function(data) {
+    st.style.display = 'none';
+    var elements = (data.elements || []).filter(function(el) {
+      return el.tags && el.tags.name;
+    }).slice(0, cantidad);
+
+    if (!elements.length) {
+      mostrarToast('⚠️ Sin resultados para esa ubicación en OpenStreetMap. Probá con otra ciudad o provincia.', '#f59e0b');
+      document.getElementById('prosp-vacio').style.display = 'block';
+      return;
+    }
+
+    var prospectos = elements.map(function(el) {
+      var tags = el.tags || {};
+      var web = tags.website || tags['contact:website'] || tags['url'] || null;
+      var ig  = tags['contact:instagram'] || tags['instagram'] || null;
+      var tel = tags.phone || tags['contact:phone'] || tags['contact:mobile'] || '';
+      var addr = [tags['addr:street'], tags['addr:housenumber'], tags['addr:city'] || tags['addr:suburb']].filter(Boolean).join(' ');
+      var ciudadTag = tags['addr:city'] || tags['addr:suburb'] || ciudad || '';
+
+      return {
+        nombre: tags.name,
+        provincia: provincia || '',
+        ciudad: ciudadTag,
+        direccion: addr,
+        web: web,
+        instagram: ig,
+        telefono: tel,
+        email: tags.email || tags['contact:email'] || '',
+        score: calcScore(tags),
+        observaciones: genObs(tags)
+      };
     });
+
+    window.agregarProspectos(prospectos);
+  })
+  .catch(function(err) {
+    st.style.display = 'none';
+    document.getElementById('prosp-vacio').style.display = 'block';
+    mostrarToast('❌ Error en la búsqueda: ' + err.message, '#dc3545');
+  });
+}
+
+function calcScore(tags) {
+  var s = 5;
+  var web = tags.website || tags['contact:website'];
+  var tel = tags.phone || tags['contact:phone'] || tags['contact:mobile'];
+  var ig  = tags['contact:instagram'] || tags['instagram'];
+  if (!web) s += 2;
+  if (!tel) s += 1;
+  if (!ig)  s += 1;
+  if (tags.opening_hours) s -= 1;
+  return Math.min(10, Math.max(1, s));
+}
+
+function genObs(tags) {
+  var partes = [];
+  if (!tags.website && !tags['contact:website']) partes.push('Sin web propia');
+  if (!tags.phone && !tags['contact:phone'] && !tags['contact:mobile']) partes.push('Sin teléfono visible');
+  if (!tags['contact:instagram'] && !tags['instagram']) partes.push('Sin Instagram');
+  if (tags['addr:city'] || tags['addr:suburb']) partes.push(tags['addr:city'] || tags['addr:suburb']);
+  return partes.join(' · ') || 'Negocio registrado en OpenStreetMap';
 }
 
 function limpiarProspeccion() {
-    _prospectos = []; _prospectosFiltrados = [];
-    document.getElementById('prosp-tipo').value = 'bicicleterías';
-    document.getElementById('prosp-provincia').value = '';
-    document.getElementById('prosp-ciudad').value = '';
-    document.getElementById('prosp-cantidad').value = 20;
-    ['f-sin-web','f-sin-instagram','f-con-telefono','f-alta-oport'].forEach(function(id){
-        var el = document.getElementById(id); if(el) el.checked = false;
-    });
-    document.getElementById('prosp-resultados').style.display = 'none';
-    document.getElementById('prosp-instruccion-panel').style.display = 'none';
-    document.getElementById('prosp-status').style.display = 'none';
-    document.getElementById('prosp-vacio').style.display = 'block';
-    var badge = document.getElementById('prosp-badge-count');
-    if (badge) badge.style.display = 'none';
+  _prospectos = []; _prospectosFiltrados = [];
+  document.getElementById('prosp-tipo').value = 'bicicleterías';
+  document.getElementById('prosp-provincia').value = '';
+  document.getElementById('prosp-ciudad').value = '';
+  document.getElementById('prosp-cantidad').value = 20;
+  ['f-sin-web','f-sin-instagram','f-con-telefono','f-alta-oport'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.checked = false;
+  });
+  var br = document.getElementById('prosp-busqueda-rapida'); if(br) br.value = '';
+  document.getElementById('prosp-resultados').style.display = 'none';
+  document.getElementById('prosp-status').style.display = 'none';
+  document.getElementById('prosp-vacio').style.display = 'block';
+  var badge = document.getElementById('prosp-badge-count');
+  if (badge) badge.style.display = 'none';
 }
 
-/* Claude llama a esta función para inyectar resultados */
+/* Claude o demo llama a esto para inyectar resultados */
 window.agregarProspectos = function(lista) {
-    _prospectos = lista || [];
-    filtrarProspectos();
-    document.getElementById('prosp-instruccion-panel').style.display = 'none';
-    document.getElementById('prosp-vacio').style.display = 'none';
-    document.getElementById('prosp-resultados').style.display = 'block';
-    var badge = document.getElementById('prosp-badge-count');
-    if (badge) { badge.textContent = _prospectos.length + ' encontrados'; badge.style.display = 'flex'; }
-    mostrarToast('✅ ' + _prospectos.length + ' prospectos cargados', '#16a34a');
+  _prospectos = lista || [];
+  filtrarProspectos();
+  document.getElementById('prosp-vacio').style.display = 'none';
+  document.getElementById('prosp-resultados').style.display = 'block';
+  var badge = document.getElementById('prosp-badge-count');
+  if (badge) { badge.textContent = _prospectos.length + ' encontrados'; badge.style.display = 'flex'; }
+  mostrarToast('✅ ' + _prospectos.length + ' negocios encontrados', '#16a34a');
 };
 
 function filtrarProspectos() {
-    var sinWeb     = document.getElementById('f-sin-web') && document.getElementById('f-sin-web').checked;
-    var sinIG      = document.getElementById('f-sin-instagram') && document.getElementById('f-sin-instagram').checked;
-    var conTel     = document.getElementById('f-con-telefono') && document.getElementById('f-con-telefono').checked;
-    var altaOport  = document.getElementById('f-alta-oport') && document.getElementById('f-alta-oport').checked;
-    var busqueda   = (document.getElementById('prosp-busqueda-rapida') ? document.getElementById('prosp-busqueda-rapida').value.toLowerCase() : '');
-    var orden      = document.getElementById('prosp-orden') ? document.getElementById('prosp-orden').value : 'score';
+  var sinWeb    = document.getElementById('f-sin-web') && document.getElementById('f-sin-web').checked;
+  var sinIG     = document.getElementById('f-sin-instagram') && document.getElementById('f-sin-instagram').checked;
+  var conTel    = document.getElementById('f-con-telefono') && document.getElementById('f-con-telefono').checked;
+  var altaOport = document.getElementById('f-alta-oport') && document.getElementById('f-alta-oport').checked;
+  var busq      = document.getElementById('prosp-busqueda-rapida') ? document.getElementById('prosp-busqueda-rapida').value.toLowerCase() : '';
+  var orden     = document.getElementById('prosp-orden') ? document.getElementById('prosp-orden').value : 'score';
 
-    _prospectosFiltrados = _prospectos.filter(function(p) {
-        if (sinWeb && p.web) return false;
-        if (sinIG && p.instagram) return false;
-        if (conTel && !p.telefono) return false;
-        if (altaOport && (p.score||0) < 7) return false;
-        if (busqueda) {
-            var haystack = (p.nombre||'') + ' ' + (p.ciudad||'') + ' ' + (p.provincia||'') + ' ' + (p.observaciones||'');
-            if (haystack.toLowerCase().indexOf(busqueda) === -1) return false;
-        }
-        return true;
-    });
+  _prospectosFiltrados = _prospectos.filter(function(p) {
+    if (sinWeb    && p.web)     return false;
+    if (sinIG     && p.instagram) return false;
+    if (conTel    && !p.telefono) return false;
+    if (altaOport && (p.score||0) < 7) return false;
+    if (busq) {
+      var hay = (p.nombre||'') + ' ' + (p.ciudad||'') + ' ' + (p.provincia||'') + ' ' + (p.observaciones||'') + ' ' + (p.direccion||'');
+      if (hay.toLowerCase().indexOf(busq) === -1) return false;
+    }
+    return true;
+  });
 
-    _prospectosFiltrados.sort(function(a, b) {
-        if (orden === 'nombre') return (a.nombre||'').localeCompare(b.nombre||'');
-        if (orden === 'ciudad') return (a.ciudad||'').localeCompare(b.ciudad||'');
-        return (b.score||0) - (a.score||0);
-    });
+  _prospectosFiltrados.sort(function(a, b) {
+    if (orden === 'nombre') return (a.nombre||'').localeCompare(b.nombre||'');
+    if (orden === 'ciudad') return (a.ciudad||'').localeCompare(b.ciudad||'');
+    return (b.score||0) - (a.score||0);
+  });
 
-    renderTablaProspectos();
+  renderTablaProspectos();
 
-    var avgScore = _prospectosFiltrados.length
-        ? Math.round(_prospectosFiltrados.reduce(function(a,p){ return a+(p.score||0); },0) / _prospectosFiltrados.length * 10)/10
-        : 0;
-    document.getElementById('prosp-resumen-count').textContent = _prospectosFiltrados.length + ' de ' + _prospectos.length + ' prospectos';
-    document.getElementById('prosp-resumen-score').textContent = '— Oportunidad promedio: ' + avgScore + '/10';
+  var avg = _prospectosFiltrados.length
+    ? Math.round(_prospectosFiltrados.reduce(function(a,p){ return a+(p.score||0); },0) / _prospectosFiltrados.length * 10)/10
+    : 0;
+  document.getElementById('prosp-resumen-count').textContent = _prospectosFiltrados.length + ' de ' + _prospectos.length + ' negocios';
+  document.getElementById('prosp-resumen-score').textContent = '— Oportunidad promedio: ' + avg + '/10';
 }
 
 function renderTablaProspectos() {
-    var tbody = document.getElementById('prosp-tbody');
-    tbody.innerHTML = '';
-    _prospectosFiltrados.forEach(function(p, i) {
-        var realIdx = _prospectos.indexOf(p);
-        var scoreClass = (p.score||0) >= 7 ? 'prosp-score-high' : (p.score||0) >= 4 ? 'prosp-score-mid' : 'prosp-score-low';
-        var webTxt = p.web
-            ? '<a class="prosp-web-link" href="'+p.web+'" target="_blank">🌐 Web</a>'
-            : '<span style="color:#dc3545;font-size:11px;font-weight:700;">✗ Sin web</span>';
-        var igTxt = p.instagram
-            ? '<a class="prosp-ig-link" href="'+p.instagram+'" target="_blank">📷 IG</a>'
-            : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
-        var telTxt = p.telefono
-            ? '<span style="font-size:11px;color:var(--text);">'+escHTML(p.telefono)+'</span>'
-            : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
+  var tbody = document.getElementById('prosp-tbody');
+  tbody.innerHTML = '';
 
-        var tr = document.createElement('tr');
-        tr.id = 'prosp-row-' + realIdx;
-        tr.innerHTML =
-            '<td><input type="checkbox" class="prosp-chk" data-idx="'+realIdx+'" onchange="onChkProsp(this)" style="width:auto;cursor:pointer;"></td>' +
-            '<td style="font-weight:700;color:var(--text);font-size:12px;">'+escHTML(p.nombre||'—')+'</td>' +
-            '<td style="font-size:11px;color:var(--text-muted);">'+escHTML(p.provincia||'—')+'</td>' +
-            '<td style="font-size:11px;color:var(--text-muted);">'+escHTML(p.ciudad||'—')+'</td>' +
-            '<td>'+webTxt+'</td>' +
-            '<td>'+igTxt+'</td>' +
-            '<td>'+telTxt+'</td>' +
-            '<td style="text-align:center;"><span class="prosp-score '+scoreClass+'">'+(p.score||'—')+'</span></td>' +
-            '<td style="font-size:11px;color:var(--text-muted);max-width:200px;white-space:normal;">'+escHTML(p.observaciones||'—')+'</td>' +
-            '<td style="white-space:nowrap;">' +
-                '<button class="btn-accion btn-accion-edit" onclick="importarProspecto('+realIdx+')" title="Agregar como cliente">➕</button>' +
-            '</td>';
-        tbody.appendChild(tr);
-    });
+  if (!_prospectosFiltrados.length) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td colspan="10" style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">Sin resultados para los filtros actuales</td>';
+    tbody.appendChild(tr);
+    return;
+  }
+
+  _prospectosFiltrados.forEach(function(p) {
+    var realIdx = _prospectos.indexOf(p);
+    var sc = p.score || 0;
+    var scoreClass = sc >= 7 ? 'prosp-score-high' : sc >= 4 ? 'prosp-score-mid' : 'prosp-score-low';
+    var webTxt = p.web
+      ? '<a class="prosp-web-link" href="'+escHTML(p.web)+'" target="_blank">🌐 Ver</a>'
+      : '<span style="color:#dc3545;font-size:11px;font-weight:700;">✗ Sin web</span>';
+    var igTxt = p.instagram
+      ? '<a class="prosp-ig-link" href="'+escHTML(p.instagram)+'" target="_blank">📷 IG</a>'
+      : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
+    var telTxt = p.telefono
+      ? '<a href="tel:'+escHTML(p.telefono)+'" style="color:var(--accent);font-size:11px;text-decoration:none;">📞 '+escHTML(p.telefono)+'</a>'
+      : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
+
+    var tr = document.createElement('tr');
+    tr.id = 'prosp-row-' + realIdx;
+    tr.innerHTML =
+      '<td><input type="checkbox" class="prosp-chk" data-idx="'+realIdx+'" onchange="onChkProsp(this)" style="width:auto;cursor:pointer;"></td>' +
+      '<td style="font-weight:700;color:var(--text);font-size:12px;">'+escHTML(p.nombre||'—')+'</td>' +
+      '<td style="font-size:11px;color:var(--text-muted);">'+escHTML(p.provincia||'—')+'</td>' +
+      '<td style="font-size:11px;color:var(--text-muted);">'+escHTML(p.ciudad||'—')+'</td>' +
+      '<td>'+webTxt+'</td>' +
+      '<td>'+igTxt+'</td>' +
+      '<td>'+telTxt+'</td>' +
+      '<td style="text-align:center;"><span class="prosp-score '+scoreClass+'">'+sc+'</span></td>' +
+      '<td style="font-size:11px;color:var(--text-muted);max-width:200px;white-space:normal;">'+escHTML(p.observaciones||'—')+'</td>' +
+      '<td style="white-space:nowrap;">' +
+        '<button class="btn-accion btn-accion-edit" onclick="importarProspecto('+realIdx+')" title="Agregar como cliente">➕</button>' +
+      '</td>';
+    tbody.appendChild(tr);
+  });
 }
 
-function escHTML(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escHTML(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function onChkProsp(chk) {
-    var idx = chk.dataset.idx;
-    var row = document.getElementById('prosp-row-' + idx);
-    if (row) row.classList.toggle('prosp-row-sel', chk.checked);
+  var row = document.getElementById('prosp-row-' + chk.dataset.idx);
+  if (row) row.classList.toggle('prosp-row-sel', chk.checked);
 }
 
 function selAllProspectos(checked) {
-    document.querySelectorAll('.prosp-chk').forEach(function(c){
-        c.checked = checked;
-        var row = document.getElementById('prosp-row-' + c.dataset.idx);
-        if(row) row.classList.toggle('prosp-row-sel', checked);
-    });
+  document.querySelectorAll('.prosp-chk').forEach(function(c){
+    c.checked = checked;
+    var row = document.getElementById('prosp-row-' + c.dataset.idx);
+    if(row) row.classList.toggle('prosp-row-sel', checked);
+  });
 }
 
 function importarProspecto(idx) {
-    var p = _prospectos[idx];
-    if (!p) return;
-    var cliente = {
-        id: 'prosp_' + Date.now() + '_' + idx,
-        nombre: p.nombre || '',
-        telefono: p.telefono || '',
-        ciudad: p.ciudad || '',
-        provincia: p.provincia || '',
-        cuit: '',
-        email: '',
-        rubro: (document.getElementById('prosp-tipo') ? document.getElementById('prosp-tipo').value : '') || 'Bicicletería',
-        direccion: '',
-        tipo: 'Sin Credifin',
-        fuente: 'Prospección',
-        vendedor: null,
-        estado: 'Sin contactar',
-        notas: []
-    };
-    if (typeof clientesSinCredifin !== 'undefined') {
-        clientesSinCredifin.push(cliente);
-        if (typeof filtrarSin === 'function') filtrarSin();
-        mostrarToast('✅ "' + cliente.nombre + '" agregado como cliente', '#16a34a');
-    } else if (typeof clientes !== 'undefined') {
-        clientes.push(cliente);
-        mostrarToast('✅ "' + cliente.nombre + '" agregado como cliente', '#16a34a');
-    } else {
-        mostrarToast('⚠️ Andá al tab Asignar para ver el cliente importado', '#f59e0b');
-    }
+  var p = _prospectos[idx];
+  if (!p) return;
+  var cliente = {
+    id: 'prosp_' + Date.now() + '_' + idx,
+    nombre: p.nombre || '',
+    telefono: p.telefono || '',
+    email: p.email || '',
+    ciudad: p.ciudad || '',
+    provincia: p.provincia || '',
+    cuit: '',
+    rubro: 'Bicicletería',
+    direccion: p.direccion || '',
+    tipo: 'Sin Credifin',
+    fuente: 'Prospección',
+    vendedor: null,
+    estado: 'Sin contactar',
+    notas: []
+  };
+  if (typeof clientesSinCredifin !== 'undefined') {
+    clientesSinCredifin.push(cliente);
+    if (typeof filtrarSin === 'function') filtrarSin();
+  } else if (typeof clientes !== 'undefined') {
+    clientes.push(cliente);
+  }
+  mostrarToast('✅ "' + cliente.nombre + '" agregado como cliente', '#16a34a');
 }
 
 function importarSeleccionadosProspectos() {
-    var checks = document.querySelectorAll('.prosp-chk:checked');
-    if (!checks.length) { mostrarToast('⚠️ Seleccioná al menos un prospecto', '#f59e0b'); return; }
-    checks.forEach(function(c){ importarProspecto(parseInt(c.dataset.idx)); });
-    mostrarToast('✅ ' + checks.length + ' clientes agregados', '#16a34a');
+  var checks = document.querySelectorAll('.prosp-chk:checked');
+  if (!checks.length) { mostrarToast('⚠️ Seleccioná al menos un negocio', '#f59e0b'); return; }
+  checks.forEach(function(c){ importarProspecto(parseInt(c.dataset.idx)); });
+  mostrarToast('✅ ' + checks.length + ' clientes agregados', '#16a34a');
 }
 
 function exportarProspectosJSON() {
-    if (!_prospectos.length) return;
-    var blob = new Blob([JSON.stringify(_prospectos, null, 2)], {type:'application/json'});
-    var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = 'prospectos-' + new Date().toISOString().slice(0,10) + '.json'; a.click();
+  if (!_prospectos.length) return;
+  var blob = new Blob([JSON.stringify(_prospectos, null, 2)], {type:'application/json'});
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'prospectos-' + new Date().toISOString().slice(0,10) + '.json'; a.click();
 }
 
 function mostrarToast(msg, color) {
-    var t = document.getElementById('toast-crm');
-    if (!t) return;
-    t.textContent = msg; t.style.background = color || '#333';
-    t.style.opacity = '1';
-    setTimeout(function(){ t.style.opacity = '0'; }, 2800);
+  var t = document.getElementById('toast-crm');
+  if (!t) return;
+  t.textContent = msg; t.style.background = color || '#333';
+  t.style.opacity = '1';
+  setTimeout(function(){ t.style.opacity = '0'; }, 2800);
 }
 </script>
 
@@ -4430,23 +4502,5 @@ function mostrarToast(msg, color) {
 })();
 </script>
 
-<script id="prosp-demo-data">
-window.addEventListener('load', function() {
-  setTimeout(function() {
-    if (typeof window.agregarProspectos === 'function') {
-      var t=document.getElementById('prosp-tipo'); if(t) t.value='bicicleterías';
-      var prov=document.getElementById('prosp-provincia'); if(prov) prov.value='Buenos Aires';
-      window.agregarProspectos([
-        { nombre:"Canaglia Bicicletería", provincia:"Buenos Aires", ciudad:"Buenos Aires", web:"https://www.canaglia.com", instagram:null, telefono:"", score:9, observaciones:"Sin teléfono, sin redes sociales, sin formulario. Alta oportunidad." },
-        { nombre:"Bicicletas Tonino", provincia:"Buenos Aires", ciudad:"Gran Buenos Aires", web:"https://bicicletastonino.com.ar", instagram:"https://instagram.com/bicicletastonino", telefono:"011 15 62283003", score:7, observaciones:"30 años en el rubro. Sin pixel de conversión. Buen candidato." },
-        { nombre:"Bicicletas Belgrano", provincia:"CABA", ciudad:"Belgrano", web:"https://www.bicicletasbelgrano.com.ar", instagram:null, telefono:"11-4056-6288", score:6, observaciones:"Catálogo acotado. Sin presencia en IG. Abierto a nuevas marcas." },
-        { nombre:"Biciup", provincia:"Buenos Aires", ciudad:"Banfield", web:"https://biciup.com.ar", instagram:"https://instagram.com/biciup", telefono:"", score:5, observaciones:"Concentrado en premium. Zona sur GBA con alta demanda." },
-        { nombre:"Pedales del Sur", provincia:"Buenos Aires", ciudad:"Lomas de Zamora", web:null, instagram:"https://instagram.com/pedalesdelsur", telefono:"11 5543-2210", score:8, observaciones:"Sin web propia. Solo maneja Instagram. Oportunidad de ampliar catálogo." },
-        { nombre:"El Ciclista", provincia:"Santa Fe", ciudad:"Rosario", web:null, instagram:null, telefono:"341 422-9900", score:9, observaciones:"Sin presencia digital. Solo teléfono fijo. Mercado potencial alto." }
-      ]);
-    }
-  }, 900);
-});
-</script>
 </body>
 </html>
