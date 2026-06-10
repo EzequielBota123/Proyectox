@@ -594,7 +594,15 @@
     .prosp-score-mid  { background:color-mix(in srgb,#f59e0b 15%,var(--surface)); color:#d97706; border:2px solid #f59e0b; }
     .prosp-score-low  { background:color-mix(in srgb,#dc3545 15%,var(--surface)); color:#dc3545; border:2px solid #dc3545; }
     .prosp-problema-tag { display:inline-block; background:color-mix(in srgb,#dc3545 10%,var(--surface)); color:#dc3545; font-size:9px; font-weight:700; padding:2px 7px; border-radius:10px; margin:2px 2px 0 0; border:1px solid color-mix(in srgb,#dc3545 25%,var(--border)); }
-    .prosp-detalle-row { display:none; }
+    .prosp-filtros-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:14px 0 4px; border-top:1px solid var(--border); margin-top:4px; }
+    .prosp-filtro-chip { display:flex; align-items:center; gap:5px; padding:5px 12px; border:1.5px solid var(--border-2); border-radius:20px; font-size:11px; font-weight:700; color:var(--text-muted); background:var(--surface-2); cursor:pointer; user-select:none; transition:all 0.15s; white-space:nowrap; }
+    .prosp-filtro-chip:has(input:checked) { background:color-mix(in srgb,var(--accent) 12%,var(--surface)); color:var(--accent); border-color:color-mix(in srgb,var(--accent) 40%,var(--border)); }
+    .prosp-filtro-chip input { width:auto; margin:0; cursor:pointer; }
+    .prosp-acciones-bar { padding:14px 16px; margin-bottom:12px; }
+    .prosp-detalle-flotante { margin-top:12px; }
+    .prosp-ig-link { color:#e1306c; text-decoration:none; font-size:11px; }
+    .prosp-ig-link:hover { text-decoration:underline; }
+        .prosp-detalle-row { display:none; }
     .prosp-detalle-row.open { display:table-row; }
     .prosp-detalle-inner { padding:16px 20px; background:var(--surface-2); border-bottom:1px solid var(--border); }
     .prosp-msg-tabs-bar { display:flex; gap:4px; margin-bottom:10px; }
@@ -893,13 +901,16 @@
     <!-- ===== PROSPECCIÓN ===== -->
     <div id="tab-prospeccion" class="tab-content">
 
-        <!-- Título sección -->
+        <!-- Header -->
         <div class="prosp-header">
             <div>
-                <h2 class="prosp-title">🔍 Prospección</h2>
-                <p class="prosp-subtitle">Buscá clientes potenciales, analizá su presencia digital y conseguí sus datos de contacto.</p>
+                <h2 class="prosp-title">🔍 Prospección de Clientes</h2>
+                <p class="prosp-subtitle">Buscá bicicleterías y negocios del rubro en cualquier provincia. Filtrá los mejores candidatos y conseguí sus datos de contacto.</p>
             </div>
-            <div class="prosp-instruccion-badge">💡 Claude busca y analiza automáticamente</div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <div id="prosp-badge-count" class="prosp-instruccion-badge" style="display:none;">0 encontrados</div>
+                <div class="prosp-instruccion-badge">💡 Claude busca en Google automáticamente</div>
+            </div>
         </div>
 
         <!-- Formulario de búsqueda -->
@@ -907,65 +918,110 @@
             <div class="prosp-form-grid">
                 <div class="form-group">
                     <label>Tipo de negocio</label>
-                    <input type="text" id="prosp-tipo" placeholder="restaurantes, clínicas, gimnasios...">
+                    <input type="text" id="prosp-tipo" placeholder="bicicleterías, deportes, ciclismo..." value="bicicleterías">
                 </div>
                 <div class="form-group">
-                    <label>Ciudad o zona</label>
-                    <input type="text" id="prosp-ciudad" placeholder="Buenos Aires, Córdoba, Madrid...">
-                </div>
-                <div class="form-group">
-                    <label>Servicio a ofrecer</label>
-                    <select id="prosp-servicio">
-                        <option value="diseño web">Diseño Web</option>
-                        <option value="SEO">SEO</option>
-                        <option value="marketing digital">Marketing Digital</option>
-                        <option value="automatización">Automatización</option>
-                        <option value="redes sociales">Redes Sociales</option>
-                        <option value="publicidad online">Publicidad Online (Meta/Google Ads)</option>
+                    <label>Provincia</label>
+                    <select id="prosp-provincia">
+                        <option value="">— Todas las provincias —</option>
+                        <option>Buenos Aires</option>
+                        <option>CABA</option>
+                        <option>Córdoba</option>
+                        <option>Santa Fe</option>
+                        <option>Mendoza</option>
+                        <option>Tucumán</option>
+                        <option>Entre Ríos</option>
+                        <option>Salta</option>
+                        <option>Misiones</option>
+                        <option>Chaco</option>
+                        <option>Corrientes</option>
+                        <option>Santiago del Estero</option>
+                        <option>San Juan</option>
+                        <option>Jujuy</option>
+                        <option>Río Negro</option>
+                        <option>Neuquén</option>
+                        <option>Formosa</option>
+                        <option>Chubut</option>
+                        <option>San Luis</option>
+                        <option>Catamarca</option>
+                        <option>La Rioja</option>
+                        <option>La Pampa</option>
+                        <option>Santa Cruz</option>
+                        <option>Tierra del Fuego</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Cantidad de prospectos</label>
-                    <input type="number" id="prosp-cantidad" value="15" min="5" max="30">
+                    <label>Ciudad o zona <span style="font-weight:400;text-transform:none;font-size:10px;">(opcional)</span></label>
+                    <input type="text" id="prosp-ciudad" placeholder="Rosario, Mar del Plata, zona norte...">
+                </div>
+                <div class="form-group">
+                    <label>Cantidad</label>
+                    <input type="number" id="prosp-cantidad" value="20" min="5" max="50">
                 </div>
             </div>
-            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                <button class="btn btn-blue" onclick="iniciarProspeccion()" style="padding:10px 24px;font-size:14px;">🔍 Buscar prospectos</button>
+
+            <!-- Filtros avanzados -->
+            <div class="prosp-filtros-bar">
+                <span style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;white-space:nowrap;">Filtrar por:</span>
+                <label class="prosp-filtro-chip">
+                    <input type="checkbox" id="f-sin-web" onchange="filtrarProspectos()"> Sin web propia
+                </label>
+                <label class="prosp-filtro-chip">
+                    <input type="checkbox" id="f-sin-instagram" onchange="filtrarProspectos()"> Sin Instagram
+                </label>
+                <label class="prosp-filtro-chip">
+                    <input type="checkbox" id="f-con-telefono" onchange="filtrarProspectos()"> Con teléfono
+                </label>
+                <label class="prosp-filtro-chip">
+                    <input type="checkbox" id="f-alta-oport" onchange="filtrarProspectos()"> Alta oportunidad (7+)
+                </label>
+                <span style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;white-space:nowrap;margin-left:8px;">Ordenar:</span>
+                <select id="prosp-orden" onchange="filtrarProspectos()" style="width:auto;font-size:12px;padding:5px 10px;border-radius:20px;">
+                    <option value="score">Mayor oportunidad</option>
+                    <option value="nombre">Nombre A-Z</option>
+                    <option value="ciudad">Ciudad A-Z</option>
+                </select>
+            </div>
+
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px;">
+                <button class="btn btn-blue" onclick="iniciarProspeccion()" style="padding:10px 28px;font-size:14px;">🔍 Buscar</button>
                 <button class="btn btn-gray" onclick="limpiarProspeccion()" style="font-size:12px;">🗑 Limpiar</button>
                 <div id="prosp-status" class="prosp-status" style="display:none;">
-                    <span class="prosp-spinner">⟳</span> <span id="prosp-status-txt">Buscando negocios...</span>
+                    <span class="prosp-spinner">⟳</span> <span id="prosp-status-txt">Buscando en Google...</span>
                 </div>
             </div>
         </div>
 
-        <!-- Panel de instrucción para Claude -->
+        <!-- Panel instrucción Claude -->
         <div id="prosp-instruccion-panel" class="prosp-instruccion-panel" style="display:none;">
             <div class="prosp-instruccion-inner">
                 <div style="font-size:15px;font-weight:800;margin-bottom:6px;">📋 Pedile esto a Claude en el chat:</div>
                 <div id="prosp-prompt-generado" class="prosp-prompt-box"></div>
                 <button class="btn btn-blue" onclick="copiarPromptProspeccion()" style="margin-top:10px;font-size:12px;">📋 Copiar prompt</button>
-                <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">Claude usará el skill de Prospección, analizará los negocios y llamará a <code>agregarProspectos([...])</code> para mostrar los resultados acá.</p>
+                <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">Claude busca en Google, analiza cada negocio y llama a <code>agregarProspectos([...])</code> para poblar los resultados acá.</p>
             </div>
         </div>
 
-        <!-- Resultados -->
+        <!-- Barra de resultados + acciones masivas -->
         <div id="prosp-resultados" style="display:none;">
-            <div class="card" style="margin-bottom:12px;">
+            <div class="card prosp-acciones-bar">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-                    <div>
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span id="prosp-resumen-count" style="font-size:15px;font-weight:800;color:var(--text);"></span>
-                        <span id="prosp-resumen-score" style="font-size:12px;color:var(--text-muted);margin-left:10px;"></span>
+                        <span id="prosp-resumen-score" style="font-size:12px;color:var(--text-muted);"></span>
+                        <input type="text" id="prosp-busqueda-rapida" placeholder="🔍 Buscar en resultados..." style="width:200px;font-size:12px;padding:6px 10px;" oninput="filtrarProspectos()">
                     </div>
-                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                        <button class="btn btn-green" onclick="importarSeleccionadosProspectos()" style="font-size:12px;">➕ Importar seleccionados como clientes</button>
-                        <button class="btn btn-gray" onclick="exportarProspectosJSON()" style="font-size:12px;">📄 Exportar JSON</button>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
                         <label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;">
                             <input type="checkbox" id="prosp-sel-all" onchange="selAllProspectos(this.checked)" style="width:auto;"> Sel. todo
                         </label>
+                        <button class="btn btn-green" onclick="importarSeleccionadosProspectos()" style="font-size:12px;">➕ Agregar como clientes</button>
+                        <button class="btn btn-gray" onclick="exportarProspectosJSON()" style="font-size:12px;">📄 Exportar JSON</button>
                     </div>
                 </div>
             </div>
 
+            <!-- Tabla -->
             <div class="card" style="padding:0;overflow:hidden;">
                 <div class="tabla-wrap" style="max-height:none;">
                     <table id="prosp-tabla">
@@ -973,11 +1029,13 @@
                             <tr>
                                 <th style="width:32px;"></th>
                                 <th>Negocio</th>
+                                <th>Provincia</th>
                                 <th>Ciudad</th>
                                 <th>Web</th>
-                                <th>Oportunidad</th>
-                                <th>Problemas detectados</th>
+                                <th>Instagram</th>
                                 <th>Teléfono</th>
+                                <th style="text-align:center;">Oportunidad</th>
+                                <th>Observaciones</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -985,13 +1043,16 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Detalle expandido (fuera de tabla para simplicidad) -->
+            <div id="prosp-detalle-panel" class="card prosp-detalle-flotante" style="display:none;"></div>
         </div>
 
         <!-- Estado vacío -->
         <div id="prosp-vacio" class="prosp-vacio">
-            <div class="prosp-vacio-icon">🔍</div>
-            <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Sin búsquedas todavía</div>
-            <div style="font-size:13px;color:var(--text-muted);">Completá el formulario y hacé clic en <strong>Buscar prospectos</strong></div>
+            <div class="prosp-vacio-icon">🚲</div>
+            <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;">Sin resultados todavía</div>
+            <div style="font-size:13px;color:var(--text-muted);">Elegí provincia, tipo de negocio y hacé clic en <strong>Buscar</strong></div>
         </div>
 
     </div>
@@ -4097,40 +4158,80 @@ function waTel(num, display) {
 <script>
 /* ===== PROSPECCIÓN ===== */
 var _prospectos = [];
+var _prospectosFiltrados = [];
 
 function iniciarProspeccion() {
-    var tipo     = document.getElementById('prosp-tipo').value.trim();
+    var tipo     = (document.getElementById('prosp-tipo').value.trim()) || 'bicicleterías';
+    var provincia = document.getElementById('prosp-provincia').value;
     var ciudad   = document.getElementById('prosp-ciudad').value.trim();
-    var servicio = document.getElementById('prosp-servicio').value;
-    var cantidad = document.getElementById('prosp-cantidad').value || 15;
-    if (!tipo || !ciudad) {
-        alert('Completá el tipo de negocio y la ciudad.');
-        return;
-    }
+    var cantidad = document.getElementById('prosp-cantidad').value || 20;
+
     document.getElementById('prosp-vacio').style.display = 'none';
     document.getElementById('prosp-resultados').style.display = 'none';
     var st = document.getElementById('prosp-status');
     st.style.display = 'flex';
-    document.getElementById('prosp-status-txt').textContent = 'Generando búsqueda...';
+    document.getElementById('prosp-status-txt').textContent = 'Generando prompt de búsqueda...';
 
-    var prompt = 'Buscá ' + cantidad + ' prospectos del tipo "' + tipo + '" en "' + ciudad + '" para ofrecerles ' + servicio + '.\n\n'
-        + 'Usá la skill de prospección. Al terminar, llamá a esta función con los resultados:\n\n'
-        + 'agregarProspectos([\n'
-        + '  {\n'
-        + '    nombre: "Nombre del negocio",\n'
-        + '    ciudad: "' + ciudad + '",\n'
-        + '    web: "https://..." ,  // o null si no tiene\n'
-        + '    telefono: "...",       // o "" si no encontrás\n'
-        + '    score: 8,              // 1-10, más alto = más oportunidad\n'
-        + '    problemas: ["Sin formulario", "Web no responsive"],\n'
-        + '    mensajes: {\n'
-        + '      email: "Texto del email de contacto...",\n'
-        + '      linkedin: "Texto para LinkedIn...",\n'
-        + '      whatsapp: "Texto corto para WhatsApp..."\n'
-        + '    }\n'
-        + '  },\n'
-        + '  // ... resto de prospectos\n'
-        + ']);';
+    var zona = provincia ? provincia : (ciudad || 'Argentina');
+    if (ciudad && provincia) zona = ciudad + ', ' + provincia;
+
+    var prompt =
+        'Sos un asistente de prospección comercial. Buscá ' + cantidad + ' negocios del tipo "' + tipo + '" en ' + zona + ' que puedan estar interesados en comprar bicicletas al por mayor.
+
+' +
+        'Usá WebSearch y WebFetch para buscar en Google y en directorios argentinos (páginas amarillas, Google Maps, Mercado Libre, Facebook).
+
+' +
+        'Por cada negocio encontrado, recopilá:
+' +
+        '- nombre del negocio
+' +
+        '- provincia (texto)
+' +
+        '- ciudad
+' +
+        '- web (URL o null)
+' +
+        '- instagram (URL del perfil o null)
+' +
+        '- telefono (string o "")
+' +
+        '- score: número del 1 al 10 — cuánta oportunidad tiene de comprar bicicletas al por mayor (10 = urgente, sin proveedor claro; 1 = ya está muy abastecido)
+' +
+        '- observaciones: una línea con lo que notaste del negocio
+
+' +
+        'Al terminar, llamá a esta función con todos los resultados:
+
+' +
+        'window.agregarProspectos([
+' +
+        '  {
+' +
+        '    nombre: "Bicicletería El Pedal",
+' +
+        '    provincia: "' + (provincia || 'Buenos Aires') + '",
+' +
+        '    ciudad: "' + (ciudad || zona) + '",
+' +
+        '    web: "https://..." ,  // null si no tiene
+' +
+        '    instagram: "https://instagram.com/...",  // null si no tiene
+' +
+        '    telefono: "011 1234-5678",
+' +
+        '    score: 8,
+' +
+        '    observaciones: "Sin web propia, solo Instagram desactualizado"
+' +
+        '  },
+' +
+        '  // ... ' + cantidad + ' negocios en total
+' +
+        ']);
+
+' +
+        'IMPORTANTE: No inventes datos. Solo incluí negocios que encontraste en la búsqueda. Si no llegás a ' + cantidad + ', devolvé los que encontraste.';
 
     document.getElementById('prosp-prompt-generado').textContent = prompt;
     document.getElementById('prosp-instruccion-panel').style.display = 'block';
@@ -4140,119 +4241,115 @@ function iniciarProspeccion() {
 function copiarPromptProspeccion() {
     var txt = document.getElementById('prosp-prompt-generado').textContent;
     navigator.clipboard.writeText(txt).then(function(){
-        mostrarToast('✅ Prompt copiado', '#16a34a');
+        mostrarToast('✅ Prompt copiado — pegalo en el chat de Claude', '#16a34a');
     });
 }
 
 function limpiarProspeccion() {
-    _prospectos = [];
-    document.getElementById('prosp-tipo').value = '';
+    _prospectos = []; _prospectosFiltrados = [];
+    document.getElementById('prosp-tipo').value = 'bicicleterías';
+    document.getElementById('prosp-provincia').value = '';
     document.getElementById('prosp-ciudad').value = '';
-    document.getElementById('prosp-cantidad').value = 15;
+    document.getElementById('prosp-cantidad').value = 20;
+    ['f-sin-web','f-sin-instagram','f-con-telefono','f-alta-oport'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.checked = false;
+    });
     document.getElementById('prosp-resultados').style.display = 'none';
     document.getElementById('prosp-instruccion-panel').style.display = 'none';
     document.getElementById('prosp-status').style.display = 'none';
     document.getElementById('prosp-vacio').style.display = 'block';
+    var badge = document.getElementById('prosp-badge-count');
+    if (badge) badge.style.display = 'none';
 }
 
 /* Claude llama a esta función para inyectar resultados */
 window.agregarProspectos = function(lista) {
     _prospectos = lista || [];
-    renderTablaProspectos();
+    filtrarProspectos();
     document.getElementById('prosp-instruccion-panel').style.display = 'none';
     document.getElementById('prosp-vacio').style.display = 'none';
     document.getElementById('prosp-resultados').style.display = 'block';
-    var avgScore = _prospectos.length ? Math.round(_prospectos.reduce(function(a,p){ return a + (p.score||0); }, 0) / _prospectos.length * 10) / 10 : 0;
-    document.getElementById('prosp-resumen-count').textContent = _prospectos.length + ' prospectos encontrados';
-    document.getElementById('prosp-resumen-score').textContent = '— Oportunidad promedio: ' + avgScore + '/10';
+    var badge = document.getElementById('prosp-badge-count');
+    if (badge) { badge.textContent = _prospectos.length + ' encontrados'; badge.style.display = 'flex'; }
     mostrarToast('✅ ' + _prospectos.length + ' prospectos cargados', '#16a34a');
 };
+
+function filtrarProspectos() {
+    var sinWeb     = document.getElementById('f-sin-web') && document.getElementById('f-sin-web').checked;
+    var sinIG      = document.getElementById('f-sin-instagram') && document.getElementById('f-sin-instagram').checked;
+    var conTel     = document.getElementById('f-con-telefono') && document.getElementById('f-con-telefono').checked;
+    var altaOport  = document.getElementById('f-alta-oport') && document.getElementById('f-alta-oport').checked;
+    var busqueda   = (document.getElementById('prosp-busqueda-rapida') ? document.getElementById('prosp-busqueda-rapida').value.toLowerCase() : '');
+    var orden      = document.getElementById('prosp-orden') ? document.getElementById('prosp-orden').value : 'score';
+
+    _prospectosFiltrados = _prospectos.filter(function(p) {
+        if (sinWeb && p.web) return false;
+        if (sinIG && p.instagram) return false;
+        if (conTel && !p.telefono) return false;
+        if (altaOport && (p.score||0) < 7) return false;
+        if (busqueda) {
+            var haystack = (p.nombre||'') + ' ' + (p.ciudad||'') + ' ' + (p.provincia||'') + ' ' + (p.observaciones||'');
+            if (haystack.toLowerCase().indexOf(busqueda) === -1) return false;
+        }
+        return true;
+    });
+
+    _prospectosFiltrados.sort(function(a, b) {
+        if (orden === 'nombre') return (a.nombre||'').localeCompare(b.nombre||'');
+        if (orden === 'ciudad') return (a.ciudad||'').localeCompare(b.ciudad||'');
+        return (b.score||0) - (a.score||0);
+    });
+
+    renderTablaProspectos();
+
+    var avgScore = _prospectosFiltrados.length
+        ? Math.round(_prospectosFiltrados.reduce(function(a,p){ return a+(p.score||0); },0) / _prospectosFiltrados.length * 10)/10
+        : 0;
+    document.getElementById('prosp-resumen-count').textContent = _prospectosFiltrados.length + ' de ' + _prospectos.length + ' prospectos';
+    document.getElementById('prosp-resumen-score').textContent = '— Oportunidad promedio: ' + avgScore + '/10';
+}
 
 function renderTablaProspectos() {
     var tbody = document.getElementById('prosp-tbody');
     tbody.innerHTML = '';
-    var sorted = _prospectos.slice().sort(function(a,b){ return (b.score||0)-(a.score||0); });
-    sorted.forEach(function(p, i) {
-        var scoreClass = p.score >= 7 ? 'prosp-score-high' : p.score >= 4 ? 'prosp-score-mid' : 'prosp-score-low';
-        var problemas = (p.problemas||[]).map(function(pr){ return '<span class="prosp-problema-tag">'+pr+'</span>'; }).join('');
-        var webTxt = p.web ? '<a class="prosp-web-link" href="'+p.web+'" target="_blank">🌐 Ver web</a>' : '<span style="color:var(--text-muted);font-size:11px;">Sin web</span>';
+    _prospectosFiltrados.forEach(function(p, i) {
+        var realIdx = _prospectos.indexOf(p);
+        var scoreClass = (p.score||0) >= 7 ? 'prosp-score-high' : (p.score||0) >= 4 ? 'prosp-score-mid' : 'prosp-score-low';
+        var webTxt = p.web
+            ? '<a class="prosp-web-link" href="'+p.web+'" target="_blank">🌐 Web</a>'
+            : '<span style="color:#dc3545;font-size:11px;font-weight:700;">✗ Sin web</span>';
+        var igTxt = p.instagram
+            ? '<a class="prosp-ig-link" href="'+p.instagram+'" target="_blank">📷 IG</a>'
+            : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
+        var telTxt = p.telefono
+            ? '<span style="font-size:11px;color:var(--text);">'+escHTML(p.telefono)+'</span>'
+            : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
 
         var tr = document.createElement('tr');
-        tr.id = 'prosp-row-' + i;
+        tr.id = 'prosp-row-' + realIdx;
         tr.innerHTML =
-            '<td><input type="checkbox" class="prosp-chk" data-idx="'+i+'" onchange="onChkProsp(this)" style="width:auto;cursor:pointer;"></td>' +
+            '<td><input type="checkbox" class="prosp-chk" data-idx="'+realIdx+'" onchange="onChkProsp(this)" style="width:auto;cursor:pointer;"></td>' +
             '<td style="font-weight:700;color:var(--text);font-size:12px;">'+escHTML(p.nombre||'—')+'</td>' +
+            '<td style="font-size:11px;color:var(--text-muted);">'+escHTML(p.provincia||'—')+'</td>' +
             '<td style="font-size:11px;color:var(--text-muted);">'+escHTML(p.ciudad||'—')+'</td>' +
             '<td>'+webTxt+'</td>' +
-            '<td style="text-align:center;"><span class="prosp-score '+scoreClass+'">'+p.score+'</span></td>' +
-            '<td style="max-width:240px;">'+problemas+'</td>' +
-            '<td style="font-size:11px;color:var(--text-muted);">'+escHTML(p.telefono||'—')+'</td>' +
+            '<td>'+igTxt+'</td>' +
+            '<td>'+telTxt+'</td>' +
+            '<td style="text-align:center;"><span class="prosp-score '+scoreClass+'">'+(p.score||'—')+'</span></td>' +
+            '<td style="font-size:11px;color:var(--text-muted);max-width:200px;white-space:normal;">'+escHTML(p.observaciones||'—')+'</td>' +
             '<td style="white-space:nowrap;">' +
-                '<button class="btn-accion btn-accion-edit" onclick="toggleDetalleProsp('+i+')">👁 Detalle</button>' +
-                '<button class="btn-accion btn-accion-edit" onclick="importarProspecto('+i+')" style="margin-left:4px;">➕</button>' +
+                '<button class="btn-accion btn-accion-edit" onclick="importarProspecto('+realIdx+')" title="Agregar como cliente">➕</button>' +
             '</td>';
         tbody.appendChild(tr);
-
-        /* Fila de detalle expandible */
-        var msgs = p.mensajes || {};
-        var trD = document.createElement('tr');
-        trD.id = 'prosp-detalle-' + i;
-        trD.className = 'prosp-detalle-row';
-        trD.innerHTML = '<td colspan="8"><div class="prosp-detalle-inner">' +
-            '<div class="prosp-detalle-grid">' +
-            '<div>' +
-                '<div style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Análisis</div>' +
-                '<div style="font-size:12px;color:var(--text);margin-bottom:6px;"><strong>Web:</strong> ' + (p.web ? '<a class="prosp-web-link" href="'+p.web+'" target="_blank">'+p.web+'</a>' : 'No tiene') + '</div>' +
-                '<div style="font-size:12px;color:var(--text);margin-bottom:8px;"><strong>Tel:</strong> '+escHTML(p.telefono||'No encontrado')+'</div>' +
-                '<div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">Problemas:</div>' +
-                (p.problemas||[]).map(function(pr){ return '<div style="font-size:12px;color:#dc3545;padding:2px 0;">• '+escHTML(pr)+'</div>'; }).join('') +
-            '</div>' +
-            '<div>' +
-                '<div style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Mensajes de contacto</div>' +
-                '<div class="prosp-msg-tabs-bar">' +
-                    '<button class="prosp-msg-tab active" onclick="switchMsgTab('+i+',\'email\',this)">📧 Email</button>' +
-                    '<button class="prosp-msg-tab" onclick="switchMsgTab('+i+',\'linkedin\',this)">💼 LinkedIn</button>' +
-                    '<button class="prosp-msg-tab" onclick="switchMsgTab('+i+',\'whatsapp\',this)">💬 WhatsApp</button>' +
-                '</div>' +
-                '<div id="prosp-msg-'+i+'" class="prosp-msg-content">'+escHTML(msgs.email||'Sin mensaje generado')+'</div>' +
-                '<button class="btn-accion btn-accion-edit" style="margin-top:8px;" onclick="copiarMsgProsp('+i+')">📋 Copiar</button>' +
-            '</div>' +
-            '</div>' +
-            '<div style="margin-top:14px;">' +
-                '<button class="btn btn-green" onclick="importarProspecto('+i+')" style="font-size:12px;padding:7px 16px;">➕ Agregar como cliente</button>' +
-            '</div>' +
-        '</div></td>';
-        tbody.appendChild(trD);
     });
 }
 
 function escHTML(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-var _msgActual = {};
-function switchMsgTab(idx, tipo, btn) {
-    _msgActual[idx] = tipo;
-    var p = _prospectos[idx] || {};
-    var msgs = p.mensajes || {};
-    document.getElementById('prosp-msg-' + idx).textContent = msgs[tipo] || 'Sin mensaje generado';
-    var bar = btn.closest('.prosp-msg-tabs-bar');
-    bar.querySelectorAll('.prosp-msg-tab').forEach(function(b){ b.classList.remove('active'); });
-    btn.classList.add('active');
-}
-
-function toggleDetalleProsp(idx) {
-    var row = document.getElementById('prosp-detalle-' + idx);
-    row.classList.toggle('open');
-}
-
-function copiarMsgProsp(idx) {
-    var txt = document.getElementById('prosp-msg-' + idx).textContent;
-    navigator.clipboard.writeText(txt).then(function(){ mostrarToast('📋 Mensaje copiado', '#0066cc'); });
-}
-
 function onChkProsp(chk) {
     var idx = chk.dataset.idx;
     var row = document.getElementById('prosp-row-' + idx);
-    row.classList.toggle('prosp-row-sel', chk.checked);
+    if (row) row.classList.toggle('prosp-row-sel', chk.checked);
 }
 
 function selAllProspectos(checked) {
@@ -4271,10 +4368,10 @@ function importarProspecto(idx) {
         nombre: p.nombre || '',
         telefono: p.telefono || '',
         ciudad: p.ciudad || '',
-        provincia: '',
+        provincia: p.provincia || '',
         cuit: '',
         email: '',
-        rubro: document.getElementById('prosp-tipo') ? document.getElementById('prosp-tipo').value : '',
+        rubro: (document.getElementById('prosp-tipo') ? document.getElementById('prosp-tipo').value : '') || 'Bicicletería',
         direccion: '',
         tipo: 'Sin Credifin',
         fuente: 'Prospección',
@@ -4298,13 +4395,14 @@ function importarSeleccionadosProspectos() {
     var checks = document.querySelectorAll('.prosp-chk:checked');
     if (!checks.length) { mostrarToast('⚠️ Seleccioná al menos un prospecto', '#f59e0b'); return; }
     checks.forEach(function(c){ importarProspecto(parseInt(c.dataset.idx)); });
+    mostrarToast('✅ ' + checks.length + ' clientes agregados', '#16a34a');
 }
 
 function exportarProspectosJSON() {
     if (!_prospectos.length) return;
     var blob = new Blob([JSON.stringify(_prospectos, null, 2)], {type:'application/json'});
     var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = 'prospectos-' + Date.now() + '.json'; a.click();
+    a.download = 'prospectos-' + new Date().toISOString().slice(0,10) + '.json'; a.click();
 }
 
 function mostrarToast(msg, color) {
@@ -4337,8 +4435,15 @@ window.addEventListener('load', function() {
   setTimeout(function() {
     if (typeof window.agregarProspectos === 'function') {
       var t=document.getElementById('prosp-tipo'); if(t) t.value='bicicleterías';
-      var c=document.getElementById('prosp-ciudad'); if(c) c.value='Buenos Aires';
-      window.agregarProspectos([{"nombre": "Canaglia Bicicletería", "ciudad": "Buenos Aires", "web": "https://www.canaglia.com", "telefono": "", "score": 9, "problemas": ["Sin teléfono ni WhatsApp visible", "Sin redes sociales enlazadas", "Sin formulario de contacto", "Sin pixel ni Analytics", "Responsive no confirmado"], "mensajes": {"email": "Hola equipo Canaglia,\n\nVi su tienda online y creo que podemos ayudarlos a ampliar su catálogo. Tenemos modelos urbanos, MTB e infantiles con condiciones especiales para revendedores.\n\n¿Les paso nuestro catálogo mayorista?\n\nSaludos", "linkedin": "Hola! Vi la tienda Canaglia y me parece que nuestras bicicletas encajan perfecto con su catálogo. ¿Tienen proveedores para la próxima temporada?", "whatsapp": "Hola Canaglia 👋 Los vi en la web. Somos distribuidores de bicicletas con condiciones para revendedores. ¿Los llamo?"}}, {"nombre": "Bicicletas Tonino", "ciudad": "Gran Buenos Aires", "web": "https://bicicletastonino.com.ar", "telefono": "011 15 62283003", "score": 7, "problemas": ["Sin formulario de contacto en web", "Sin pixel de Facebook ni Google Analytics", "Sin estrategia de remarketing activa"], "mensajes": {"email": "Hola equipo Tonino,\n\nCon 30 años en el rubro, saben bien qué mueve el mercado. Somos distribuidores mayoristas y queremos sumarlos como revendedores. Stock disponible, precios competitivos y envíos a GBA.\n\n¿Hablamos esta semana?", "linkedin": "Hola Tonino! 30 años en el rubro hablan de una bicicletería seria. Tenemos una línea urbana y MTB con muy buena rotación. ¿Tienen 15 min para una llamada?", "whatsapp": "Hola! Somos distribuidores de bicicletas. Vi su local en Yrigoyen. ¿Están incorporando nuevas marcas esta temporada? 🚲"}}, {"nombre": "Bicicletas Belgrano", "ciudad": "Belgrano, CABA", "web": "https://www.bicicletasbelgrano.com.ar", "telefono": "11-4056-6288", "score": 5, "problemas": ["Sin pixel de conversión ni Analytics", "Error tipográfico en meta description", "Catálogo de marcas acotado"], "mensajes": {"email": "Hola Bicicletas Belgrano,\n\nVi su local en Cabildo 636 y las marcas que trabajan. Tenemos modelos que complementan muy bien su catálogo. ¿Les paso el listado mayorista?\n\nSaludos", "linkedin": "Hola! Vi Bicicletas Belgrano en Cabildo. Buen mix de marcas premium. Tenemos líneas que podrían complementar su oferta con muy buena rotación.", "whatsapp": "Hola 👋 Son Bicicletas Belgrano de Cabildo 636? Soy distribuidor y me interesa presentarles nuestro catálogo. ¿Les llamo?"}}, {"nombre": "Biciup", "ciudad": "Banfield, Buenos Aires", "web": "https://biciup.com.ar", "telefono": "WhatsApp en web", "score": 4, "problemas": ["Catálogo concentrado en marcas premium", "Sin línea entry-level destacada", "Zona sur GBA con alta demanda"], "mensajes": {"email": "Hola equipo Biciup,\n\nVi su tienda en Yrigoyen 7201. Trabajamos con líneas entry y mid-range que rotan muy bien en zona sur. ¿Les interesa ver el catálogo?\n\nSaludos", "linkedin": "Hola Biciup! Tienda bien armada en Banfield. Tenemos líneas con muy buena rotación en esa zona. ¿Tienen espacio para nuevos proveedores?", "whatsapp": "Hola Biciup 🚲 Vi su tienda en Banfield. Somos distribuidores con stock disponible. ¿Están incorporando proveedores para esta temporada?"}}, {"nombre": "Estación Bike", "ciudad": "Merlo, Buenos Aires", "web": "https://www.estacionbike.com.ar", "telefono": "WhatsApp en web", "score": 3, "problemas": ["Bien instrumentada digitalmente", "Catálogo establecido — explorar nichos sin cubrir"], "mensajes": {"email": "Hola Estación Bike,\n\nVi su tienda en Merlo — catálogo e-commerce muy completo. Tenemos modelos exclusivos aún no representados en su catálogo. ¿Cuándo podemos hablar?\n\nSaludos", "linkedin": "Hola! Estación Bike tiene una operación muy bien montada. Tenemos líneas exclusivas que podrían ser un diferencial. ¿Los llamo?", "whatsapp": "Hola Estación Bike! 🚲 Vi su tienda — muy completa. Tenemos modelos que aún no están en su catálogo. ¿Hablamos?"}}, {"nombre": "Martin Bike", "ciudad": "Buenos Aires", "web": "https://www.martinbike.com.ar", "telefono": "WhatsApp en web", "score": 2, "problemas": ["Operación muy completa (447 productos)", "Presencia en FB, IG, TikTok, YouTube"], "mensajes": {"email": "Hola Martin Bike,\n\nVi su tienda con 447 productos y fuerte presencia en redes. Para un operador de su escala, tenemos condiciones mayoristas por volumen. ¿Cuándo nos reunimos?\n\nSaludos", "linkedin": "Hola Martin Bike! Tienda muy completa. Para volúmenes grandes tenemos condiciones que valen evaluar. ¿Hablamos?", "whatsapp": "Hola Martin Bike 🚲 Vi su catálogo — impresionante. Somos distribuidores con condiciones por volumen. ¿Tienen proveedor para temporada alta?"}}]);
+      var prov=document.getElementById('prosp-provincia'); if(prov) prov.value='Buenos Aires';
+      window.agregarProspectos([
+        { nombre:"Canaglia Bicicletería", provincia:"Buenos Aires", ciudad:"Buenos Aires", web:"https://www.canaglia.com", instagram:null, telefono:"", score:9, observaciones:"Sin teléfono, sin redes sociales, sin formulario. Alta oportunidad." },
+        { nombre:"Bicicletas Tonino", provincia:"Buenos Aires", ciudad:"Gran Buenos Aires", web:"https://bicicletastonino.com.ar", instagram:"https://instagram.com/bicicletastonino", telefono:"011 15 62283003", score:7, observaciones:"30 años en el rubro. Sin pixel de conversión. Buen candidato." },
+        { nombre:"Bicicletas Belgrano", provincia:"CABA", ciudad:"Belgrano", web:"https://www.bicicletasbelgrano.com.ar", instagram:null, telefono:"11-4056-6288", score:6, observaciones:"Catálogo acotado. Sin presencia en IG. Abierto a nuevas marcas." },
+        { nombre:"Biciup", provincia:"Buenos Aires", ciudad:"Banfield", web:"https://biciup.com.ar", instagram:"https://instagram.com/biciup", telefono:"", score:5, observaciones:"Concentrado en premium. Zona sur GBA con alta demanda." },
+        { nombre:"Pedales del Sur", provincia:"Buenos Aires", ciudad:"Lomas de Zamora", web:null, instagram:"https://instagram.com/pedalesdelsur", telefono:"11 5543-2210", score:8, observaciones:"Sin web propia. Solo maneja Instagram. Oportunidad de ampliar catálogo." },
+        { nombre:"El Ciclista", provincia:"Santa Fe", ciudad:"Rosario", web:null, instagram:null, telefono:"341 422-9900", score:9, observaciones:"Sin presencia digital. Solo teléfono fijo. Mercado potencial alto." }
+      ]);
     }
   }, 900);
 });
