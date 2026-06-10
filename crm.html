@@ -4110,11 +4110,8 @@ function waTel(num, display) {
 </div>
 
 <script>
-/* ===== PROSPECCIÓN — Foursquare Places API ===== */
+/* ===== PROSPECCIÓN — Nominatim text search (free, no key) ===== */
 var _prospectos = [];
-
-/* ─── Pegá acá tu API key de developer.foursquare.com ─── */
-var FSQ_KEY = 'fsq3KyDUGs4zBY6Qsz0aU0FRicHKKojgNiZ6QQKR68+riGY=';
 
 function iniciarProspeccion() {
   var provincia = document.getElementById('prosp-provincia').value;
@@ -4126,82 +4123,81 @@ function iniciarProspeccion() {
     return;
   }
 
-  if (FSQ_KEY === 'TU_API_KEY_FOURSQUARE') {
-    mostrarToast('⚠️ Necesitás configurar la API key de Foursquare', '#f59e0b');
-    document.getElementById('prosp-vacio').innerHTML =
-      '<div class="prosp-vacio-icon">🔑</div>' +
-      '<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:8px;">Falta configurar la API key</div>' +
-      '<div style="font-size:13px;color:var(--text-muted);line-height:1.6;">' +
-        '1. Entrá a <strong>developer.foursquare.com</strong><br>' +
-        '2. Creá una cuenta gratis<br>' +
-        '3. Creá un proyecto → copiá la API Key<br>' +
-        '4. Mandásela a tu desarrollador para activar la búsqueda' +
-      '</div>';
-    document.getElementById('prosp-vacio').style.display = 'block';
-    return;
-  }
-
   var st = document.getElementById('prosp-status');
   document.getElementById('prosp-vacio').style.display = 'none';
   document.getElementById('prosp-resultados').style.display = 'none';
   st.style.display = 'flex';
 
-  var zona = ciudad ? ciudad + ', ' + (provincia || 'Argentina') : provincia + ', Argentina';
-  document.getElementById('prosp-status-txt').textContent = 'Buscando bicicleterías en ' + (ciudad || provincia) + '...';
+  var zona = ciudad || provincia;
+  document.getElementById('prosp-status-txt').textContent = 'Buscando bicicleterías en ' + zona + '...';
 
-  var params = new URLSearchParams({
-    query:  'bicicletería',
-    near:   zona,
-    limit:  String(cantidad),
-    fields: 'name,location,tel,website,social_media'
-  });
+  /* Buscar "bicicletería" + zona en Nominatim — gratis, sin key */
+  var queries = [
+    'bicicletería ' + zona + ' Argentina',
+    'bicicleta ' + zona + ' Argentina',
+    'bike shop ' + zona + ' Argentina'
+  ];
 
-  fetch('https://api.foursquare.com/v3/places/search?' + params.toString(), {
-    headers: {
-      'Authorization': FSQ_KEY,
-      'Accept': 'application/json'
-    }
-  })
-  .then(function(r) {
-    if (r.status === 401) throw new Error('API key inválida — revisá tu clave de Foursquare');
-    if (!r.ok) throw new Error('Error de conexión (HTTP ' + r.status + ')');
-    return r.json();
-  })
-  .then(function(data) {
+  Promise.all(queries.map(function(q) {
+    return fetch('https://nominatim.openstreetmap.org/search?' + new URLSearchParams({
+      q: q,
+      format: 'json',
+      addressdetails: '1',
+      extratags: '1',
+      limit: '50',
+      countrycodes: 'ar'
+    }), { headers: { 'Accept-Language': 'es' } }).then(function(r){ return r.json(); });
+  }))
+  .then(function(resultados) {
     st.style.display = 'none';
-    var resultados = (data.results || []).map(function(p) {
-      var loc = p.location || {};
-      var dir = [loc.address, loc.address_extended].filter(Boolean).join(', ');
-      var ig  = (p.social_media && p.social_media.instagram)
-                ? 'https://instagram.com/' + p.social_media.instagram
-                : null;
-      return {
-        nombre:    p.name || '—',
-        ciudad:    loc.locality || loc.census_block || ciudad || '',
-        provincia: loc.region   || provincia || '',
-        direccion: dir,
-        web:       p.website || null,
-        instagram: ig,
-        telefono:  p.tel || '',
-        email:     ''
-      };
+
+    /* Combinar, deduplicar por nombre */
+    var visto = {};
+    var lista = [];
+    resultados.forEach(function(arr) {
+      (arr || []).forEach(function(item) {
+        var key = (item.name || item.display_name || '').toLowerCase().replace(/\s+/g,'').slice(0,20);
+        if (!key || visto[key]) return;
+        visto[key] = true;
+        var addr = item.address || {};
+        var dir = [addr.road, addr.house_number].filter(Boolean).join(' ');
+        var tel = (item.extratags && (item.extratags.phone || item.extratags['contact:phone'])) || '';
+        var web = (item.extratags && (item.extratags.website || item.extratags['contact:website'])) || null;
+        var ig  = (item.extratags && item.extratags['contact:instagram']) || null;
+        if (ig && ig.indexOf('http') === -1) ig = 'https://instagram.com/' + ig;
+        lista.push({
+          nombre:    item.name || item.display_name.split(',')[0] || '—',
+          ciudad:    addr.city || addr.town || addr.village || addr.municipality || ciudad || '',
+          provincia: addr.state || provincia || '',
+          direccion: dir,
+          web:       web,
+          instagram: ig,
+          telefono:  tel,
+          email:     ''
+        });
+      });
     });
 
-    if (!resultados.length) {
+    lista = lista.slice(0, cantidad);
+
+    if (!lista.length) {
       document.getElementById('prosp-vacio').innerHTML =
         '<div class="prosp-vacio-icon">🚲</div>' +
-        '<div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;">Sin resultados para "' + (ciudad||provincia) + '"</div>' +
-        '<div style="font-size:13px;color:var(--text-muted);">Probá con otra ciudad o escribí el nombre de la capital de la provincia.</div>';
+        '<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:8px;">Sin resultados para "' + zona + '"</div>' +
+        '<div style="font-size:13px;color:var(--text-muted);line-height:1.7;">' +
+          'OpenStreetMap tiene cobertura limitada en Argentina.<br>' +
+          'Probá con una ciudad grande: <strong>Córdoba</strong>, <strong>Rosario</strong>, <strong>Mendoza</strong>.' +
+        '</div>';
       document.getElementById('prosp-vacio').style.display = 'block';
       mostrarToast('Sin resultados — probá con otra ciudad', '#f59e0b');
       return;
     }
 
-    _prospectos = resultados;
+    _prospectos = lista;
     renderTablaProspectos(_prospectos);
     document.getElementById('prosp-vacio').style.display = 'none';
     document.getElementById('prosp-resultados').style.display = 'block';
-    document.getElementById('prosp-resumen-count').textContent = _prospectos.length + ' bicicleterías encontradas en ' + (ciudad || provincia);
+    document.getElementById('prosp-resumen-count').textContent = _prospectos.length + ' bicicleterías encontradas en ' + zona;
     var badge = document.getElementById('prosp-badge-count');
     if (badge) { badge.textContent = _prospectos.length + ' encontradas'; badge.style.display = 'flex'; }
     mostrarToast('✅ ' + _prospectos.length + ' bicicleterías encontradas', '#16a34a');
@@ -4209,7 +4205,7 @@ function iniciarProspeccion() {
   .catch(function(err) {
     st.style.display = 'none';
     document.getElementById('prosp-vacio').style.display = 'block';
-    mostrarToast('❌ ' + (err.message || 'Error de conexión'), '#dc3545');
+    mostrarToast('❌ Error de conexión — revisá internet', '#dc3545');
   });
 }
 
@@ -4229,16 +4225,16 @@ function renderTablaProspectos(lista) {
   tbody.innerHTML = '';
   if (!lista || !lista.length) {
     var tr = document.createElement('tr');
-    tr.innerHTML = '<td colspan="9" style="text-align:center;padding:30px;color:var(--text-muted);">Sin resultados</td>';
+    tr.innerHTML = '<td colspan="8" style="text-align:center;padding:30px;color:var(--text-muted);">Sin resultados</td>';
     tbody.appendChild(tr); return;
   }
   lista.forEach(function(p) {
     var realIdx = _prospectos.indexOf(p);
     var webTxt = p.web
-      ? '<a class="prosp-web-link" href="'+escHTML(p.web)+'" target="_blank">🌐 Ver web</a>'
+      ? '<a class="prosp-web-link" href="'+escHTML(p.web)+'" target="_blank">🌐 Web</a>'
       : '<span style="color:#dc3545;font-size:11px;font-weight:700;">Sin web</span>';
     var igTxt = p.instagram
-      ? '<a class="prosp-ig-link" href="'+escHTML(p.instagram)+'" target="_blank">📷 Instagram</a>'
+      ? '<a class="prosp-ig-link" href="'+escHTML(p.instagram)+'" target="_blank">📷 IG</a>'
       : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
     var telTxt = p.telefono
       ? '<a href="tel:'+escHTML(p.telefono)+'" style="color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;">📞 '+escHTML(p.telefono)+'</a>'
@@ -4255,7 +4251,7 @@ function renderTablaProspectos(lista) {
       '<td>'+igTxt+'</td>' +
       '<td>'+telTxt+'</td>' +
       '<td style="white-space:nowrap;">' +
-        '<button class="btn-accion btn-accion-edit" onclick="importarProspecto('+realIdx+')" title="Agregar como cliente">➕ Agregar</button>' +
+        '<button class="btn-accion btn-accion-edit" onclick="importarProspecto('+realIdx+')" title="Agregar como cliente">➕</button>' +
       '</td>';
     tbody.appendChild(tr);
   });
