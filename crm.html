@@ -572,6 +572,41 @@
     body.dark ::-webkit-scrollbar-thumb { background:#2a2a4a; border-radius:3px; }
     body.dark ::-webkit-scrollbar-thumb:hover { background:#3a3a6a; }
 
+    /* ============ PROSPECCIÓN ============ */
+    .prosp-header { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
+    .prosp-title  { font-size:20px; font-weight:800; color:var(--text); letter-spacing:-0.4px; }
+    .prosp-subtitle { font-size:12px; color:var(--text-muted); margin-top:3px; }
+    .prosp-instruccion-badge { background:color-mix(in srgb,var(--accent) 12%,var(--surface)); color:var(--accent); font-size:11px; font-weight:700; padding:6px 14px; border-radius:20px; border:1px solid color-mix(in srgb,var(--accent) 30%,var(--border)); white-space:nowrap; align-self:center; }
+    .prosp-form-card { margin-bottom:12px; }
+    .prosp-form-grid { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:12px; margin-bottom:16px; }
+    @media(max-width:900px) { .prosp-form-grid { grid-template-columns:1fr 1fr; } }
+    @media(max-width:600px) { .prosp-form-grid { grid-template-columns:1fr; } }
+    .prosp-form-grid .form-group { margin-bottom:0; }
+    .prosp-status { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--accent); }
+    .prosp-spinner { display:inline-block; animation:spin 0.8s linear infinite; font-size:16px; }
+    .prosp-instruccion-panel { background:color-mix(in srgb,#f59e0b 8%,var(--surface)); border:2px solid #f59e0b; border-radius:var(--radius); padding:20px; margin-bottom:16px; }
+    .prosp-instruccion-inner { max-width:800px; }
+    .prosp-prompt-box { background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; font-size:12px; line-height:1.7; color:var(--text); white-space:pre-wrap; word-wrap:break-word; }
+    .prosp-vacio { text-align:center; padding:60px 20px; }
+    .prosp-vacio-icon { font-size:48px; margin-bottom:12px; opacity:0.4; }
+    .prosp-score { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; font-size:12px; font-weight:800; }
+    .prosp-score-high { background:color-mix(in srgb,#16a34a 15%,var(--surface)); color:#16a34a; border:2px solid #16a34a; }
+    .prosp-score-mid  { background:color-mix(in srgb,#f59e0b 15%,var(--surface)); color:#d97706; border:2px solid #f59e0b; }
+    .prosp-score-low  { background:color-mix(in srgb,#dc3545 15%,var(--surface)); color:#dc3545; border:2px solid #dc3545; }
+    .prosp-problema-tag { display:inline-block; background:color-mix(in srgb,#dc3545 10%,var(--surface)); color:#dc3545; font-size:9px; font-weight:700; padding:2px 7px; border-radius:10px; margin:2px 2px 0 0; border:1px solid color-mix(in srgb,#dc3545 25%,var(--border)); }
+    .prosp-detalle-row { display:none; }
+    .prosp-detalle-row.open { display:table-row; }
+    .prosp-detalle-inner { padding:16px 20px; background:var(--surface-2); border-bottom:1px solid var(--border); }
+    .prosp-msg-tabs-bar { display:flex; gap:4px; margin-bottom:10px; }
+    .prosp-msg-tab { padding:5px 14px; border:1.5px solid var(--border-2); border-radius:20px; font-size:11px; font-weight:700; cursor:pointer; color:var(--text-muted); background:var(--surface); transition:all 0.15s; font-family:'Inter',sans-serif; }
+    .prosp-msg-tab.active { background:var(--accent); color:white; border-color:var(--accent); }
+    .prosp-msg-content { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; font-size:12px; line-height:1.7; color:var(--text); white-space:pre-wrap; min-height:60px; }
+    .prosp-detalle-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media(max-width:700px){ .prosp-detalle-grid { grid-template-columns:1fr; } }
+    .prosp-web-link { color:var(--accent); text-decoration:none; font-size:11px; }
+    .prosp-web-link:hover { text-decoration:underline; }
+    tr.prosp-row-sel td { background:color-mix(in srgb,var(--accent) 6%,var(--surface)) !important; }
+
     </style>
 </head>
 <body>
@@ -611,6 +646,7 @@
         <button class="tab-btn" onclick="cambiarTab('exportar',this)">📥 Exportar</button>
         <button class="tab-btn" onclick="cambiarTab('cargar',this)">📁 Cargar Excel</button>
         <button class="tab-btn" onclick="cambiarTab('calendario',this)">📅 Calendario</button>
+        <button class="tab-btn" onclick="cambiarTab('prospeccion',this)">🔍 Prospección</button>
         <button class="tab-btn admin-only" onclick="cambiarTab('usuarios',this)" style="display:none;">👥 Usuarios</button>
         <button class="tab-btn admin-only" onclick="cambiarTab('admin',this)" style="display:none;">📊 Panel Admin</button>
     </div>
@@ -852,6 +888,112 @@
             </div>
             <p style="font-size:11px;color:#888;">Los archivos se descargan directamente en tu dispositivo.</p>
         </div>
+    </div>
+
+    <!-- ===== PROSPECCIÓN ===== -->
+    <div id="tab-prospeccion" class="tab-content">
+
+        <!-- Título sección -->
+        <div class="prosp-header">
+            <div>
+                <h2 class="prosp-title">🔍 Prospección</h2>
+                <p class="prosp-subtitle">Buscá clientes potenciales, analizá su presencia digital y conseguí sus datos de contacto.</p>
+            </div>
+            <div class="prosp-instruccion-badge">💡 Claude busca y analiza automáticamente</div>
+        </div>
+
+        <!-- Formulario de búsqueda -->
+        <div class="card prosp-form-card">
+            <div class="prosp-form-grid">
+                <div class="form-group">
+                    <label>Tipo de negocio</label>
+                    <input type="text" id="prosp-tipo" placeholder="restaurantes, clínicas, gimnasios...">
+                </div>
+                <div class="form-group">
+                    <label>Ciudad o zona</label>
+                    <input type="text" id="prosp-ciudad" placeholder="Buenos Aires, Córdoba, Madrid...">
+                </div>
+                <div class="form-group">
+                    <label>Servicio a ofrecer</label>
+                    <select id="prosp-servicio">
+                        <option value="diseño web">Diseño Web</option>
+                        <option value="SEO">SEO</option>
+                        <option value="marketing digital">Marketing Digital</option>
+                        <option value="automatización">Automatización</option>
+                        <option value="redes sociales">Redes Sociales</option>
+                        <option value="publicidad online">Publicidad Online (Meta/Google Ads)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Cantidad de prospectos</label>
+                    <input type="number" id="prosp-cantidad" value="15" min="5" max="30">
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <button class="btn btn-blue" onclick="iniciarProspeccion()" style="padding:10px 24px;font-size:14px;">🔍 Buscar prospectos</button>
+                <button class="btn btn-gray" onclick="limpiarProspeccion()" style="font-size:12px;">🗑 Limpiar</button>
+                <div id="prosp-status" class="prosp-status" style="display:none;">
+                    <span class="prosp-spinner">⟳</span> <span id="prosp-status-txt">Buscando negocios...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de instrucción para Claude -->
+        <div id="prosp-instruccion-panel" class="prosp-instruccion-panel" style="display:none;">
+            <div class="prosp-instruccion-inner">
+                <div style="font-size:15px;font-weight:800;margin-bottom:6px;">📋 Pedile esto a Claude en el chat:</div>
+                <div id="prosp-prompt-generado" class="prosp-prompt-box"></div>
+                <button class="btn btn-blue" onclick="copiarPromptProspeccion()" style="margin-top:10px;font-size:12px;">📋 Copiar prompt</button>
+                <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">Claude usará el skill de Prospección, analizará los negocios y llamará a <code>agregarProspectos([...])</code> para mostrar los resultados acá.</p>
+            </div>
+        </div>
+
+        <!-- Resultados -->
+        <div id="prosp-resultados" style="display:none;">
+            <div class="card" style="margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                    <div>
+                        <span id="prosp-resumen-count" style="font-size:15px;font-weight:800;color:var(--text);"></span>
+                        <span id="prosp-resumen-score" style="font-size:12px;color:var(--text-muted);margin-left:10px;"></span>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <button class="btn btn-green" onclick="importarSeleccionadosProspectos()" style="font-size:12px;">➕ Importar seleccionados como clientes</button>
+                        <button class="btn btn-gray" onclick="exportarProspectosJSON()" style="font-size:12px;">📄 Exportar JSON</button>
+                        <label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;">
+                            <input type="checkbox" id="prosp-sel-all" onchange="selAllProspectos(this.checked)" style="width:auto;"> Sel. todo
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="padding:0;overflow:hidden;">
+                <div class="tabla-wrap" style="max-height:none;">
+                    <table id="prosp-tabla">
+                        <thead>
+                            <tr>
+                                <th style="width:32px;"></th>
+                                <th>Negocio</th>
+                                <th>Ciudad</th>
+                                <th>Web</th>
+                                <th>Oportunidad</th>
+                                <th>Problemas detectados</th>
+                                <th>Teléfono</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="prosp-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estado vacío -->
+        <div id="prosp-vacio" class="prosp-vacio">
+            <div class="prosp-vacio-icon">🔍</div>
+            <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Sin búsquedas todavía</div>
+            <div style="font-size:13px;color:var(--text-muted);">Completá el formulario y hacé clic en <strong>Buscar prospectos</strong></div>
+        </div>
+
     </div>
 
     <!-- ===== CARGAR EXCEL ===== -->
@@ -3951,6 +4093,228 @@ function waTel(num, display) {
     <button onclick="abrirPasarMultiple()" style="background:#7c3aed;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">🤝 Pasar a vendedor</button>
     <button onclick="crmCheckeados.clear();actualizarBarraMasiva();renderCRM();" style="background:#374151;color:#fff;border:none;padding:8px 12px;border-radius:8px;font-size:12px;cursor:pointer;">✖ Limpiar</button>
 </div>
+
+<script>
+/* ===== PROSPECCIÓN ===== */
+var _prospectos = [];
+
+function iniciarProspeccion() {
+    var tipo     = document.getElementById('prosp-tipo').value.trim();
+    var ciudad   = document.getElementById('prosp-ciudad').value.trim();
+    var servicio = document.getElementById('prosp-servicio').value;
+    var cantidad = document.getElementById('prosp-cantidad').value || 15;
+    if (!tipo || !ciudad) {
+        alert('Completá el tipo de negocio y la ciudad.');
+        return;
+    }
+    document.getElementById('prosp-vacio').style.display = 'none';
+    document.getElementById('prosp-resultados').style.display = 'none';
+    var st = document.getElementById('prosp-status');
+    st.style.display = 'flex';
+    document.getElementById('prosp-status-txt').textContent = 'Generando búsqueda...';
+
+    var prompt = 'Buscá ' + cantidad + ' prospectos del tipo "' + tipo + '" en "' + ciudad + '" para ofrecerles ' + servicio + '.\n\n'
+        + 'Usá la skill de prospección. Al terminar, llamá a esta función con los resultados:\n\n'
+        + 'agregarProspectos([\n'
+        + '  {\n'
+        + '    nombre: "Nombre del negocio",\n'
+        + '    ciudad: "' + ciudad + '",\n'
+        + '    web: "https://..." ,  // o null si no tiene\n'
+        + '    telefono: "...",       // o "" si no encontrás\n'
+        + '    score: 8,              // 1-10, más alto = más oportunidad\n'
+        + '    problemas: ["Sin formulario", "Web no responsive"],\n'
+        + '    mensajes: {\n'
+        + '      email: "Texto del email de contacto...",\n'
+        + '      linkedin: "Texto para LinkedIn...",\n'
+        + '      whatsapp: "Texto corto para WhatsApp..."\n'
+        + '    }\n'
+        + '  },\n'
+        + '  // ... resto de prospectos\n'
+        + ']);';
+
+    document.getElementById('prosp-prompt-generado').textContent = prompt;
+    document.getElementById('prosp-instruccion-panel').style.display = 'block';
+    st.style.display = 'none';
+}
+
+function copiarPromptProspeccion() {
+    var txt = document.getElementById('prosp-prompt-generado').textContent;
+    navigator.clipboard.writeText(txt).then(function(){
+        mostrarToast('✅ Prompt copiado', '#16a34a');
+    });
+}
+
+function limpiarProspeccion() {
+    _prospectos = [];
+    document.getElementById('prosp-tipo').value = '';
+    document.getElementById('prosp-ciudad').value = '';
+    document.getElementById('prosp-cantidad').value = 15;
+    document.getElementById('prosp-resultados').style.display = 'none';
+    document.getElementById('prosp-instruccion-panel').style.display = 'none';
+    document.getElementById('prosp-status').style.display = 'none';
+    document.getElementById('prosp-vacio').style.display = 'block';
+}
+
+/* Claude llama a esta función para inyectar resultados */
+window.agregarProspectos = function(lista) {
+    _prospectos = lista || [];
+    renderTablaProspectos();
+    document.getElementById('prosp-instruccion-panel').style.display = 'none';
+    document.getElementById('prosp-vacio').style.display = 'none';
+    document.getElementById('prosp-resultados').style.display = 'block';
+    var avgScore = _prospectos.length ? Math.round(_prospectos.reduce(function(a,p){ return a + (p.score||0); }, 0) / _prospectos.length * 10) / 10 : 0;
+    document.getElementById('prosp-resumen-count').textContent = _prospectos.length + ' prospectos encontrados';
+    document.getElementById('prosp-resumen-score').textContent = '— Oportunidad promedio: ' + avgScore + '/10';
+    mostrarToast('✅ ' + _prospectos.length + ' prospectos cargados', '#16a34a');
+};
+
+function renderTablaProspectos() {
+    var tbody = document.getElementById('prosp-tbody');
+    tbody.innerHTML = '';
+    var sorted = _prospectos.slice().sort(function(a,b){ return (b.score||0)-(a.score||0); });
+    sorted.forEach(function(p, i) {
+        var scoreClass = p.score >= 7 ? 'prosp-score-high' : p.score >= 4 ? 'prosp-score-mid' : 'prosp-score-low';
+        var problemas = (p.problemas||[]).map(function(pr){ return '<span class="prosp-problema-tag">'+pr+'</span>'; }).join('');
+        var webTxt = p.web ? '<a class="prosp-web-link" href="'+p.web+'" target="_blank">🌐 Ver web</a>' : '<span style="color:var(--text-muted);font-size:11px;">Sin web</span>';
+
+        var tr = document.createElement('tr');
+        tr.id = 'prosp-row-' + i;
+        tr.innerHTML =
+            '<td><input type="checkbox" class="prosp-chk" data-idx="'+i+'" onchange="onChkProsp(this)" style="width:auto;cursor:pointer;"></td>' +
+            '<td style="font-weight:700;color:var(--text);font-size:12px;">'+escHTML(p.nombre||'—')+'</td>' +
+            '<td style="font-size:11px;color:var(--text-muted);">'+escHTML(p.ciudad||'—')+'</td>' +
+            '<td>'+webTxt+'</td>' +
+            '<td style="text-align:center;"><span class="prosp-score '+scoreClass+'">'+p.score+'</span></td>' +
+            '<td style="max-width:240px;">'+problemas+'</td>' +
+            '<td style="font-size:11px;color:var(--text-muted);">'+escHTML(p.telefono||'—')+'</td>' +
+            '<td style="white-space:nowrap;">' +
+                '<button class="btn-accion btn-accion-edit" onclick="toggleDetalleProsp('+i+')">👁 Detalle</button>' +
+                '<button class="btn-accion btn-accion-edit" onclick="importarProspecto('+i+')" style="margin-left:4px;">➕</button>' +
+            '</td>';
+        tbody.appendChild(tr);
+
+        /* Fila de detalle expandible */
+        var msgs = p.mensajes || {};
+        var trD = document.createElement('tr');
+        trD.id = 'prosp-detalle-' + i;
+        trD.className = 'prosp-detalle-row';
+        trD.innerHTML = '<td colspan="8"><div class="prosp-detalle-inner">' +
+            '<div class="prosp-detalle-grid">' +
+            '<div>' +
+                '<div style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Análisis</div>' +
+                '<div style="font-size:12px;color:var(--text);margin-bottom:6px;"><strong>Web:</strong> ' + (p.web ? '<a class="prosp-web-link" href="'+p.web+'" target="_blank">'+p.web+'</a>' : 'No tiene') + '</div>' +
+                '<div style="font-size:12px;color:var(--text);margin-bottom:8px;"><strong>Tel:</strong> '+escHTML(p.telefono||'No encontrado')+'</div>' +
+                '<div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">Problemas:</div>' +
+                (p.problemas||[]).map(function(pr){ return '<div style="font-size:12px;color:#dc3545;padding:2px 0;">• '+escHTML(pr)+'</div>'; }).join('') +
+            '</div>' +
+            '<div>' +
+                '<div style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Mensajes de contacto</div>' +
+                '<div class="prosp-msg-tabs-bar">' +
+                    '<button class="prosp-msg-tab active" onclick="switchMsgTab('+i+',\'email\',this)">📧 Email</button>' +
+                    '<button class="prosp-msg-tab" onclick="switchMsgTab('+i+',\'linkedin\',this)">💼 LinkedIn</button>' +
+                    '<button class="prosp-msg-tab" onclick="switchMsgTab('+i+',\'whatsapp\',this)">💬 WhatsApp</button>' +
+                '</div>' +
+                '<div id="prosp-msg-'+i+'" class="prosp-msg-content">'+escHTML(msgs.email||'Sin mensaje generado')+'</div>' +
+                '<button class="btn-accion btn-accion-edit" style="margin-top:8px;" onclick="copiarMsgProsp('+i+')">📋 Copiar</button>' +
+            '</div>' +
+            '</div>' +
+            '<div style="margin-top:14px;">' +
+                '<button class="btn btn-green" onclick="importarProspecto('+i+')" style="font-size:12px;padding:7px 16px;">➕ Agregar como cliente</button>' +
+            '</div>' +
+        '</div></td>';
+        tbody.appendChild(trD);
+    });
+}
+
+function escHTML(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+var _msgActual = {};
+function switchMsgTab(idx, tipo, btn) {
+    _msgActual[idx] = tipo;
+    var p = _prospectos[idx] || {};
+    var msgs = p.mensajes || {};
+    document.getElementById('prosp-msg-' + idx).textContent = msgs[tipo] || 'Sin mensaje generado';
+    var bar = btn.closest('.prosp-msg-tabs-bar');
+    bar.querySelectorAll('.prosp-msg-tab').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+}
+
+function toggleDetalleProsp(idx) {
+    var row = document.getElementById('prosp-detalle-' + idx);
+    row.classList.toggle('open');
+}
+
+function copiarMsgProsp(idx) {
+    var txt = document.getElementById('prosp-msg-' + idx).textContent;
+    navigator.clipboard.writeText(txt).then(function(){ mostrarToast('📋 Mensaje copiado', '#0066cc'); });
+}
+
+function onChkProsp(chk) {
+    var idx = chk.dataset.idx;
+    var row = document.getElementById('prosp-row-' + idx);
+    row.classList.toggle('prosp-row-sel', chk.checked);
+}
+
+function selAllProspectos(checked) {
+    document.querySelectorAll('.prosp-chk').forEach(function(c){
+        c.checked = checked;
+        var row = document.getElementById('prosp-row-' + c.dataset.idx);
+        if(row) row.classList.toggle('prosp-row-sel', checked);
+    });
+}
+
+function importarProspecto(idx) {
+    var p = _prospectos[idx];
+    if (!p) return;
+    var cliente = {
+        id: 'prosp_' + Date.now() + '_' + idx,
+        nombre: p.nombre || '',
+        telefono: p.telefono || '',
+        ciudad: p.ciudad || '',
+        provincia: '',
+        cuit: '',
+        email: '',
+        rubro: document.getElementById('prosp-tipo') ? document.getElementById('prosp-tipo').value : '',
+        direccion: '',
+        tipo: 'Sin Credifin',
+        fuente: 'Prospección',
+        vendedor: null,
+        estado: 'Sin contactar',
+        notas: []
+    };
+    if (typeof clientesSinCredifin !== 'undefined') {
+        clientesSinCredifin.push(cliente);
+        if (typeof filtrarSin === 'function') filtrarSin();
+        mostrarToast('✅ "' + cliente.nombre + '" agregado como cliente', '#16a34a');
+    } else if (typeof clientes !== 'undefined') {
+        clientes.push(cliente);
+        mostrarToast('✅ "' + cliente.nombre + '" agregado como cliente', '#16a34a');
+    } else {
+        mostrarToast('⚠️ Andá al tab Asignar para ver el cliente importado', '#f59e0b');
+    }
+}
+
+function importarSeleccionadosProspectos() {
+    var checks = document.querySelectorAll('.prosp-chk:checked');
+    if (!checks.length) { mostrarToast('⚠️ Seleccioná al menos un prospecto', '#f59e0b'); return; }
+    checks.forEach(function(c){ importarProspecto(parseInt(c.dataset.idx)); });
+}
+
+function exportarProspectosJSON() {
+    if (!_prospectos.length) return;
+    var blob = new Blob([JSON.stringify(_prospectos, null, 2)], {type:'application/json'});
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'prospectos-' + Date.now() + '.json'; a.click();
+}
+
+function mostrarToast(msg, color) {
+    var t = document.getElementById('toast-crm');
+    if (!t) return;
+    t.textContent = msg; t.style.background = color || '#333';
+    t.style.opacity = '1';
+    setTimeout(function(){ t.style.opacity = '0'; }, 2800);
+}
+</script>
 
 <script>
 (function(){
