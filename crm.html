@@ -3567,7 +3567,7 @@ function renderAdminPanel() {
     }
 
     // ── Cards por vendedor ──
-    const evColors = { 'En proceso': '#1d4ed8', 'Negociando': '#d97706', 'Cerrado': '#15803d', 'No interesado': '#991b1b' };
+    const VEND_COLORS_ADM = { 'e-activo':'#ea580c', 'e-activo2':'#6d28d9', 'e-cont':'#1d4ed8', 'e-int':'#d97706', 'e-cerr':'#15803d', 'e-sin':'#991b1b' };
     const vvEl = document.getElementById('adm2-vendedores');
     if (vvEl) {
         if (!vendedoresVenta.length) {
@@ -3580,7 +3580,7 @@ function renderAdminPanel() {
                 const sinCr = recib.filter(c => c.tipo === 'Sin Credifin').length;
                 const ret   = recib.filter(c => c.tipo === 'Retail').length;
 
-                // estadoVend
+                // estadoVend — dinámico desde ESTADOS_VEND
                 const evMap = {};
                 recib.forEach(c => { const e = c.estadoVend || 'En proceso'; evMap[e] = (evMap[e] || 0) + 1; });
 
@@ -3591,6 +3591,8 @@ function renderAdminPanel() {
                     `<span class="adm2-chip" style="background:#eff6ff;color:#1d4ed8;">📞 ${tm}: ${n}</span>`
                 ).join('') || '<span style="color:#aaa;font-size:12px;">—</span>';
 
+                const donutSlices = ESTADOS_VEND.map(e => ({ value: evMap[e.key]||0, color: VEND_COLORS_ADM[e.cls]||'#888' }));
+
                 return `<div class="adm2-card">
                     <div class="adm2-card-hdr" style="background:linear-gradient(135deg,#7c3aed,#5b21b6)">
                         <div>
@@ -3598,13 +3600,13 @@ function renderAdminPanel() {
                             <div class="adm2-card-sub">Vendedor</div>
                         </div>
                         <div style="display:flex;align-items:center;gap:12px;">
-                            ${svgDonut([{value:evMap['En proceso']||0,color:'#1d4ed8'},{value:evMap['Negociando']||0,color:'#d97706'},{value:evMap['Cerrado']||0,color:'#15803d'},{value:evMap['No interesado']||0,color:'#991b1b'}], 58)}
+                            ${svgDonut(donutSlices, 58)}
                             <div class="adm2-card-total">${tot}</div>
                         </div>
                     </div>
                     <div class="adm2-card-body">
                         <div class="adm2-mini-title">Estado en CRM Vendedores</div>
-                        ${['En proceso','Negociando','Cerrado','No interesado'].map(e => adm2Bar(e, evMap[e]||0, tot, evColors[e])).join('')}
+                        ${ESTADOS_VEND.map(e => adm2Bar(`${e.icon} ${e.key}`, evMap[e.key]||0, tot, VEND_COLORS_ADM[e.cls]||'#888')).join('')}
                         <hr class="adm2-divider">
                         <div class="adm2-mini-title">Categorías de los clientes</div>
                         <div class="adm2-chips-row">
