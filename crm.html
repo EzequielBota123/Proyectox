@@ -4173,15 +4173,16 @@ function renderCRMVendedores() {
             }).join('');
     }
 
-    // Stats
+    // Stats — dinámico desde ESTADOS_VEND
+    const VEND_COLORS = { 'e-activo':'#ea580c', 'e-activo2':'#6d28d9', 'e-cont':'#d97706', 'e-int':'#7c3aed', 'e-cerr':'#15803d', 'e-sin':'#991b1b' };
     const sr = document.getElementById('crmv-stats-row');
     if (sr) {
-        sr.innerHTML = [
-            { label:'Total', val:todos.length, color:'#0066cc' },
-            { label:'En proceso', val:todos.filter(c=>(c.estadoVend||'En proceso')==='En proceso').length, color:'#d97706' },
-            { label:'Negociando', val:todos.filter(c=>(c.estadoVend||'')===   'Negociando').length, color:'#7c3aed' },
-            { label:'Cerrados',   val:todos.filter(c=>(c.estadoVend||'')==='Cerrado').length, color:'#15803d' },
-        ].map(s=>`<div class="stat-box"><h3 style="color:${s.color}">${s.val}</h3><p>${s.label}</p></div>`).join('');
+        sr.innerHTML =
+            `<div class="stat-box"><h3 style="color:#0066cc">${todos.length}</h3><p>Total</p></div>` +
+            ESTADOS_VEND.map(e => {
+                const n = todos.filter(c => (c.estadoVend||'En proceso') === e.key).length;
+                return `<div class="stat-box"><h3 style="color:${VEND_COLORS[e.cls]||'#0066cc'}">${n}</h3><p>${e.icon} ${e.key}</p></div>`;
+            }).join('');
     }
 
     const lbl = document.getElementById('crmv-count-label');
