@@ -4336,8 +4336,17 @@ function mostrarDetalleCRMV() {
 async function cambiarEstadoCRMV(estadoVend) {
     if (!crmVClienteSel) return;
     const c = crmVClienteSel;
-    // estadoVend se guarda como _ev en notas; _vv se preserva
-    const notasStr = fcSerializarVend(c.fecha_contacto||null, c.notasHistorial||[], c.vendedorVenta||'', estadoVend);
+    const estadoAnterior = c.estadoVend || 'En proceso';
+    if (estadoAnterior === estadoVend) return;
+    // Registrar el cambio de estado como nota automática con timestamp
+    const autor = CURRENT_USER.nombre || CURRENT_USER.username || 'Vendedor';
+    const notaAuto = {
+        t: `Estado cambiado: ${estadoAnterior} → ${estadoVend}`,
+        f: new Date().toISOString(),
+        u: autor
+    };
+    const notas = [...(c.notasHistorial||[]), notaAuto];
+    const notasStr = fcSerializarVend(c.fecha_contacto||null, notas, c.vendedorVenta||'', estadoVend);
     try {
         if (!sbDisponible) throw new Error('Sin conexión con Supabase');
         const { error } = await db.from('asignaciones').update({ notas: notasStr }).eq('cliente_id', c.id);
