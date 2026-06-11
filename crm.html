@@ -4139,14 +4139,25 @@ function renderCRMVendedores() {
     if (sinVend) sinVend.style.display = 'none';
     if (main)    main.style.display = 'block';
 
+    const KEY_ANS = '__activo_noasig__';
+
     // Clientes "en manos de" este vendedor
     const todos = getClientesAsignados().filter(c =>
         c.estado === 'En manos de vendedor' && c.vendedorVenta === crmVendActivo
     );
 
+    // Clientes Activos No Asignados = todos los "Cliente Activo" de TODOS los vendedores
+    const activosNoAsig = getClientesAsignados().filter(c =>
+        c.estado === 'En manos de vendedor' && (c.estadoVend||'') === 'Cliente Activo'
+    );
+
+    // Pool según filtro activo
+    const pool = crmVFiltroEstado === KEY_ANS ? activosNoAsig : todos;
+
     const busq = (document.getElementById('f-crmvend')?.value||'').toLowerCase();
-    const filtrados = todos.filter(c => {
-        const okEst  = crmVFiltroEstado === 'todos' || (c.estadoVend||'En proceso') === crmVFiltroEstado;
+    const filtrados = pool.filter(c => {
+        const okEst  = crmVFiltroEstado === 'todos' || crmVFiltroEstado === KEY_ANS
+            || (c.estadoVend||'En proceso') === crmVFiltroEstado;
         const okBusq = !busq ||
             c.nombre.toLowerCase().includes(busq) ||
             (c.telefono||'').includes(busq) ||
@@ -4159,6 +4170,7 @@ function renderCRMVendedores() {
     if (pb) {
         pb.innerHTML =
             `<span class="pill p-todos ${crmVFiltroEstado==='todos'?'on':''}" onclick="crmVFiltroEstado='todos';renderCRMVendedores()">Todos <strong>${todos.length}</strong></span>` +
+            `<span class="pill p-activo ${crmVFiltroEstado===KEY_ANS?'on':''}" onclick="crmVFiltroEstado='${KEY_ANS}';renderCRMVendedores()" title="Todos los clientes activos del equipo">⭐ Activos No Asig. <strong>${activosNoAsig.length}</strong></span>` +
             ESTADOS_VEND.map(e => {
                 const n = todos.filter(c => (c.estadoVend||'En proceso') === e.key).length;
                 return `<span class="pill ${e.pill} ${crmVFiltroEstado===e.key?'on':''}" onclick="crmVFiltroEstado='${e.key}';renderCRMVendedores()">${e.icon} ${e.key} <strong>${n}</strong></span>`;
@@ -4187,8 +4199,11 @@ function renderCRMVendedores() {
         const badge = c.tipo==='Credifin' ? '<span class="badge-cred">CRE</span>'
                    : c.tipo==='Retail'    ? '<span class="badge-retail">RET</span>'
                                           : '<span class="badge-sin">SIN</span>';
+        const vendTag = crmVFiltroEstado === KEY_ANS && c.vendedorVenta
+            ? `<span style="font-size:9px;color:#ea580c;font-weight:700;background:#fff7ed;padding:1px 6px;border-radius:4px;margin-left:4px;">👤 ${c.vendedorVenta}</span>`
+            : '';
         return `<div class="crm-item ${sel}" onclick="seleccionarClienteCRMV('${c.id}')">
-            <div class="crm-nombre">${badge} ${c.nombre}</div>
+            <div class="crm-nombre">${badge} ${c.nombre}${vendTag}</div>
             <div class="crm-datos">${c.ciudad||''}${c.provincia?' — '+c.provincia:''} · ${c.telefono||'—'}</div>
             <div style="margin-top:3px;"><span class="eb ${ev.eb}">${ev.icon} ${ev.key}</span></div>
         </div>`;
