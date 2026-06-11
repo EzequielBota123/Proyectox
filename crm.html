@@ -1417,7 +1417,104 @@
                 <strong>💡 Cómo funciona:</strong> Cuando cambiás el estado de un cliente en el CRM, se registra automáticamente la fecha y hora del contacto. También podés editarla manualmente desde el detalle de cada cliente.
             </div>
         </div>
+
+        <!-- ===== CALENDARIO DE VISITAS ===== -->
+        <div class="card" style="margin-top:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+                <div>
+                    <h2 style="margin:0;">📋 Calendario de Visitas</h2>
+                    <p style="font-size:11px;color:var(--text-muted);margin-top:3px;">Planificá y gestioná visitas a clientes</p>
+                </div>
+                <button class="btn btn-blue" onclick="abrirModalVisita(null)">➕ Nueva visita</button>
+            </div>
+
+            <div class="cal-nav">
+                <button class="btn-nav" onclick="prevMesVisitas()">◀ Anterior</button>
+                <span class="cal-nav-titulo" id="calv-titulo">—</span>
+                <button class="btn-nav" onclick="nextMesVisitas()">Siguiente ▶</button>
+                <button class="btn-nav btn-hoy" onclick="irAHoyVisitas()">📅 Hoy</button>
+                <select id="calv-filtro-vendedor" onchange="renderCalVisitas()" style="max-width:200px;font-weight:700;flex:1;">
+                    <option value="">Todos los vendedores</option>
+                </select>
+            </div>
+
+            <div class="cal-layout">
+                <div>
+                    <div class="cal-dias-semana">
+                        <div class="cal-dia-nombre">Lun</div><div class="cal-dia-nombre">Mar</div>
+                        <div class="cal-dia-nombre">Mié</div><div class="cal-dia-nombre">Jue</div>
+                        <div class="cal-dia-nombre">Vie</div><div class="cal-dia-nombre">Sáb</div>
+                        <div class="cal-dia-nombre">Dom</div>
+                    </div>
+                    <div class="cal-grid" id="calv-grid"></div>
+                    <div class="cal-leyenda">
+                        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#d97706;"></span>Pendiente</span>
+                        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#15803d;"></span>Realizada</span>
+                        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#991b1b;"></span>Cancelada</span>
+                        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#1d4ed8;"></span>Virtual</span>
+                        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#7c3aed;"></span>Llamada</span>
+                    </div>
+                </div>
+                <div class="cal-panel" id="calv-panel">
+                    <div class="cal-panel-vacio">📋 Hacé clic en un día<br>para ver las visitas</div>
+                </div>
+            </div>
+        </div>
     </div>
+
+<!-- Modal Visita -->
+<div class="modal" id="modal-visita">
+    <div class="modal-box" style="max-width:520px;">
+        <h3 style="margin-bottom:16px;font-size:16px;" id="modal-visita-titulo">➕ Nueva visita</h3>
+        <input type="hidden" id="mv-id">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div class="form-group" style="grid-column:1/-1;">
+                <label>Cliente *</label>
+                <input type="text" id="mv-cliente" placeholder="Nombre del cliente" list="mv-clientes-list" autocomplete="off">
+                <datalist id="mv-clientes-list"></datalist>
+            </div>
+            <div class="form-group">
+                <label>Fecha *</label>
+                <input type="date" id="mv-fecha">
+            </div>
+            <div class="form-group">
+                <label>Hora</label>
+                <input type="time" id="mv-hora">
+            </div>
+            <div class="form-group">
+                <label>Vendedor *</label>
+                <select id="mv-vendedor">
+                    <option value="">— Elegí un vendedor —</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tipo</label>
+                <select id="mv-tipo">
+                    <option value="Presencial">🏠 Presencial</option>
+                    <option value="Virtual">💻 Virtual</option>
+                    <option value="Llamada">📞 Llamada</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Estado</label>
+                <select id="mv-estado">
+                    <option value="Pendiente">🟡 Pendiente</option>
+                    <option value="Realizada">✅ Realizada</option>
+                    <option value="Cancelada">❌ Cancelada</option>
+                </select>
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+                <label>Notas</label>
+                <textarea id="mv-notas" style="min-height:70px;" placeholder="Objetivo de la visita, dirección, etc."></textarea>
+            </div>
+        </div>
+        <div id="mv-error" style="display:none;color:#dc2626;font-size:12px;margin-bottom:10px;"></div>
+        <div style="display:flex;gap:10px;margin-top:6px;">
+            <button class="btn btn-gray" style="flex:1;" onclick="cerrarModalVisita()">Cancelar</button>
+            <button class="btn btn-green" style="flex:1;" onclick="guardarVisita()">💾 Guardar</button>
+        </div>
+    </div>
+</div>
 
 <!-- Modal agregar / editar cliente -->
 <div class="modal" id="modal-cli">
@@ -2576,7 +2673,7 @@ function cambiarTab(id, btn) {
     if (id==='crmvend')    { renderCRMVendedores(); }
     if (id==='asignar')    { renderVendedores(); filtrarCredifin(); filtrarSin(); filtrarRetail(); renderSeccionesProvincias(); actualizarDebug(); }
     if (id==='usuarios')   { cargarListaUsuarios(); }
-    if (id==='calendario') { renderCalendario(); }
+    if (id==='calendario') { renderCalendario(); renderCalVisitas(); }
     if (id==='admin')      { renderAdminPanel(); }
 }
 
@@ -4543,6 +4640,269 @@ async function cargarExcelYAsignar(input) {
         }
     };
     reader.readAsArrayBuffer(file);
+}
+
+/* =========================================================
+   CALENDARIO DE VISITAS
+   ========================================================= */
+const VISITAS_KEY = 'crm_visitas_v1';
+let visitCalAnio = new Date().getFullYear();
+let visitCalMes  = new Date().getMonth();
+let visitCalDiaSel = null;  // 'YYYY-MM-DD'
+
+function cargarVisitas() {
+    try { return JSON.parse(localStorage.getItem(VISITAS_KEY) || '[]'); } catch { return []; }
+}
+function guardarVisitasLS(arr) {
+    localStorage.setItem(VISITAS_KEY, JSON.stringify(arr));
+}
+
+function visitDotColor(v) {
+    if (v.estado === 'Realizada')  return '#15803d';
+    if (v.estado === 'Cancelada')  return '#991b1b';
+    if (v.tipo === 'Virtual')      return '#1d4ed8';
+    if (v.tipo === 'Llamada')      return '#7c3aed';
+    return '#d97706';
+}
+
+function renderCalVisitas() {
+    const tituloEl = document.getElementById('calv-titulo');
+    const gridEl   = document.getElementById('calv-grid');
+    if (!tituloEl || !gridEl) return;
+
+    const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    tituloEl.textContent = `${meses[visitCalMes]} ${visitCalAnio}`;
+
+    const filtroVend = document.getElementById('calv-filtro-vendedor')?.value || '';
+    const visitas    = cargarVisitas();
+
+    // agrupar por 'YYYY-MM-DD'
+    const porDia = {};
+    visitas.forEach(v => {
+        if (filtroVend && v.vendedor !== filtroVend) return;
+        if (!porDia[v.fecha]) porDia[v.fecha] = [];
+        porDia[v.fecha].push(v);
+    });
+
+    const primerDia = new Date(visitCalAnio, visitCalMes, 1);
+    const diasMes   = new Date(visitCalAnio, visitCalMes + 1, 0).getDate();
+    let inicioGrid  = (primerDia.getDay() + 6) % 7; // Lunes=0
+
+    const hoy = new Date();
+    const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+
+    let html = '';
+    for (let i = 0; i < inicioGrid; i++) html += '<div class="cal-dia cal-otro"></div>';
+
+    for (let d = 1; d <= diasMes; d++) {
+        const fechaStr = `${visitCalAnio}-${String(visitCalMes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const esSel    = visitCalDiaSel === fechaStr;
+        const esHoy    = fechaStr === hoyStr;
+        const vsHoy    = porDia[fechaStr] || [];
+        const dots     = vsHoy.slice(0,5).map(v => `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${visitDotColor(v)};"></span>`).join('');
+        const extra    = vsHoy.length > 5 ? `<span style="font-size:9px;font-weight:800;color:var(--accent)">+${vsHoy.length-5}</span>` : '';
+
+        html += `<div class="cal-dia${esSel?' cal-sel':''}${esHoy?' cal-hoy':''}" onclick="selDiaVisita('${fechaStr}')">
+            <div class="cal-dia-num">${d}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:2px;align-items:center;">${dots}${extra}</div>
+        </div>`;
+    }
+
+    gridEl.innerHTML = html;
+    renderCalVisitasPanel();
+    poblarSelectVendVisitas();
+}
+
+function selDiaVisita(fechaStr) {
+    visitCalDiaSel = fechaStr;
+    renderCalVisitas();
+}
+
+function renderCalVisitasPanel() {
+    const panel = document.getElementById('calv-panel');
+    if (!panel) return;
+
+    if (!visitCalDiaSel) {
+        panel.innerHTML = '<div class="cal-panel-vacio">📋 Hacé clic en un día<br>para ver las visitas</div>';
+        return;
+    }
+
+    const filtroVend = document.getElementById('calv-filtro-vendedor')?.value || '';
+    const visitas = cargarVisitas().filter(v => v.fecha === visitCalDiaSel && (!filtroVend || v.vendedor === filtroVend));
+    const [anio, mes, dia] = visitCalDiaSel.split('-');
+    const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const titulo = `${parseInt(dia)} de ${meses[parseInt(mes)-1]} ${anio}`;
+
+    let html = `<h4>📅 ${titulo}</h4>`;
+    if (visitas.length === 0) {
+        html += `<div class="cal-panel-vacio" style="padding:20px 10px;">Sin visitas este día</div>`;
+    } else {
+        visitas.sort((a,b) => (a.hora||'99:99').localeCompare(b.hora||'99:99'));
+        visitas.forEach(v => {
+            const colorDot = visitDotColor(v);
+            const tipoIcon = v.tipo === 'Virtual' ? '💻' : v.tipo === 'Llamada' ? '📞' : '🏠';
+            html += `<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;border-left:3px solid ${colorDot};">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+                    <div style="font-weight:700;font-size:13px;color:var(--text);flex:1;">${escHtml(v.cliente||'(sin nombre)')}</div>
+                    <div style="display:flex;gap:4px;">
+                        <button onclick="editarVisita('${v.id}')" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px;" title="Editar">✏️</button>
+                        <button onclick="eliminarVisita('${v.id}')" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px;" title="Eliminar">🗑️</button>
+                    </div>
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:5px;display:flex;flex-wrap:wrap;gap:8px;">
+                    ${v.hora ? `<span>🕐 ${v.hora}</span>` : ''}
+                    <span>${tipoIcon} ${v.tipo||'Presencial'}</span>
+                    ${v.vendedor ? `<span>👤 ${escHtml(v.vendedor)}</span>` : ''}
+                </div>
+                <div style="margin-top:6px;">
+                    <span style="font-size:11px;font-weight:700;color:${colorDot};background:${colorDot}22;border-radius:20px;padding:2px 8px;">${v.estado||'Pendiente'}</span>
+                </div>
+                ${v.notas ? `<div style="font-size:11px;color:var(--text-2);margin-top:7px;font-style:italic;">"${escHtml(v.notas)}"</div>` : ''}
+                ${v.clienteId ? `<button onclick="irAClienteCRMV('${v.clienteId}')" style="margin-top:8px;font-size:11px;background:#0066cc22;border:1px solid #0066cc44;color:#0066cc;border-radius:6px;padding:3px 10px;cursor:pointer;font-weight:700;">Ver en CRM →</button>` : ''}
+            </div>`;
+        });
+    }
+    html += `<button class="btn btn-blue" style="width:100%;margin-top:6px;font-size:12px;" onclick="abrirModalVisita('${visitCalDiaSel}')">➕ Agregar visita este día</button>`;
+    panel.innerHTML = html;
+}
+
+function poblarSelectVendVisitas() {
+    const selNav  = document.getElementById('calv-filtro-vendedor');
+    const selModal = document.getElementById('mv-vendedor');
+    if (!selNav && !selModal) return;
+    const rawVends = getVendedores ? getVendedores() : [];
+    const vends = rawVends.map(v => (typeof v === 'string' ? v : v.nombre || v.username || '')).filter(Boolean).sort();
+    if (selNav) {
+        const curNav = selNav.value;
+        selNav.innerHTML = '<option value="">Todos los vendedores</option>' + vends.map(n => `<option${n===curNav?' selected':''}>${escHtml(n)}</option>`).join('');
+    }
+    if (selModal) {
+        const curMod = selModal.value;
+        selModal.innerHTML = '<option value="">— Elegí un vendedor —</option>' + vends.map(n => `<option${n===curMod?' selected':''}>${escHtml(n)}</option>`).join('');
+        if (CURRENT_USER && (CURRENT_USER.nombre || CURRENT_USER.username)) {
+            const me = CURRENT_USER.nombre || CURRENT_USER.username;
+            if (vends.includes(me)) selModal.value = me;
+        }
+    }
+    // datalist clientes CRM
+    const dl = document.getElementById('mv-clientes-list');
+    if (dl) {
+        const clientes = getClientesAsignados ? getClientesAsignados() : [];
+        dl.innerHTML = clientes.map(c => `<option value="${escHtml(c.nombre||c.razon_social||'')}" data-id="${c.id}">`).join('');
+    }
+}
+
+function abrirModalVisita(fechaPreset) {
+    document.getElementById('modal-visita-titulo').textContent = '➕ Nueva visita';
+    document.getElementById('mv-id').value = '';
+    document.getElementById('mv-cliente').value = '';
+    document.getElementById('mv-fecha').value = fechaPreset || visitCalDiaSel || '';
+    document.getElementById('mv-hora').value = '';
+    document.getElementById('mv-tipo').value = 'Presencial';
+    document.getElementById('mv-estado').value = 'Pendiente';
+    document.getElementById('mv-notas').value = '';
+    document.getElementById('mv-error').style.display = 'none';
+    poblarSelectVendVisitas();
+    document.getElementById('modal-visita').style.display = 'flex';
+    setTimeout(() => document.getElementById('mv-cliente').focus(), 100);
+}
+
+function cerrarModalVisita() {
+    document.getElementById('modal-visita').style.display = 'none';
+}
+
+function guardarVisita() {
+    const errEl = document.getElementById('mv-error');
+    const cliente  = document.getElementById('mv-cliente').value.trim();
+    const fecha    = document.getElementById('mv-fecha').value;
+    const vendedor = document.getElementById('mv-vendedor').value;
+    if (!cliente)  { errEl.textContent = 'El nombre del cliente es obligatorio.';  errEl.style.display='block'; return; }
+    if (!fecha)    { errEl.textContent = 'La fecha es obligatoria.';               errEl.style.display='block'; return; }
+    if (!vendedor) { errEl.textContent = 'Seleccioná un vendedor.';                errEl.style.display='block'; return; }
+    errEl.style.display = 'none';
+
+    // try to link to CRM client
+    let clienteId = null;
+    const clientes = getClientesAsignados ? getClientesAsignados() : [];
+    const match = clientes.find(c => (c.nombre||c.razon_social||'').toLowerCase() === cliente.toLowerCase());
+    if (match) clienteId = match.id;
+
+    const visitas = cargarVisitas();
+    const id = document.getElementById('mv-id').value;
+    if (id) {
+        const idx = visitas.findIndex(v => String(v.id) === String(id));
+        if (idx !== -1) {
+            visitas[idx] = { ...visitas[idx], cliente, fecha,
+                hora:     document.getElementById('mv-hora').value,
+                vendedor, tipo: document.getElementById('mv-tipo').value,
+                estado:   document.getElementById('mv-estado').value,
+                notas:    document.getElementById('mv-notas').value.trim(),
+                clienteId };
+        }
+    } else {
+        visitas.push({ id: Date.now(), cliente, fecha,
+            hora:     document.getElementById('mv-hora').value,
+            vendedor, tipo: document.getElementById('mv-tipo').value,
+            estado:   document.getElementById('mv-estado').value,
+            notas:    document.getElementById('mv-notas').value.trim(),
+            clienteId });
+    }
+    guardarVisitasLS(visitas);
+    cerrarModalVisita();
+    visitCalDiaSel = fecha;
+    visitCalAnio = parseInt(fecha.split('-')[0]);
+    visitCalMes  = parseInt(fecha.split('-')[1]) - 1;
+    renderCalVisitas();
+    mostrarToast('✓ Visita guardada');
+}
+
+function editarVisita(id) {
+    const visitas = cargarVisitas();
+    const v = visitas.find(x => String(x.id) === String(id));
+    if (!v) return;
+    document.getElementById('modal-visita-titulo').textContent = '✏️ Editar visita';
+    document.getElementById('mv-id').value     = v.id;
+    document.getElementById('mv-cliente').value = v.cliente || '';
+    document.getElementById('mv-fecha').value   = v.fecha   || '';
+    document.getElementById('mv-hora').value    = v.hora    || '';
+    document.getElementById('mv-tipo').value    = v.tipo    || 'Presencial';
+    document.getElementById('mv-estado').value  = v.estado  || 'Pendiente';
+    document.getElementById('mv-notas').value   = v.notas   || '';
+    document.getElementById('mv-error').style.display = 'none';
+    poblarSelectVendVisitas();
+    document.getElementById('mv-vendedor').value = v.vendedor || '';
+    document.getElementById('modal-visita').style.display = 'flex';
+}
+
+function eliminarVisita(id) {
+    if (!confirm('¿Eliminar esta visita?')) return;
+    const visitas = cargarVisitas().filter(v => String(v.id) !== String(id));
+    guardarVisitasLS(visitas);
+    renderCalVisitas();
+    mostrarToast('Visita eliminada');
+}
+
+function prevMesVisitas() {
+    visitCalMes--;
+    if (visitCalMes < 0) { visitCalMes = 11; visitCalAnio--; }
+    renderCalVisitas();
+}
+function nextMesVisitas() {
+    visitCalMes++;
+    if (visitCalMes > 11) { visitCalMes = 0; visitCalAnio++; }
+    renderCalVisitas();
+}
+function irAHoyVisitas() {
+    const h = new Date();
+    visitCalAnio = h.getFullYear();
+    visitCalMes  = h.getMonth();
+    visitCalDiaSel = `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}-${String(h.getDate()).padStart(2,'0')}`;
+    renderCalVisitas();
+}
+
+function escHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
 
