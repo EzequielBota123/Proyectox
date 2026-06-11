@@ -279,12 +279,13 @@
     .pills-bar { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
     .pill { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:20px; font-size:11px; font-weight:700; cursor:pointer; border:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
     .pill:hover { opacity:0.85; transform:translateY(-1px); }
-    .p-todos { background:#e0f2fe; color:#0369a1; } .p-todos.on { background:#0369a1; color:#fff; }
-    .p-sin   { background:#fee2e2; color:#991b1b; } .p-sin.on   { background:#991b1b; color:#fff; }
-    .p-cont  { background:#dbeafe; color:#1d4ed8; } .p-cont.on  { background:#1d4ed8; color:#fff; }
-    .p-int   { background:#fef9c3; color:#a16207; } .p-int.on   { background:#d97706; color:#fff; }
-    .p-vend  { background:#f3e8ff; color:#7c3aed; } .p-vend.on  { background:#7c3aed; color:#fff; }
-    .p-cerr  { background:#dcfce7; color:#15803d; } .p-cerr.on  { background:#15803d; color:#fff; }
+    .p-todos   { background:#e0f2fe; color:#0369a1; } .p-todos.on   { background:#0369a1; color:#fff; }
+    .p-sin     { background:#fee2e2; color:#991b1b; } .p-sin.on     { background:#991b1b; color:#fff; }
+    .p-cont    { background:#dbeafe; color:#1d4ed8; } .p-cont.on    { background:#1d4ed8; color:#fff; }
+    .p-int     { background:#fef9c3; color:#a16207; } .p-int.on     { background:#d97706; color:#fff; }
+    .p-vend    { background:#f3e8ff; color:#7c3aed; } .p-vend.on    { background:#7c3aed; color:#fff; }
+    .p-cerr    { background:#dcfce7; color:#15803d; } .p-cerr.on    { background:#15803d; color:#fff; }
+    .p-activo  { background:#fff7ed; color:#c2410c; } .p-activo.on  { background:#ea580c; color:#fff; }
     .crm-grid { display:grid; grid-template-columns:340px 1fr; gap:16px; align-items:start; }
     @media(max-width:900px) { .crm-grid { grid-template-columns:1fr; } }
     .crm-list-wrap { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--surface); max-height:680px; overflow-y:auto; transition:background 0.3s,border-color 0.3s; }
@@ -295,11 +296,12 @@
     .crm-nombre { font-weight:700; font-size:13px; margin-bottom:3px; color:var(--text); }
     .crm-datos  { font-size:11px; color:var(--text-muted); margin-bottom:5px; }
     .eb { display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; }
-    .eb-sin  { background:#fee2e2; color:#991b1b; }
-    .eb-cont { background:#dbeafe; color:#1d4ed8; }
-    .eb-int  { background:#fef9c3; color:#a16207; }
-    .eb-vend { background:#f3e8ff; color:#7c3aed; }
-    .eb-cerr { background:#dcfce7; color:#15803d; }
+    .eb-sin    { background:#fee2e2; color:#991b1b; }
+    .eb-cont   { background:#dbeafe; color:#1d4ed8; }
+    .eb-int    { background:#fef9c3; color:#a16207; }
+    .eb-vend   { background:#f3e8ff; color:#7c3aed; }
+    .eb-cerr   { background:#dcfce7; color:#15803d; }
+    .eb-activo { background:#fff7ed; color:#c2410c; }
     .crm-detalle-card { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); padding:20px; position:sticky; top:16px; max-height:85vh; overflow-y:auto; transition:background 0.3s,border-color 0.3s; }
     .det-nombre { font-size:20px; font-weight:800; color:var(--text); margin-bottom:8px; }
     .det-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; background:var(--surface-2); border-radius:var(--radius-sm); padding:14px; margin-bottom:16px; border:1px solid var(--border); transition:background 0.3s; }
@@ -311,11 +313,12 @@
     .est-btns { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:8px; margin-bottom:18px; }
     .est-btn { padding:10px 8px; border:2px solid; border-radius:var(--radius-sm); cursor:pointer; font-size:12px; font-weight:700; font-family:'Inter',sans-serif; transition:all 0.2s; text-align:center; }
     .est-btn:hover { transform:translateY(-1px); box-shadow:0 2px 8px rgba(0,0,0,0.15); }
-    .e-sin  { border-color:#fca5a5; background:#fee2e2; color:#991b1b; } .e-sin.on  { background:#991b1b; color:#fff; border-color:#991b1b; }
-    .e-cont { border-color:#93c5fd; background:#dbeafe; color:#1d4ed8; } .e-cont.on { background:#1d4ed8; color:#fff; border-color:#1d4ed8; }
-    .e-int  { border-color:#fde68a; background:#fef9c3; color:#a16207; } .e-int.on  { background:#d97706; color:#fff; border-color:#d97706; }
-    .e-vend { border-color:#c084fc; background:#f3e8ff; color:#7c3aed; } .e-vend.on { background:#7c3aed; color:#fff; border-color:#7c3aed; }
-    .e-cerr { border-color:#86efac; background:#dcfce7; color:#15803d; } .e-cerr.on { background:#15803d; color:#fff; border-color:#15803d; }
+    .e-sin    { border-color:#fca5a5; background:#fee2e2; color:#991b1b; } .e-sin.on    { background:#991b1b; color:#fff; border-color:#991b1b; }
+    .e-cont   { border-color:#93c5fd; background:#dbeafe; color:#1d4ed8; } .e-cont.on   { background:#1d4ed8; color:#fff; border-color:#1d4ed8; }
+    .e-int    { border-color:#fde68a; background:#fef9c3; color:#a16207; } .e-int.on    { background:#d97706; color:#fff; border-color:#d97706; }
+    .e-vend   { border-color:#c084fc; background:#f3e8ff; color:#7c3aed; } .e-vend.on   { background:#7c3aed; color:#fff; border-color:#7c3aed; }
+    .e-cerr   { border-color:#86efac; background:#dcfce7; color:#15803d; } .e-cerr.on   { background:#15803d; color:#fff; border-color:#15803d; }
+    .e-activo { border-color:#fdba74; background:#fff7ed; color:#c2410c; } .e-activo.on { background:#ea580c; color:#fff; border-color:#ea580c; }
 
     /* ============ STATS ============ */
     .stats-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
@@ -546,22 +549,26 @@
     body.dark .p-cont  { background:rgba(29,78,216,0.22);   color:#93c5fd; }
     body.dark .p-int   { background:rgba(161,98,7,0.22);    color:#fde68a; }
     body.dark .p-vend  { background:rgba(124,58,237,0.22);  color:#c4b5fd; }
-    body.dark .p-cerr  { background:rgba(21,128,61,0.22);   color:#86efac; }
-    body.dark .eb-sin  { background:rgba(153,27,27,0.22);   color:#fca5a5; }
-    body.dark .eb-cont { background:rgba(29,78,216,0.22);   color:#93c5fd; }
-    body.dark .eb-int  { background:rgba(161,98,7,0.22);    color:#fde68a; }
-    body.dark .eb-vend { background:rgba(124,58,237,0.22);  color:#c4b5fd; }
-    body.dark .eb-cerr { background:rgba(21,128,61,0.22);   color:#86efac; }
-    body.dark .e-sin  { border-color:rgba(252,165,165,0.3); background:rgba(153,27,27,0.2);  color:#fca5a5; }
-    body.dark .e-cont { border-color:rgba(147,197,253,0.3); background:rgba(29,78,216,0.2);  color:#93c5fd; }
-    body.dark .e-int  { border-color:rgba(253,230,138,0.3); background:rgba(161,98,7,0.2);   color:#fde68a; }
-    body.dark .e-vend { border-color:rgba(192,132,252,0.3); background:rgba(124,58,237,0.2); color:#c4b5fd; }
-    body.dark .e-cerr { border-color:rgba(134,239,172,0.3); background:rgba(21,128,61,0.2);  color:#86efac; }
-    body.dark .e-sin.on  { background:#991b1b; color:#fff; border-color:#991b1b; }
-    body.dark .e-cont.on { background:#1d4ed8; color:#fff; border-color:#1d4ed8; }
-    body.dark .e-int.on  { background:#d97706; color:#fff; border-color:#d97706; }
-    body.dark .e-vend.on { background:#7c3aed; color:#fff; border-color:#7c3aed; }
-    body.dark .e-cerr.on { background:#15803d; color:#fff; border-color:#15803d; }
+    body.dark .p-cerr   { background:rgba(21,128,61,0.22);    color:#86efac; }
+    body.dark .p-activo { background:rgba(194,65,12,0.2);     color:#fb923c; }
+    body.dark .eb-sin    { background:rgba(153,27,27,0.22);   color:#fca5a5; }
+    body.dark .eb-cont   { background:rgba(29,78,216,0.22);   color:#93c5fd; }
+    body.dark .eb-int    { background:rgba(161,98,7,0.22);    color:#fde68a; }
+    body.dark .eb-vend   { background:rgba(124,58,237,0.22);  color:#c4b5fd; }
+    body.dark .eb-cerr   { background:rgba(21,128,61,0.22);   color:#86efac; }
+    body.dark .eb-activo { background:rgba(194,65,12,0.2);    color:#fb923c; }
+    body.dark .e-sin    { border-color:rgba(252,165,165,0.3); background:rgba(153,27,27,0.2);  color:#fca5a5; }
+    body.dark .e-cont   { border-color:rgba(147,197,253,0.3); background:rgba(29,78,216,0.2);  color:#93c5fd; }
+    body.dark .e-int    { border-color:rgba(253,230,138,0.3); background:rgba(161,98,7,0.2);   color:#fde68a; }
+    body.dark .e-vend   { border-color:rgba(192,132,252,0.3); background:rgba(124,58,237,0.2); color:#c4b5fd; }
+    body.dark .e-cerr   { border-color:rgba(134,239,172,0.3); background:rgba(21,128,61,0.2);  color:#86efac; }
+    body.dark .e-activo { border-color:rgba(251,146,60,0.3);  background:rgba(194,65,12,0.18); color:#fb923c; }
+    body.dark .e-sin.on    { background:#991b1b; color:#fff; border-color:#991b1b; }
+    body.dark .e-cont.on   { background:#1d4ed8; color:#fff; border-color:#1d4ed8; }
+    body.dark .e-int.on    { background:#d97706; color:#fff; border-color:#d97706; }
+    body.dark .e-vend.on   { background:#7c3aed; color:#fff; border-color:#7c3aed; }
+    body.dark .e-cerr.on   { background:#15803d; color:#fff; border-color:#15803d; }
+    body.dark .e-activo.on { background:#ea580c; color:#fff; border-color:#ea580c; }
     body.dark .info-box       { background:rgba(22,163,74,0.12); color:#86efac; }
     body.dark .script-cliente { background:rgba(245,158,11,0.12); border-color:#f59e0b; color:#fde68a; }
     body.dark .vend-asignado-box { background:rgba(253,230,138,0.08); border-color:rgba(253,230,138,0.3); }
@@ -572,57 +579,372 @@
     body.dark ::-webkit-scrollbar-thumb { background:#2a2a4a; border-radius:3px; }
     body.dark ::-webkit-scrollbar-thumb:hover { background:#3a3a6a; }
 
-    /* ============ PROSPECCIÓN ============ */
-    .prosp-header { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
-    .prosp-title  { font-size:20px; font-weight:800; color:var(--text); letter-spacing:-0.4px; }
-    .prosp-subtitle { font-size:12px; color:var(--text-muted); margin-top:3px; }
-    .prosp-instruccion-badge { background:color-mix(in srgb,var(--accent) 12%,var(--surface)); color:var(--accent); font-size:11px; font-weight:700; padding:6px 14px; border-radius:20px; border:1px solid color-mix(in srgb,var(--accent) 30%,var(--border)); white-space:nowrap; align-self:center; }
-    .prosp-form-card { margin-bottom:12px; }
-    .prosp-form-grid { display:grid; grid-template-columns:1fr 1fr auto; gap:12px; margin-bottom:16px; }
-    @media(max-width:700px) { .prosp-form-grid { grid-template-columns:1fr 1fr; } }
-    @media(max-width:600px) { .prosp-form-grid { grid-template-columns:1fr; } }
-    .prosp-form-grid .form-group { margin-bottom:0; }
-    .prosp-status { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--accent); }
-    .prosp-spinner { display:inline-block; animation:spin 0.8s linear infinite; font-size:16px; }
-    .prosp-vacio { text-align:center; padding:60px 20px; }
-    .prosp-vacio-icon { font-size:48px; margin-bottom:12px; opacity:0.4; }
-    .prosp-score { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; font-size:12px; font-weight:800; }
-    .prosp-score-high { background:color-mix(in srgb,#16a34a 15%,var(--surface)); color:#16a34a; border:2px solid #16a34a; }
-    .prosp-score-mid  { background:color-mix(in srgb,#f59e0b 15%,var(--surface)); color:#d97706; border:2px solid #f59e0b; }
-    .prosp-score-low  { background:color-mix(in srgb,#dc3545 15%,var(--surface)); color:#dc3545; border:2px solid #dc3545; }
-    .prosp-problema-tag { display:inline-block; background:color-mix(in srgb,#dc3545 10%,var(--surface)); color:#dc3545; font-size:9px; font-weight:700; padding:2px 7px; border-radius:10px; margin:2px 2px 0 0; border:1px solid color-mix(in srgb,#dc3545 25%,var(--border)); }
-    .prosp-acciones-bar { padding:14px 16px; margin-bottom:12px; }
-    .prosp-detalle-flotante { margin-top:12px; }
-    .prosp-ig-link { color:#e1306c; text-decoration:none; font-size:11px; }
-    .prosp-ig-link:hover { text-decoration:underline; }
-        .prosp-detalle-row { display:none; }
-    .prosp-detalle-row.open { display:table-row; }
-    .prosp-detalle-inner { padding:16px 20px; background:var(--surface-2); border-bottom:1px solid var(--border); }
-    .prosp-msg-tabs-bar { display:flex; gap:4px; margin-bottom:10px; }
-    .prosp-msg-tab { padding:5px 14px; border:1.5px solid var(--border-2); border-radius:20px; font-size:11px; font-weight:700; cursor:pointer; color:var(--text-muted); background:var(--surface); transition:all 0.15s; font-family:'Inter',sans-serif; }
-    .prosp-msg-tab.active { background:var(--accent); color:white; border-color:var(--accent); }
-    .prosp-msg-content { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; font-size:12px; line-height:1.7; color:var(--text); white-space:pre-wrap; min-height:60px; }
-    .prosp-detalle-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    @media(max-width:700px){ .prosp-detalle-grid { grid-template-columns:1fr; } }
-    .prosp-web-link { color:var(--accent); text-decoration:none; font-size:11px; }
-    .prosp-web-link:hover { text-decoration:underline; }
-    tr.prosp-row-sel td { background:color-mix(in srgb,var(--accent) 6%,var(--surface)) !important; }
+    /* ============================================================
+       MOBILE RESPONSIVE — solo pantallas ≤ 768px
+       Desktop (>768px) queda EXACTAMENTE igual
+    ============================================================ */
+    @media (max-width: 768px) {
 
-        /* Prospección — detalle expandible + modal destino */
-    .prosp-expand-row td { padding:0 !important; border-bottom:1px solid var(--border); }
-    .prosp-expand-inner { display:none; padding:14px 20px; background:var(--surface-2); gap:24px; flex-wrap:wrap; }
-    .prosp-expand-inner.open { display:flex; }
-    .prosp-expand-group { min-width:140px; }
-    .prosp-expand-label { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-muted); margin-bottom:4px; }
-    .prosp-expand-val { font-size:12px; color:var(--text); font-weight:600; }
-    .prosp-expand-val a { color:var(--accent); text-decoration:none; }
-    .prosp-expand-val a:hover { text-decoration:underline; }
-    .prosp-dest-modal { position:fixed; z-index:9999; background:var(--surface); border:1.5px solid var(--border-2); border-radius:var(--radius); box-shadow:0 8px 32px rgba(0,0,0,0.25); padding:14px 16px; min-width:220px; }
-    .prosp-dest-modal h4 { font-size:12px; font-weight:800; color:var(--text); margin:0 0 10px; }
-    .prosp-dest-btn { display:block; width:100%; text-align:left; padding:8px 12px; margin-bottom:6px; border-radius:8px; border:1.5px solid var(--border-2); background:var(--surface-2); color:var(--text); font-size:12px; font-weight:700; cursor:pointer; transition:all 0.15s; font-family:inherit; }
-    .prosp-dest-btn:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
-    .prosp-dest-btn:last-child { margin-bottom:0; }
-    .prosp-dest-overlay { position:fixed; inset:0; z-index:9998; }
+        /* Contenedor general */
+        .container { padding: 8px 8px; }
+
+        /* Header */
+        header { padding: 10px 12px; gap: 8px; }
+        header h1 { font-size: 15px; }
+        .header-right { gap: 5px; }
+        .header-stat { padding: 5px 9px; }
+        .header-stat strong { font-size: 15px; }
+        .header-stat span { font-size: 9px; }
+        .theme-toggle { padding: 6px 10px; font-size: 12px; }
+
+        /* Tabs — scroll horizontal en lugar de wrap que corta */
+        .tabs {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding: 5px;
+            gap: 3px;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-btn {
+            white-space: nowrap;
+            flex-shrink: 0;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        /* Evitar zoom automático en iOS al tocar inputs */
+        input, select, textarea { font-size: 16px !important; }
+
+        /* Grids → columna única antes de 768px también */
+        .grid2 { grid-template-columns: 1fr; }
+        .adm2-grid { grid-template-columns: 1fr; }
+        .admin-vend-grid { grid-template-columns: 1fr; }
+        .zonas-excel { grid-template-columns: 1fr; }
+        .det-info-grid { grid-template-columns: 1fr; }
+
+        /* Tablas genéricas — scroll horizontal para previews */
+        .preview-small { overflow-x: auto; }
+        .preview-small table { min-width: 400px; }
+
+        /* ── TARJETAS DE CLIENTE en mobile ──────────────────────────────
+           Aplica a: Credifin (.seccion-tipo .tabla-wrap)
+                     Sin Credifin, Retail (ídem)
+                     Provincias (.prov-section .table-wrap)
+           Las columnas se convierten en pares etiqueta:valor apilados.
+           thead oculta, tr = card, td = fila dentro de la card.
+        ──────────────────────────────────────────────────────────────── */
+
+        /* — Credifin / Sin Credifin / Retail — */
+        .seccion-tipo .tabla-wrap {
+            overflow: visible;
+            max-height: none;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+        }
+        .seccion-tipo .tabla-wrap table {
+            display: block;
+            width: 100%;
+            min-width: 0 !important;
+        }
+        .seccion-tipo .tabla-wrap thead { display: none; }
+        .seccion-tipo .tabla-wrap tbody { display: block; }
+
+        /* Card por fila */
+        .seccion-tipo .tabla-wrap tr {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            background: var(--surface);
+            border: 1px solid var(--border-2);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            gap: 0;
+        }
+        /* Neutralizar colores de fila alternada/hover que romperían la card */
+        .seccion-tipo .tabla-wrap tr:nth-child(even) td,
+        .seccion-tipo .tabla-wrap tr:hover td { background: transparent; }
+
+        /* td único → mensaje "Sin resultados" */
+        .seccion-tipo .tabla-wrap td:only-child {
+            flex: 0 0 100% !important;
+            text-align: center !important;
+            padding: 14px 0 !important;
+            border: none !important;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Checkbox (td:1) */
+        .seccion-tipo .tabla-wrap td:nth-child(1) {
+            flex: 0 0 28px;
+            padding: 0;
+            border: none;
+            display: flex;
+            align-items: center;
+            margin-right: 8px;
+            margin-top: 2px;
+        }
+        .seccion-tipo .tabla-wrap td:nth-child(1) input[type=checkbox] {
+            width: 18px !important;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        /* Nombre (td:2) — negrita, ocupa el ancho restante de la primera fila */
+        .seccion-tipo .tabla-wrap td:nth-child(2) {
+            flex: 1 1 0;
+            padding: 0;
+            border: none;
+            font-weight: 800;
+            font-size: 14px;
+            color: var(--text);
+            word-break: break-word;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+
+        /* Campos de datos (CUIT / Rubro / Prov. / Ciudad / Tel.) */
+        .seccion-tipo .tabla-wrap td:nth-child(3),
+        .seccion-tipo .tabla-wrap td:nth-child(4),
+        .seccion-tipo .tabla-wrap td:nth-child(5),
+        .seccion-tipo .tabla-wrap td:nth-child(6),
+        .seccion-tipo .tabla-wrap td:nth-child(7) {
+            flex: 0 0 50%;
+            padding: 3px 0;
+            border: none;
+            font-size: 12px;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            color: var(--text-2);
+            overflow: hidden;
+        }
+        /* Etiquetas via ::before */
+        .seccion-tipo .tabla-wrap td:nth-child(3)::before,
+        .seccion-tipo .tabla-wrap td:nth-child(4)::before,
+        .seccion-tipo .tabla-wrap td:nth-child(5)::before,
+        .seccion-tipo .tabla-wrap td:nth-child(6)::before,
+        .seccion-tipo .tabla-wrap td:nth-child(7)::before {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .seccion-tipo .tabla-wrap td:nth-child(3)::before { content: "CUIT "; }
+        .seccion-tipo .tabla-wrap td:nth-child(4)::before { content: "Rubro "; }
+        .seccion-tipo .tabla-wrap td:nth-child(5)::before { content: "Prov. "; }
+        .seccion-tipo .tabla-wrap td:nth-child(6)::before { content: "Ciudad "; }
+        .seccion-tipo .tabla-wrap td:nth-child(7)::before { content: "Tel. "; }
+
+        /* Acciones (td:8) — fila completa, botones a la derecha */
+        .seccion-tipo .tabla-wrap td:nth-child(8) {
+            flex: 0 0 100%;
+            border: none;
+            border-top: 1px solid var(--border);
+            white-space: normal;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding: 8px 0 0;
+            margin-top: 6px;
+        }
+        /* Botones más grandes para touch */
+        .seccion-tipo .tabla-wrap .btn-accion {
+            padding: 8px 20px;
+            font-size: 13px;
+            border-radius: 7px;
+            min-height: 38px;
+            min-width: 48px;
+        }
+
+        /* — Provincias (.prov-section .table-wrap) — misma lógica —
+           Columnas: ckbox / Nombre / CUIT / Rubro / Ciudad / Tel / Acciones */
+        .prov-section .table-wrap table {
+            display: block;
+            width: 100%;
+            min-width: 0 !important;
+        }
+        .prov-section .table-wrap thead { display: none; }
+        .prov-section .table-wrap tbody { display: block; }
+        .prov-section .table-wrap tr {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            background: var(--surface);
+            border: 1px solid var(--border-2);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            gap: 0;
+        }
+        .prov-section .table-wrap tr:nth-child(even) td,
+        .prov-section .table-wrap tr:hover td { background: transparent; }
+        .prov-section .table-wrap td:only-child {
+            flex: 0 0 100% !important;
+            text-align: center !important;
+            padding: 14px 0 !important;
+            border: none !important;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        .prov-section .table-wrap td:nth-child(1) {
+            flex: 0 0 28px;
+            padding: 0;
+            border: none;
+            display: flex;
+            align-items: center;
+            margin-right: 8px;
+            margin-top: 2px;
+        }
+        .prov-section .table-wrap td:nth-child(1) input[type=checkbox] {
+            width: 18px !important;
+            height: 18px;
+            flex-shrink: 0;
+        }
+        .prov-section .table-wrap td:nth-child(2) {
+            flex: 1 1 0;
+            padding: 0;
+            border: none;
+            font-weight: 800;
+            font-size: 14px;
+            color: var(--text);
+            word-break: break-word;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+        .prov-section .table-wrap td:nth-child(3),
+        .prov-section .table-wrap td:nth-child(4),
+        .prov-section .table-wrap td:nth-child(5),
+        .prov-section .table-wrap td:nth-child(6) {
+            flex: 0 0 50%;
+            padding: 3px 0;
+            border: none;
+            font-size: 12px;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            color: var(--text-2);
+            overflow: hidden;
+        }
+        .prov-section .table-wrap td:nth-child(3)::before,
+        .prov-section .table-wrap td:nth-child(4)::before,
+        .prov-section .table-wrap td:nth-child(5)::before,
+        .prov-section .table-wrap td:nth-child(6)::before {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .prov-section .table-wrap td:nth-child(3)::before { content: "CUIT "; }
+        .prov-section .table-wrap td:nth-child(4)::before { content: "Rubro "; }
+        .prov-section .table-wrap td:nth-child(5)::before { content: "Ciudad "; }
+        .prov-section .table-wrap td:nth-child(6)::before { content: "Tel. "; }
+        .prov-section .table-wrap td:nth-child(7) {
+            flex: 0 0 100%;
+            border: none;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding: 8px 0 0;
+            margin-top: 6px;
+        }
+        .prov-section .table-wrap .btn-accion {
+            padding: 8px 20px;
+            font-size: 13px;
+            border-radius: 7px;
+            min-height: 38px;
+            min-width: 48px;
+        }
+
+        /* Headers de sección tipo (Credifin, Sin Credifin, etc.) */
+        .tipo-header-cred,
+        .tipo-header-sin,
+        .tipo-header-retail { flex-wrap: wrap; gap: 6px; font-size: 13px; }
+        .tipo-header-prov   { flex-wrap: wrap; gap: 6px; font-size: 13px; }
+
+        /* Province section header — buscador y botones que se apilan */
+        .prov-section-header { gap: 8px; }
+        .prov-section-header input[type=text] { width: 100%; min-width: 0; flex: 1 1 100%; }
+
+        /* Asignar box */
+        .asignar-box { flex-direction: column; align-items: stretch; gap: 8px; }
+        .asignar-box label { white-space: normal; }
+        .asignar-box select { min-width: 0; width: 100%; }
+
+        /* "Cómo asignar" hint — más compacto en móvil */
+        .hint-asignar { font-size: 11px !important; gap: 4px 10px !important; padding: 8px 12px !important; }
+        .hint-asignar span[style], .hint-asignar span { font-size: 11px; }
+        .hint-asignar span:is(:nth-child(3),:nth-child(5)) { display: none; }
+
+        /* Filtros dentro de secciones */
+        .filtros { grid-template-columns: 1fr 1fr; }
+
+        /* CRM Telemarketers topbar */
+        .crm-topbar { flex-direction: column; align-items: stretch; gap: 8px; }
+        .crm-topbar select,
+        .crm-topbar input { max-width: 100%; width: 100%; }
+
+        /* CRM Vendedores topbar */
+        .crmv-topbar { flex-direction: column; align-items: stretch; gap: 8px; }
+        .crmv-topbar select { max-width: 100%; width: 100%; }
+
+        /* Stats row — más compacto */
+        .stats-row { gap: 6px; }
+        .stat-box { min-width: 70px; padding: 8px 10px; }
+        .stat-box h3 { font-size: 18px; }
+        .stat-box p  { font-size: 9px; }
+
+        /* Pills de estado */
+        .pills-bar { gap: 4px; }
+        .pill { padding: 5px 10px; font-size: 10px; }
+        .crmv-pills-bar { gap: 4px; }
+        .crmv-pill { padding: 5px 10px; font-size: 10px; }
+
+        /* CRM detalle — quita sticky en mobile para no quedar flotante */
+        .crm-detalle-card { position: static; max-height: none; }
+        .crmv-detalle-card { position: static; max-height: none; }
+
+        /* Estado botones en detalle */
+        .est-btns { grid-template-columns: 1fr 1fr; }
+
+        /* Exportar */
+        .export-btns { flex-direction: column; }
+        .export-btns .btn { width: 100%; }
+
+        /* Modales */
+        .modal-box { padding: 16px; width: 97%; max-height: 94vh; }
+
+        /* Calendario */
+        .cal-layout { grid-template-columns: 1fr; }
+        .cal-dia { min-height: 44px; padding: 3px 4px; }
+        .mcrm-dia { min-height: 38px; padding: 3px 4px; }
+        .cal-nav { gap: 6px; }
+        .cal-nav-titulo { font-size: 14px; min-width: 150px; }
+
+        /* Vendedores grid */
+        .vendedores-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+
+        /* Admin panel v2 */
+        .adm2-header { flex-direction: column; gap: 4px; }
+        .adm2-bar-lbl { min-width: 110px; font-size: 10px; }
+
+        /* Buscador de provincias en top de Asignar */
+        #g-prov-buscar { font-size: 16px !important; }
+        #g-prov-dropdown { font-size: 14px; }
+
+    }
+
 </style>
 </head>
 <body>
@@ -661,7 +983,6 @@
         <button class="tab-btn" onclick="cambiarTab('crmvend',this)">🤝 CRM Vendedores</button>
         <button class="tab-btn" onclick="cambiarTab('exportar',this)">📥 Exportar</button>
         <button class="tab-btn" onclick="cambiarTab('calendario',this)">📅 Calendario</button>
-        <button class="tab-btn" onclick="cambiarTab('prospeccion',this)">🔍 Prospección</button>
         <button class="tab-btn admin-only" onclick="cambiarTab('usuarios',this)" style="display:none;">👥 Usuarios</button>
         <button class="tab-btn admin-only" onclick="cambiarTab('admin',this)" style="display:none;">📊 Panel Admin</button>
     </div>
@@ -684,13 +1005,20 @@
 
     <!-- ===== ASIGNAR CLIENTES ===== -->
     <div id="tab-asignar" class="tab-content">
-        <div style="background:#eff6ff;border:2px solid #0066cc;border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:13px;font-weight:600;color:#1a1a2e;display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
+        <div class="hint-asignar" style="background:#eff6ff;border:2px solid #0066cc;border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:13px;font-weight:600;color:#1a1a2e;display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
             <span>📌 <strong>Cómo asignar:</strong></span>
             <span>① Hacé clic en una tarjeta de vendedor</span>
             <span>→</span>
             <span>② Se marcan todos los clientes automáticamente</span>
             <span>→</span>
             <span>③ Hacé clic en <strong>✅ Asignar</strong></span>
+        </div>
+        <!-- Buscador de provincias / listas -->
+        <div style="position:relative;margin-bottom:12px;max-width:380px;">
+            <input type="text" id="g-prov-buscar" placeholder="🔍 Ir a una provincia o lista..."
+                   style="width:100%;font-size:13px;box-sizing:border-box;"
+                   oninput="buscarProvincia(this.value)" onkeydown="navProvBuscar(event)" autocomplete="off">
+            <div id="g-prov-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.18);z-index:200;max-height:220px;overflow-y:auto;margin-top:3px;"></div>
         </div>
         <div class="grid2">
             <!-- Vendedores -->
@@ -810,6 +1138,43 @@
                     </button>
                 </div>
                 <div id="asignar-error" style="display:none;background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;padding:10px 14px;border-radius:8px;margin-top:8px;font-size:14px;font-weight:600;"></div>
+
+                <!-- Importar Excel y asignar directamente a un usuario -->
+                <div class="card" style="margin-top:16px;padding:14px 16px;">
+                    <h3 style="font-size:14px;font-weight:800;margin:0 0 12px;color:var(--text);">📥 Importar Excel al CRM</h3>
+                    <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+                        <div class="form-group" style="margin:0;flex:1;min-width:150px;">
+                            <label style="font-size:11px;">Asignar a</label>
+                            <select id="sel-excel-usuario" style="font-size:13px;">
+                                <option value="">— Elegí un usuario —</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin:0;flex:1;min-width:180px;">
+                            <label style="font-size:11px;">¿Dónde aparece en CRM?</label>
+                            <select id="excel-destino-crm" style="font-size:13px;">
+                                <option value="telemarketer">📊 CRM Telemarketers (Sin contactar)</option>
+                                <option value="vendedor">🤝 CRM Vendedores (En manos de vendedor)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin:0;flex:1;min-width:140px;">
+                            <label style="font-size:11px;">Categoría</label>
+                            <select id="excel-tipo-asignar" style="font-size:13px;">
+                                <option value="">⬜ Sin categoría</option>
+                                <option value="Sin Credifin">🟡 Sin Credifin</option>
+                                <option value="Credifin">🟢 Credifin</option>
+                                <option value="Retail">🟣 Retail</option>
+                            </select>
+                        </div>
+                        <label class="btn btn-blue" style="font-size:12px;padding:9px 16px;cursor:pointer;margin:0;align-self:flex-end;">
+                            📂 Elegir Excel
+                            <input type="file" accept=".xlsx,.xls" style="display:none;" onchange="cargarExcelYAsignar(this)">
+                        </label>
+                    </div>
+                    <p style="font-size:11px;color:#888;margin:8px 0 0;">
+                        <strong>Telemarketers</strong> (Ezequiel, Sabrina): elegí "CRM Telemarketers" ·
+                        <strong>Vendedores</strong> (Leo, Pablo, Pancho): elegí "CRM Vendedores"
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -905,125 +1270,6 @@
         </div>
     </div>
 
-    <!-- ===== PROSPECCIÓN ===== -->
-    <div id="tab-prospeccion" class="tab-content">
-
-        <!-- Header -->
-        <div class="prosp-header">
-            <div>
-                <h2 class="prosp-title">🔍 Prospección de Clientes</h2>
-                <p class="prosp-subtitle">Buscá bicicleterías en cualquier provincia o ciudad de Argentina. Conseguí nombre, teléfono, web y email para contactarlas.</p>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                <div id="prosp-badge-count" class="prosp-instruccion-badge" style="display:none;">0 encontrados</div>
-            </div>
-        </div>
-
-        <!-- Formulario de búsqueda -->
-        <div class="card prosp-form-card">
-            <div class="prosp-form-grid">
-                <div class="form-group">
-                    <label>Provincia</label>
-                    <select id="prosp-provincia">
-                        <option value="">— Todas las provincias —</option>
-                        <option>Buenos Aires</option>
-                        <option>CABA</option>
-                        <option>Córdoba</option>
-                        <option>Santa Fe</option>
-                        <option>Mendoza</option>
-                        <option>Tucumán</option>
-                        <option>Entre Ríos</option>
-                        <option>Salta</option>
-                        <option>Misiones</option>
-                        <option>Chaco</option>
-                        <option>Corrientes</option>
-                        <option>Santiago del Estero</option>
-                        <option>San Juan</option>
-                        <option>Jujuy</option>
-                        <option>Río Negro</option>
-                        <option>Neuquén</option>
-                        <option>Formosa</option>
-                        <option>Chubut</option>
-                        <option>San Luis</option>
-                        <option>Catamarca</option>
-                        <option>La Rioja</option>
-                        <option>La Pampa</option>
-                        <option>Santa Cruz</option>
-                        <option>Tierra del Fuego</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Ciudad o zona <span style="font-weight:400;text-transform:none;font-size:10px;">(opcional)</span></label>
-                    <input type="text" id="prosp-ciudad" placeholder="Rosario, Mar del Plata, zona norte...">
-                </div>
-                <div class="form-group">
-                    <label>Cantidad</label>
-                    <input type="number" id="prosp-cantidad" value="20" min="5" max="50">
-                </div>
-            </div>
-
-
-
-            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px;">
-                <button class="btn btn-blue" onclick="iniciarProspeccion()" style="padding:10px 28px;font-size:14px;">🔍 Buscar</button>
-                <button class="btn btn-gray" onclick="limpiarProspeccion()" style="font-size:12px;">🗑 Limpiar</button>
-                <div id="prosp-status" class="prosp-status" style="display:none;">
-                    <span class="prosp-spinner">⟳</span> <span id="prosp-status-txt">Buscando en Google...</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Barra de resultados + acciones masivas -->
-        <div id="prosp-resultados" style="display:none;">
-            <div class="card prosp-acciones-bar">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                        <span id="prosp-resumen-count" style="font-size:15px;font-weight:800;color:var(--text);"></span>
-                        <input type="text" id="prosp-busqueda-rapida" placeholder="🔍 Filtrar resultados..." style="width:200px;font-size:12px;padding:6px 10px;" oninput="filtrarTablaProspectos()">
-                    </div>
-                    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-                        <label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;">
-                            <input type="checkbox" id="prosp-sel-all" onchange="selAllProspectos(this.checked)" style="width:auto;"> Sel. todo
-                        </label>
-                        <button class="btn btn-green" onclick="importarSeleccionadosProspectos()" style="font-size:12px;">➕ Agregar como clientes</button>
-                        <button class="btn btn-gray" onclick="exportarProspectosJSON()" style="font-size:12px;">📄 Exportar JSON</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tabla -->
-            <div class="card" style="padding:0;overflow:hidden;">
-                <div class="tabla-wrap" style="max-height:none;">
-                    <table id="prosp-tabla">
-                        <thead>
-                            <tr>
-                                <th style="width:32px;"></th>
-                                <th>Negocio</th>
-                                <th>Ciudad</th>
-                                <th>Dirección</th>
-                                <th>Web</th>
-                                <th>Instagram</th>
-                                <th>Teléfono</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="prosp-tbody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Detalle expandido (fuera de tabla para simplicidad) -->
-            <div id="prosp-detalle-panel" class="card prosp-detalle-flotante" style="display:none;"></div>
-        </div>
-
-        <!-- Estado vacío -->
-        <div id="prosp-vacio" class="prosp-vacio">
-            <div class="prosp-vacio-icon">🚲</div>
-            <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;">Sin resultados todavía</div>
-            <div style="font-size:13px;color:var(--text-muted);">Elegí provincia, tipo de negocio y hacé clic en <strong>Buscar</strong></div>
-        </div>
-
-    </div>
 
     <!-- ===== CARGAR EXCEL ===== -->
     <div id="tab-cargar" class="tab-content">
@@ -1288,6 +1534,7 @@ const SB_URL = 'https://nwlvvtcltnatkuljtlob.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53bHZ2dGNsdG5hdGt1bGp0bG9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NTU0NTQsImV4cCI6MjA5NTAzMTQ1NH0.q9XDqJ_yfqgO3A1hrkgtHTLtYax-vMUIXy-6x2NzVPw';
 const db = supabase.createClient(SB_URL, SB_KEY);
 let sbDisponible = false;
+let cachedTelemarketers = []; // nombres de usuarios de la tabla usuarios
 
 function mostrarToast(msg, color) {
     const t = document.getElementById('toast-crm');
@@ -1310,7 +1557,7 @@ function mapClienteFromDB(c) {
         cuit: c.cuit||'', telefono: c.telefono||'', telefono2: c.telefono2||'',
         email: c.email||'', ciudad: c.ciudad||'', provincia: c.provincia||'',
         direccion: c.direccion||'', rubro: c.rubro||'',
-        vendedor_sugerido: c.vendedor_sugerido||'', tipo: c.tipo||'Credifin'
+        vendedor_sugerido: c.vendedor_sugerido||'', tipo: c.tipo??'Credifin'
     };
 }
 
@@ -1359,7 +1606,7 @@ async function refreshFromSupabase() {
 // Helper: detecta si el usuario está escribiendo en el panel de detalle
 function isEditingDetalle() {
     const id = document.activeElement?.id;
-    return id === 'nueva-nota-input' || id === 'fecha-contacto-crm';
+    return id === 'nueva-nota-input' || id === 'fecha-contacto-crm' || id === 'nueva-nota-vend-input';
 }
 
 // Re-renderiza todas las vistas del CRM
@@ -1373,6 +1620,19 @@ function rerenderAll() {
     actualizarHeader();
     renderCRM();
     renderCRMVendedores();
+    if (crmVClienteSel) {
+        const freshV = getClientesAsignados().find(c => String(c.id) === String(crmVClienteSel.id));
+        if (!freshV) {
+            crmVClienteSel = null;
+            mostrarDetalleCRMV();
+        } else if (document.activeElement?.id === 'nueva-nota-vend-input') {
+            // Vendedor escribiendo → actualizar memoria sin borrar el textarea
+            crmVClienteSel = freshV;
+        } else {
+            crmVClienteSel = freshV;
+            mostrarDetalleCRMV();
+        }
+    }
     if (crmClienteSel) {
         const fresh = getClientesAsignados().find(c => String(c.id) === String(crmClienteSel.id));
         if (!fresh) {
@@ -1435,6 +1695,14 @@ async function inicializarDB() {
         sbDisponible = true;
         console.log('[CRM] Supabase conectado');
         await refreshFromSupabase();
+        // Cargar nombres de telemarketers (usuarios de la tabla usuarios)
+        try {
+            const { data: uData } = await db.from('usuarios').select('nombre').order('nombre');
+            if (uData) {
+                cachedTelemarketers = uData.map(u => u.nombre).filter(Boolean);
+                renderVendedores(); // re-render para que aparezcan en el dropdown
+            }
+        } catch(e) { console.warn('[CRM] No se pudieron cargar usuarios:', e.message); }
         subscribeRealtime();
         // Auto-routing: si el nombre del usuario coincide con un vendedorVenta existente → CRM Vendedores
         const miNombre = (CURRENT_USER.nombre || CURRENT_USER.username || '').toLowerCase();
@@ -1613,10 +1881,10 @@ function renderVendedores() {
         }).join('');
     }
 
-    // Sincronizar selectores de vendedores
+    // Sincronizar todos los selectores con la misma lista de vendedores
     const opts = '<option value="">— Elegí un vendedor —</option>' +
         vendedores.map(n=>`<option value="${n}">${n}</option>`).join('');
-    ['sel-vendedor-asignar','sel-vendedor-crm'].forEach(id => {
+    ['sel-vendedor-asignar','sel-vendedor-crm','sel-excel-usuario'].forEach(id => {
         const el = document.getElementById(id); if(!el) return;
         const prev = el.value;
         el.innerHTML = opts;
@@ -1626,7 +1894,7 @@ function renderVendedores() {
     const selVV = document.getElementById('sel-vendedor-crmvend');
     if (selVV) {
         const prev = selVV.value;
-        selVV.innerHTML = '<option value="">— Elegí un vendedor —</option>' + vendedores.map(n=>`<option value="${n}">${n}</option>`).join('');
+        selVV.innerHTML = opts;
         if (crmVendActivo && vendedores.includes(crmVendActivo)) selVV.value = crmVendActivo;
         else if (prev && vendedores.includes(prev)) selVV.value = prev;
     }
@@ -3505,7 +3773,16 @@ function renderSeccionesProvincias() {
     const cont = document.getElementById('secciones-provincias');
     if (!cont) return;
     const listas = getListasProvincias();
-    if (!listas.length) { cont.innerHTML = ''; return; }
+    if (!listas.length) {
+        cont.innerHTML = '';
+        const tipoSel = document.getElementById('excel-tipo-asignar');
+        if (tipoSel) tipoSel.innerHTML =
+            '<option value="">⬜ Sin categoría</option>' +
+            '<option value="Sin Credifin">🟡 Sin Credifin</option>' +
+            '<option value="Credifin">🟢 Credifin</option>' +
+            '<option value="Retail">🟣 Retail</option>';
+        return;
+    }
 
     const cargados  = getClientesCargados();
     const asignados = getClientesAsignados();
@@ -3549,6 +3826,18 @@ function renderSeccionesProvincias() {
 
     // Render each section's table
     listas.forEach(p => filtrarProv(p.nombre, p.id));
+
+    // Actualizar selector de tipo en "Importar Excel y asignar directamente"
+    const tipoSel = document.getElementById('excel-tipo-asignar');
+    if (tipoSel) {
+        const provOpts = listas.map(p => `<option value="${p.nombre}">${p.nombre}</option>`).join('');
+        tipoSel.innerHTML =
+            '<option value="">⬜ Sin categoría</option>' +
+            '<option value="Sin Credifin">🟡 Sin Credifin</option>' +
+            '<option value="Credifin">🟢 Credifin</option>' +
+            '<option value="Retail">🟣 Retail</option>' +
+            (provOpts ? '<optgroup label="── Listas ──">' + provOpts + '</optgroup>' : '');
+    }
 }
 
 function filtrarProv(tipo, provId) {
@@ -3817,10 +4106,11 @@ async function confirmarPasarMultiple() {
 // CRM VENDEDORES
 // ============================================================
 const ESTADOS_VEND = [
-    { key: 'En proceso',    cls: 'e-cont', pill: 'p-cont', eb: 'eb-cont', icon: '🔄' },
-    { key: 'Negociando',    cls: 'e-int',  pill: 'p-int',  eb: 'eb-int',  icon: '💬' },
-    { key: 'Cerrado',       cls: 'e-cerr', pill: 'p-cerr', eb: 'eb-cerr', icon: '✅' },
-    { key: 'No interesado', cls: 'e-sin',  pill: 'p-sin',  eb: 'eb-sin',  icon: '❌' },
+    { key: 'Cliente Activo', cls: 'e-activo', pill: 'p-activo', eb: 'eb-activo', icon: '⭐' },
+    { key: 'En proceso',     cls: 'e-cont',   pill: 'p-cont',   eb: 'eb-cont',   icon: '🔄' },
+    { key: 'Negociando',     cls: 'e-int',    pill: 'p-int',    eb: 'eb-int',    icon: '💬' },
+    { key: 'Cerrado',        cls: 'e-cerr',   pill: 'p-cerr',   eb: 'eb-cerr',   icon: '✅' },
+    { key: 'No interesado',  cls: 'e-sin',    pill: 'p-sin',    eb: 'eb-sin',    icon: '❌' },
 ];
 function getEstVend(key) { return ESTADOS_VEND.find(e => e.key === key) || { key: key||'En proceso', cls:'e-cont', eb:'eb-cont', icon:'🔄' }; }
 
@@ -3920,24 +4210,34 @@ function mostrarDetalleCRMV() {
 
     const campo = (lbl, val, link) => val ? `<div class="det-field"><div class="lbl">${lbl}</div><div class="val">${link === 'tel:' ? waTel(val) : val}</div></div>` : '';
 
-    const notas = c.notasHistorial || [];
-    const fmtFecha = (iso) => {
-        if (!iso) return '—';
+    const notas = (c.notasHistorial || []).slice().sort((a,b) => {
+        if (!a.f) return -1; if (!b.f) return 1;
+        return new Date(a.f) - new Date(b.f);
+    });
+    const fmtFechaTimeline = (iso) => {
+        if (!iso) return { fecha: '—', hora: '' };
         const d = new Date(iso);
         const p = n => String(n).padStart(2,'0');
-        return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+        return {
+            fecha: `${p(d.getDate())}/${p(d.getMonth()+1)}`,
+            hora:  `${p(d.getHours())}:${p(d.getMinutes())}`
+        };
     };
 
     const historialHTML = notas.length
-        ? notas.map(nota => `
-            <div class="nota-item">
+        ? `<div style="border-left:3px solid var(--accent);padding-left:14px;margin-top:4px;">` +
+          notas.map(nota => {
+            const { fecha, hora } = fmtFechaTimeline(nota.f);
+            const autor = nota.u || '';
+            return `<div class="nota-item" style="margin-bottom:10px;border-left:3px solid #16a34a;">
                 <div class="nota-header">
-                    <span class="nota-fecha">📅 ${fmtFecha(nota.f)}</span>
-                    ${nota.u ? `<span class="nota-autor">· ${nota.u}</span>` : ''}
+                    <span class="nota-fecha">📌 ${fecha} ${hora}</span>
+                    ${autor ? `<span class="nota-autor" style="font-weight:700;color:var(--text-2);">— ${autor}</span>` : ''}
                 </div>
                 <div class="nota-texto">${nota.t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</div>
-            </div>`).join('')
-        : '<div class="nota-vacia">Sin notas del telemarketer</div>';
+            </div>`;
+          }).join('') + `</div>`
+        : '<div class="nota-vacia">Sin mensajes aún</div>';
 
     const btnEstados = ESTADOS_VEND.map(e =>
         `<button class="est-btn ${e.cls} ${(c.estadoVend||'En proceso')===e.key?'on':''}" onclick="cambiarEstadoCRMV('${e.key}')">${e.icon} ${e.key}</button>`
@@ -3961,12 +4261,14 @@ function mostrarDetalleCRMV() {
         </div>
         <div class="est-section-title" style="margin-top:12px;">Cambiar estado</div>
         <div class="est-btns">${btnEstados}</div>
-        <div style="border-top:1px solid #f0f0f0;padding-top:14px;margin-top:14px;">
-            <div class="est-section-title">Historial del telemarketer</div>
-            <div class="notas-historial" style="margin-bottom:12px;">${historialHTML}</div>
-            <div class="est-section-title">Tu nota</div>
+        <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
+            <div class="est-section-title">Nueva nota</div>
             <textarea id="nueva-nota-vend-input" style="min-height:70px;width:100%;box-sizing:border-box;" placeholder="Escribí tu observación..."></textarea>
             <button class="btn btn-green" style="width:100%;padding:11px;margin-top:8px;" onclick="guardarNotaVendedor()">💾 Guardar nota</button>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
+            <div class="est-section-title">📅 Historial de mensajes <span style="font-weight:400;font-size:10px;color:var(--text-muted);">(${notas.length})</span></div>
+            <div class="notas-historial" style="margin-bottom:4px;">${historialHTML}</div>
         </div>
     </div>`;
 }
@@ -3993,15 +4295,19 @@ async function guardarNotaVendedor() {
     const texto = input?.value?.trim();
     if (!texto) { mostrarToast('⚠️ Escribí algo antes de guardar', '#dc2626'); return; }
     const c = crmVClienteSel;
-    const nuevaNota = { t: texto, f: new Date().toISOString(), u: CURRENT_USER.nombre || CURRENT_USER.username };
+    const ahora = new Date();
+    const nuevaNota = { t: texto, f: ahora.toISOString(), u: CURRENT_USER.nombre || CURRENT_USER.username };
     const notas = [...(c.notasHistorial||[]), nuevaNota];
     const notasStr = fcSerializarVend(c.fecha_contacto||null, notas, c.vendedorVenta||'', c.estadoVend||'');
     try {
         if (!sbDisponible) throw new Error('Sin conexión con Supabase');
         const { error } = await db.from('asignaciones').update({ notas: notasStr }).eq('cliente_id', c.id);
         if (error) throw new Error(error.message);
+        // Limpiar textarea ANTES del refresh para que isEditingDetalle() no bloquee el re-render
+        if (input) input.value = '';
+        const horaStr = ahora.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
         await refreshFromSupabase();
-        mostrarToast('💾 Nota guardada');
+        mostrarToast(`✓ Guardado a las ${horaStr}`);
     } catch(err) {
         mostrarToast(`❌ ${err.message}`, '#dc2626');
     }
@@ -4034,6 +4340,140 @@ function waTel(num, display) {
     const safe = (num + '').replace(/'/g, "\\'");
     const txt  = display || num;
     return `<span class="wa-link" onclick="abrirWhatsApp('${safe}')" title="Abrir en WhatsApp">📱 ${txt}</span>`;
+}
+
+// ── Buscador de provincia / lista con scroll ──
+function buscarProvincia(val) {
+    var dd = document.getElementById('g-prov-dropdown');
+    if (!dd) return;
+    val = val.trim().toLowerCase();
+    if (!val) { dd.style.display = 'none'; return; }
+    var matches = getListasProvincias().filter(function(p) {
+        return p.nombre.toLowerCase().includes(val);
+    });
+    if (!matches.length) {
+        dd.innerHTML = '<div style="padding:9px 14px;color:#888;font-size:12px;">Sin resultados</div>';
+        dd.style.display = 'block';
+        return;
+    }
+    dd.innerHTML = matches.map(function(p) {
+        return '<div onclick="irAProvincia(\'' + p.id + '\')" style="padding:9px 14px;cursor:pointer;font-size:13px;font-weight:600;transition:background .12s;" onmouseover="this.style.background=\'var(--hover)\'" onmouseout="this.style.background=\'\'">📍 ' + p.nombre + '</div>';
+    }).join('');
+    dd.style.display = 'block';
+}
+function irAProvincia(id) {
+    var el = document.getElementById('sec-prov-' + id);
+    var dd = document.getElementById('g-prov-dropdown');
+    var inp = document.getElementById('g-prov-buscar');
+    if (dd) dd.style.display = 'none';
+    if (inp) inp.value = '';
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    el.style.outline = '3px solid #0066cc';
+    el.style.outlineOffset = '3px';
+    setTimeout(function() { el.style.outline = ''; el.style.outlineOffset = ''; }, 1600);
+}
+function navProvBuscar(e) {
+    if (e.key === 'Escape') {
+        var dd = document.getElementById('g-prov-dropdown');
+        if (dd) dd.style.display = 'none';
+    }
+}
+document.addEventListener('click', function(e) {
+    var inp = document.getElementById('g-prov-buscar');
+    var dd  = document.getElementById('g-prov-dropdown');
+    if (dd && inp && !inp.contains(e.target) && !dd.contains(e.target)) dd.style.display = 'none';
+});
+
+// ── Importar Excel y asignar a usuario ──
+async function cargarExcelYAsignar(input) {
+    var file = input.files[0]; if (!file) return;
+    var usuario = (document.getElementById('sel-excel-usuario') || {}).value || '';
+    var tipo    = (document.getElementById('excel-tipo-asignar') || {}).value;
+    var destino = (document.getElementById('excel-destino-crm') || {}).value || 'telemarketer';
+    if (!usuario) { mostrarToast('⚠️ Elegí un usuario antes de importar', '#dc2626'); input.value = ''; return; }
+    var reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            if (!sbDisponible) throw new Error('Sin conexión con Supabase');
+            var wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+            var ws = wb.Sheets[wb.SheetNames[0]];
+            var rawRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+            var hkw = ['nombre','name','razon','comercio','empresa','local','ranking',
+                       'direccion','telefono','rubro','especialidad','cuit','email','ciudad'];
+            var headerRowIdx = -1, fallbackIdx = 0, fallbackMax = 0;
+            for (var i = 0; i < Math.min(rawRows.length, 8); i++) {
+                var nonEmpty = rawRows[i].filter(function(v){ return v !== '' && v != null; }).length;
+                if (nonEmpty < 2) continue;
+                if (nonEmpty > fallbackMax) { fallbackMax = nonEmpty; fallbackIdx = i; }
+                var rowStr = rawRows[i].join(' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+                if (hkw.some(function(k){ return rowStr.includes(k); })) { headerRowIdx = i; break; }
+            }
+            if (headerRowIdx === -1) headerRowIdx = fallbackIdx;
+            var rows = XLSX.utils.sheet_to_json(ws, { range: headerRowIdx, defval: '' });
+            if (!rows.length) { mostrarToast('⚠️ Excel vacío', '#dc2626'); return; }
+            var cols = detectarColumnas(rows[0]);
+            var nKey = cols.nombre || Object.keys(rows[0])[0] || '';
+            var candidatos = rows.map(function(r) {
+                return {
+                    id: crypto.randomUUID(),
+                    nombre:   extraerCampo(r, cols.nombre, nKey),
+                    cuit:     extraerCampo(r, cols.cuit),
+                    telefono: extraerCampo(r, cols.telefono),
+                    telefono2:extraerCampo(r, cols.telefono2),
+                    email:    extraerCampo(r, cols.email),
+                    ciudad:   extraerCampo(r, cols.ciudad) || tipo,
+                    provincia:extraerCampo(r, cols.provincia) || tipo,
+                    direccion:extraerCampo(r, cols.direccion),
+                    rubro:    extraerCampo(r, cols.rubro),
+                    vendedor_sugerido: usuario,
+                    tipo:     tipo
+                };
+            }).filter(function(c){ return c.nombre && c.nombre.length > 1 && isNaN(Number(c.nombre)); });
+            if (!candidatos.length) { mostrarToast('⚠️ No se encontraron clientes válidos', '#f59e0b'); return; }
+            var yaExisten = new Set(
+                getClientesCargados().filter(function(c){ return c.tipo === tipo; })
+                    .map(function(c){ return c.nombre.toLowerCase().trim(); })
+            );
+            var nuevos   = candidatos.filter(function(c){ return !yaExisten.has(c.nombre.toLowerCase().trim()); });
+            var omitidos = candidatos.length - nuevos.length;
+            if (!nuevos.length) { mostrarToast('⚠️ Todos ya existen en "' + tipo + '"', '#f59e0b'); return; }
+            var CHUNK = 500;
+            var payload = nuevos.map(function(c){ return {
+                id:c.id, nombre:c.nombre, cuit:c.cuit||'', telefono:c.telefono||'',
+                telefono2:c.telefono2||'', email:c.email||'', ciudad:c.ciudad||'',
+                provincia:c.provincia||'', direccion:c.direccion||'', rubro:c.rubro||'',
+                vendedor_sugerido:c.vendedor_sugerido||'', tipo:c.tipo
+            }; });
+            for (var j = 0; j < payload.length; j += CHUNK) {
+                var r1 = await db.from('clientes').upsert(payload.slice(j, j+CHUNK), { onConflict:'id' });
+                if (r1.error) throw new Error(r1.error.message);
+            }
+            // Para CRM Telemarketers: estado Sin contactar, notas vacías
+            // Para CRM Vendedores: estado Interesado (DB) + _vv en notas → se muestra como "En manos de vendedor" con vendedorVenta
+            var esVendedor = destino === 'vendedor';
+            var asignPayload = nuevos.map(function(c){ return {
+                cliente_id: c.id,
+                vendedor_nombre: usuario,
+                estado: esVendedor ? 'Interesado' : 'Sin contactar',
+                notas:  esVendedor ? JSON.stringify({ _vv: usuario }) : ''
+            }; });
+            for (var k = 0; k < asignPayload.length; k += CHUNK) {
+                var r2 = await db.from('asignaciones').upsert(asignPayload.slice(k, k+CHUNK), { onConflict:'cliente_id' });
+                if (r2.error) throw new Error(r2.error.message);
+            }
+            await refreshFromSupabase();
+            input.value = '';
+            var destLabel = esVendedor ? 'CRM Vendedores' : 'CRM Telemarketers';
+            var msg = omitidos > 0
+                ? '✅ ' + nuevos.length + ' importados → ' + usuario + ' (' + destLabel + ') · ' + omitidos + ' ya existían'
+                : '✅ ' + nuevos.length + ' clientes importados → ' + usuario + ' (' + destLabel + ')';
+            mostrarToast(msg);
+        } catch(err) {
+            mostrarToast('❌ ' + err.message, '#dc2626');
+        }
+    };
+    reader.readAsArrayBuffer(file);
 }
 </script>
 
@@ -4123,369 +4563,6 @@ function waTel(num, display) {
     <button onclick="crmCheckeados.clear();actualizarBarraMasiva();renderCRM();" style="background:#374151;color:#fff;border:none;padding:8px 12px;border-radius:8px;font-size:12px;cursor:pointer;">✖ Limpiar</button>
 </div>
 
-<script>
-/* ===== PROSPECCIÓN — Nominatim + Overpass combinado ===== */
-var _prospectos = [];
-
-function iniciarProspeccion() {
-  var provincia = document.getElementById('prosp-provincia').value;
-  var ciudad    = document.getElementById('prosp-ciudad').value.trim();
-  var cantidad  = Math.min(parseInt(document.getElementById('prosp-cantidad').value) || 20, 100);
-
-  if (!provincia && !ciudad) {
-    mostrarToast('⚠️ Elegí una provincia o escribí una ciudad', '#f59e0b');
-    return;
-  }
-
-  var st = document.getElementById('prosp-status');
-  document.getElementById('prosp-vacio').style.display = 'none';
-  document.getElementById('prosp-resultados').style.display = 'none';
-  st.style.display = 'flex';
-
-  var zona = ciudad ? ciudad + (provincia ? ', ' + provincia : '') : provincia;
-  document.getElementById('prosp-status-txt').textContent = 'Buscando en ' + zona + '...';
-
-  /* Paso 1: geocodificar para obtener bounding box */
-  var geoQ = (ciudad ? ciudad + ', ' : '') + (provincia || '') + ', Argentina';
-  fetch('https://nominatim.openstreetmap.org/search?' + new URLSearchParams({
-    q: geoQ, format: 'json', limit: '1', countrycodes: 'ar'
-  }), { headers: { 'Accept-Language': 'es' } })
-  .then(function(r){ return r.json(); })
-  .then(function(geo) {
-    if (!geo || !geo.length) throw new Error('No se encontró "' + zona + '"');
-
-    var bb   = geo[0].boundingbox;
-    var sur  = parseFloat(bb[0]), norte = parseFloat(bb[1]);
-    var oeste= parseFloat(bb[2]), este  = parseFloat(bb[3]);
-
-    /* Expandir bbox para ciudades chicas (~15 km mínimo) */
-    var MIN = 0.15;
-    if (norte - sur < MIN) { var cy=(sur+norte)/2, cx=(oeste+este)/2; sur=cy-MIN; norte=cy+MIN; oeste=cx-MIN; este=cx+MIN; }
-    var bbox = sur + ',' + oeste + ',' + norte + ',' + este;
-
-    document.getElementById('prosp-status-txt').textContent = 'Consultando múltiples fuentes...';
-
-    /* Paso 2: búsquedas en paralelo ─────────────────────────────── */
-
-    /* A) Nominatim text search — varios términos argentinos */
-    var terminos = ['bicicletería', 'bicicletas', 'bike', 'ciclo', 'rodado', 'bicis', 'pedal'];
-    var nominatimCalls = terminos.map(function(t) {
-      return fetch('https://nominatim.openstreetmap.org/search?' + new URLSearchParams({
-        q: t + ' ' + zona + ' Argentina',
-        format: 'json', addressdetails: '1', extratags: '1', limit: '50', countrycodes: 'ar'
-      }), { headers: { 'Accept-Language': 'es' } })
-      .then(function(r){ return r.json(); })
-      .catch(function(){ return []; });
-    });
-
-    /* B) Overpass — shop=bicycle + name regex amplia dentro del bbox */
-    var overpassQuery =
-      '[out:json][timeout:30];\n(\n' +
-      '  node["shop"="bicycle"](' + bbox + ');\n' +
-      '  way["shop"="bicycle"]('  + bbox + ');\n' +
-      '  node["shop"="sports"]('  + bbox + ');\n' +
-      '  node[name~"[Bb]icicl"](' + bbox + ');\n' +
-      '  way[name~"[Bb]icicl"]('  + bbox + ');\n' +
-      '  node[name~"[Bb]ike"]('   + bbox + ');\n' +
-      '  node[name~"[Cc]icl"]('   + bbox + ');\n' +
-      '  node[name~"[Rr]odado"](' + bbox + ');\n' +
-      '  node[name~"[Bb]icis"]('  + bbox + ');\n' +
-      '  node[name~"[Pp]edal"]('  + bbox + ');\n' +
-      ');\nout body;\n>;\nout skel qt;';
-    var overpassCall = fetch('https://overpass-api.de/api/interpreter', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'data=' + encodeURIComponent(overpassQuery)
-    })
-    .then(function(r){ return r.ok ? r.json() : { elements:[] }; })
-    .catch(function(){ return { elements:[] }; });
-
-    return Promise.all(nominatimCalls.concat([overpassCall]));
-  })
-  .then(function(resultados) {
-    st.style.display = 'none';
-
-    var visto = {};
-    var lista = [];
-
-    function addProspecto(obj) {
-      var key = (obj.nombre||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,25);
-      if (!key || key.length < 3) return;
-      if (visto[key]) return;
-      visto[key] = true;
-      lista.push(obj);
-    }
-
-    /* Procesar resultados Nominatim (primeros 7 arrays) */
-    var nominatimResults = resultados.slice(0, 7);
-    nominatimResults.forEach(function(arr) {
-      (arr || []).forEach(function(item) {
-        if (!item.name && !item.display_name) return;
-        var addr = item.address || {};
-        var ext  = item.extratags || {};
-        var dir  = [addr.road, addr.house_number].filter(Boolean).join(' ');
-        var tel  = ext.phone || ext['contact:phone'] || ext['contact:mobile'] || '';
-        var web  = ext.website || ext['contact:website'] || null;
-        var ig   = ext['contact:instagram'] || null;
-        if (ig && ig.indexOf('http') === -1) ig = 'https://instagram.com/' + ig;
-        addProspecto({
-          nombre:    item.name || (item.display_name||'').split(',')[0] || '—',
-          ciudad:    addr.city || addr.town || addr.village || addr.municipality || '',
-          provincia: addr.state || document.getElementById('prosp-provincia').value || '',
-          direccion: dir,
-          web: web, instagram: ig, telefono: tel, email: '', fuente: 'Nominatim'
-        });
-      });
-    });
-
-    /* Procesar resultado Overpass (último elemento) */
-    var ovData = resultados[7] || { elements:[] };
-    (ovData.elements || []).forEach(function(el) {
-      if (!el.tags || !el.tags.name) return;
-      var t   = el.tags;
-      var web = t.website || t['contact:website'] || t['url'] || null;
-      var ig  = t['contact:instagram'] || t['instagram'] || null;
-      var tel = t.phone || t['contact:phone'] || t['contact:mobile'] || '';
-      var dir = [t['addr:street'], t['addr:housenumber']].filter(Boolean).join(' ');
-      if (ig && ig.indexOf('http') === -1) ig = 'https://instagram.com/' + ig;
-      addProspecto({
-        nombre:    t.name,
-        ciudad:    t['addr:city'] || t['addr:suburb'] || t['addr:municipality'] || '',
-        provincia: t['addr:state'] || document.getElementById('prosp-provincia').value || '',
-        direccion: dir,
-        web: web, instagram: ig, telefono: tel, email: '', fuente: 'OSM'
-      });
-    });
-
-    lista = lista.slice(0, cantidad);
-
-    if (!lista.length) {
-      var zona2 = document.getElementById('prosp-ciudad').value || document.getElementById('prosp-provincia').value;
-      document.getElementById('prosp-vacio').innerHTML =
-        '<div class="prosp-vacio-icon">🚲</div>' +
-        '<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:8px;">Sin resultados para "' + zona2 + '"</div>' +
-        '<div style="font-size:13px;color:var(--text-muted);line-height:1.7;">' +
-          'Probá con una ciudad grande: <strong>Córdoba</strong>, <strong>Rosario</strong>, <strong>Mendoza</strong>.' +
-        '</div>';
-      document.getElementById('prosp-vacio').style.display = 'block';
-      mostrarToast('Sin resultados — probá con otra ciudad', '#f59e0b');
-      return;
-    }
-
-    _prospectos = lista;
-    renderTablaProspectos(_prospectos);
-    document.getElementById('prosp-vacio').style.display = 'none';
-    document.getElementById('prosp-resultados').style.display = 'block';
-    document.getElementById('prosp-resumen-count').textContent = _prospectos.length + ' bicicleterías encontradas en ' + zona;
-    var badge = document.getElementById('prosp-badge-count');
-    if (badge) { badge.textContent = _prospectos.length + ' encontradas'; badge.style.display = 'flex'; }
-    mostrarToast('✅ ' + _prospectos.length + ' bicicleterías encontradas', '#16a34a');
-  })
-  .catch(function(err) {
-    document.getElementById('prosp-status').style.display = 'none';
-    document.getElementById('prosp-vacio').style.display = 'block';
-    mostrarToast('❌ ' + (err.message || 'Error de conexión'), '#dc3545');
-  });
-}
-
-function filtrarTablaProspectos() {
-  var busq = (document.getElementById('prosp-busqueda-rapida').value || '').toLowerCase();
-  var filtrados = busq
-    ? _prospectos.filter(function(p) {
-        return ((p.nombre||'')+(p.ciudad||'')+(p.direccion||'')+(p.telefono||'')).toLowerCase().indexOf(busq) !== -1;
-      })
-    : _prospectos;
-  renderTablaProspectos(filtrados);
-  document.getElementById('prosp-resumen-count').textContent = filtrados.length + ' de ' + _prospectos.length + ' bicicleterías';
-}
-
-function renderTablaProspectos(lista) {
-  var tbody = document.getElementById('prosp-tbody');
-  tbody.innerHTML = '';
-  if (!lista || !lista.length) {
-    var tr = document.createElement('tr');
-    tr.innerHTML = '<td colspan="9" style="text-align:center;padding:30px;color:var(--text-muted);">Sin resultados</td>';
-    tbody.appendChild(tr); return;
-  }
-  lista.forEach(function(p) {
-    var realIdx = _prospectos.indexOf(p);
-    var webTxt = p.web
-      ? '<a class="prosp-web-link" href="'+escHTML(p.web)+'" target="_blank">🌐 Web</a>'
-      : '<span style="color:#dc3545;font-size:11px;font-weight:700;">Sin web</span>';
-    var igTxt = p.instagram
-      ? '<a class="prosp-ig-link" href="'+escHTML(p.instagram)+'" target="_blank">📷 IG</a>'
-      : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
-    var telTxt = p.telefono
-      ? '<a href="tel:'+escHTML(p.telefono)+'" style="color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;">📞 '+escHTML(p.telefono)+'</a>'
-      : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
-
-    var tr = document.createElement('tr');
-    tr.id = 'prosp-row-' + realIdx;
-    tr.style.cursor = 'pointer';
-    tr.onclick = function(){ toggleExpandProsp(realIdx); };
-    tr.innerHTML =
-      '<td><input type="checkbox" class="prosp-chk" data-idx="'+realIdx+'" onchange="onChkProsp(this)" style="width:auto;cursor:pointer;" onclick="event.stopPropagation()"></td>' +
-      '<td style="font-weight:700;color:var(--text);font-size:13px;">'+escHTML(p.nombre||'—')+'</td>' +
-      '<td style="font-size:12px;color:var(--text-muted);">'+escHTML(p.ciudad||'—')+'</td>' +
-      '<td style="font-size:11px;color:var(--text-muted);max-width:160px;">'+escHTML(p.direccion||'—')+'</td>' +
-      '<td>'+webTxt+'</td>' +
-      '<td>'+igTxt+'</td>' +
-      '<td>'+telTxt+'</td>' +
-      '<td style="white-space:nowrap;">' +
-        '<button class="btn-accion btn-accion-edit" onclick="event.stopPropagation();toggleExpandProsp('+realIdx+')" style="margin-right:4px;">👁 Ver más</button>' +
-        '<button class="btn-accion" onclick="event.stopPropagation();abrirDestModal(event,'+realIdx+')" style="background:var(--accent);color:#fff;border-color:var(--accent);">➕ Agregar</button>' +
-      '</td>';
-    tbody.appendChild(tr);
-
-    /* Fila expandible */
-    var maps = 'https://www.google.com/maps/search/' + encodeURIComponent((p.nombre||'') + ' ' + (p.ciudad||'') + ' Argentina');
-    var trExp = document.createElement('tr');
-    trExp.className = 'prosp-expand-row';
-    trExp.id = 'prosp-exp-' + realIdx;
-    trExp.innerHTML = '<td colspan="9"><div class="prosp-expand-inner" id="prosp-expand-inner-'+realIdx+'">' +
-      '<div class="prosp-expand-group"><div class="prosp-expand-label">Nombre</div><div class="prosp-expand-val">'+escHTML(p.nombre||'—')+'</div></div>' +
-      '<div class="prosp-expand-group"><div class="prosp-expand-label">Ciudad</div><div class="prosp-expand-val">'+escHTML(p.ciudad||'—')+'</div></div>' +
-      '<div class="prosp-expand-group"><div class="prosp-expand-label">Provincia</div><div class="prosp-expand-val">'+escHTML(p.provincia||'—')+'</div></div>' +
-      '<div class="prosp-expand-group"><div class="prosp-expand-label">Dirección</div><div class="prosp-expand-val">'+escHTML(p.direccion||'—')+'</div></div>' +
-      '<div class="prosp-expand-group"><div class="prosp-expand-label">Teléfono</div><div class="prosp-expand-val">'+(p.telefono?'<a href="tel:'+escHTML(p.telefono)+'">'+escHTML(p.telefono)+'</a>':'—')+'</div></div>' +
-      '<div class="prosp-expand-group"><div class="prosp-expand-label">Sitio web</div><div class="prosp-expand-val">'+(p.web?'<a href="'+escHTML(p.web)+'" target="_blank">'+escHTML(p.web)+'</a>':'Sin web')+'</div></div>' +
-      '<div class="prosp-expand-group"><div class="prosp-expand-label">Instagram</div><div class="prosp-expand-val">'+(p.instagram?'<a href="'+escHTML(p.instagram)+'" target="_blank">Ver perfil</a>':'—')+'</div></div>' +
-      '<div class="prosp-expand-group"><div class="prosp-expand-label">Ver en mapa</div><div class="prosp-expand-val"><a href="'+escHTML(maps)+'" target="_blank">📍 Google Maps</a></div></div>' +
-      '<div style="margin-top:10px;width:100%;"><button class="btn btn-green" onclick="abrirDestModal(event,'+realIdx+')" style="font-size:12px;padding:7px 18px;">➕ Agregar como cliente</button></div>' +
-    '</div></td>';
-    tbody.appendChild(trExp);
-  });
-}
-
-function toggleExpandProsp(idx) {
-  var el = document.getElementById('prosp-expand-inner-' + idx);
-  if (el) el.classList.toggle('open');
-}
-
-/* Modal de destino */
-var _destModalIdx = -1;
-function abrirDestModal(evt, idx) {
-  evt.stopPropagation();
-  _destModalIdx = idx;
-  cerrarDestModal();
-  var overlay = document.createElement('div');
-  overlay.className = 'prosp-dest-overlay';
-  overlay.id = 'prosp-dest-overlay';
-  overlay.onclick = cerrarDestModal;
-  document.body.appendChild(overlay);
-
-  var modal = document.createElement('div');
-  modal.className = 'prosp-dest-modal';
-  modal.id = 'prosp-dest-modal';
-  modal.innerHTML =
-    '<h4>¿A dónde agregar el cliente?</h4>' +
-    '<button class="prosp-dest-btn" onclick="confirmarImport(0)">\U0001f7e1 Sin Credifin <span style="font-weight:400;font-size:10px;margin-left:4px;">→ Asignar Clientes</span></button>' +
-    '<button class="prosp-dest-btn" onclick="confirmarImport(1)">\U0001f7e2 Credifin <span style="font-weight:400;font-size:10px;margin-left:4px;">→ Asignar Clientes</span></button>' +
-    '<button class="prosp-dest-btn" onclick="confirmarImport(2)">\U0001f7e3 Retail <span style="font-weight:400;font-size:10px;margin-left:4px;">→ Asignar Clientes</span></button>';
-
-  var rect = (evt.target || evt.currentTarget).getBoundingClientRect();
-  modal.style.top  = Math.min(rect.bottom + 6, window.innerHeight - 200) + 'px';
-  modal.style.left = Math.max(rect.left - 100, 10) + 'px';
-  document.body.appendChild(modal);
-}
-
-function cerrarDestModal() {
-  var m = document.getElementById('prosp-dest-modal');
-  var o = document.getElementById('prosp-dest-overlay');
-  if (m) m.remove();
-  if (o) o.remove();
-}
-
-var _DESTINOS = ['Sin Credifin', 'Credifin', 'Retail'];
-function confirmarImport(n) {
-  cerrarDestModal();
-  importarProspecto(_destModalIdx, _DESTINOS[n] || 'Sin Credifin');
-}
-
-function escHTML(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-function limpiarProspeccion() {
-  _prospectos = [];
-  document.getElementById('prosp-provincia').value = '';
-  document.getElementById('prosp-ciudad').value = '';
-  document.getElementById('prosp-cantidad').value = 20;
-  var br = document.getElementById('prosp-busqueda-rapida'); if(br) br.value = '';
-  document.getElementById('prosp-resultados').style.display = 'none';
-  document.getElementById('prosp-status').style.display = 'none';
-  document.getElementById('prosp-vacio').innerHTML =
-    '<div class="prosp-vacio-icon">\U0001f6b2</div>' +
-    '<div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;">Sin resultados todavía</div>' +
-    '<div style="font-size:13px;color:var(--text-muted);">Elegí provincia o ciudad y hacé clic en <strong>Buscar</strong></div>';
-  document.getElementById('prosp-vacio').style.display = 'block';
-  var badge = document.getElementById('prosp-badge-count');
-  if (badge) badge.style.display = 'none';
-}
-
-window.agregarProspectos = function(lista) {
-  _prospectos = lista || [];
-  renderTablaProspectos(_prospectos);
-  document.getElementById('prosp-vacio').style.display = 'none';
-  document.getElementById('prosp-resultados').style.display = 'block';
-  document.getElementById('prosp-resumen-count').textContent = _prospectos.length + ' bicicleteriías encontradas';
-  mostrarToast('✅ ' + _prospectos.length + ' resultados cargados', '#16a34a');
-};
-
-function onChkProsp(chk) {
-  var row = document.getElementById('prosp-row-' + chk.dataset.idx);
-  if (row) row.classList.toggle('prosp-row-sel', chk.checked);
-}
-function selAllProspectos(checked) {
-  document.querySelectorAll('.prosp-chk').forEach(function(c){
-    c.checked = checked;
-    var row = document.getElementById('prosp-row-' + c.dataset.idx);
-    if(row) row.classList.toggle('prosp-row-sel', checked);
-  });
-}
-function importarProspecto(idx, destino) {
-  var p = _prospectos[idx]; if (!p) return;
-  destino = destino || 'Sin Credifin';
-  var cliente = {
-    id: 'prosp_' + Date.now() + '_' + idx,
-    nombre: p.nombre||'', telefono: p.telefono||'', email: '',
-    ciudad: p.ciudad||'', provincia: p.provincia||'', cuit: '',
-    rubro: 'Biciclería', direccion: p.direccion||'',
-    tipo: destino, fuente: 'Prospección',
-    vendedor: null, estado: 'Sin contactar', notas: []
-  };
-  if (destino === 'Sin Credifin' && typeof clientesSinCredifin !== 'undefined') {
-    clientesSinCredifin.push(cliente);
-    if (typeof filtrarSin === 'function') filtrarSin();
-  } else if (destino === 'Credifin' && typeof clientes !== 'undefined') {
-    clientes.push(cliente);
-    if (typeof filtrarCredifin === 'function') filtrarCredifin();
-  } else if (destino === 'Retail' && typeof clientesRetail !== 'undefined') {
-    clientesRetail.push(cliente);
-    if (typeof filtrarRetail === 'function') filtrarRetail();
-  } else if (typeof clientesSinCredifin !== 'undefined') {
-    clientesSinCredifin.push(cliente);
-    if (typeof filtrarSin === 'function') filtrarSin();
-  }
-  mostrarToast('✅ "' + cliente.nombre + '" agregado a ' + destino + ' → Tab Asignar Clientes', '#16a34a');
-}
-function importarSeleccionadosProspectos() {
-  var checks = document.querySelectorAll('.prosp-chk:checked');
-  if (!checks.length) { mostrarToast('⚠️ Seleccioná al menos un negocio', '#f59e0b'); return; }
-  checks.forEach(function(c){ importarProspecto(parseInt(c.dataset.idx), 'Sin Credifin'); });
-  mostrarToast('✅ ' + checks.length + ' clientes agregados a Sin Credifin', '#16a34a');
-}
-function exportarProspectosJSON() {
-  if (!_prospectos.length) return;
-  var blob = new Blob([JSON.stringify(_prospectos, null, 2)], {type:'application/json'});
-  var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = 'prospectos-' + new Date().toISOString().slice(0,10) + '.json'; a.click();
-}
-function mostrarToast(msg, color) {
-  var t = document.getElementById('toast-crm'); if (!t) return;
-  t.textContent = msg; t.style.background = color||'#333';
-  t.style.opacity = '1';
-  setTimeout(function(){ t.style.opacity='0'; }, 3000);
-}
-</script>
 
 <script>
 (function(){
