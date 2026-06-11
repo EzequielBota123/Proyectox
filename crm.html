@@ -285,7 +285,8 @@
     .p-int     { background:#fef9c3; color:#a16207; } .p-int.on     { background:#d97706; color:#fff; }
     .p-vend    { background:#f3e8ff; color:#7c3aed; } .p-vend.on    { background:#7c3aed; color:#fff; }
     .p-cerr    { background:#dcfce7; color:#15803d; } .p-cerr.on    { background:#15803d; color:#fff; }
-    .p-activo  { background:#fff7ed; color:#c2410c; } .p-activo.on  { background:#ea580c; color:#fff; }
+    .p-activo   { background:#fff7ed; color:#c2410c; } .p-activo.on   { background:#ea580c; color:#fff; }
+    .p-activo2  { background:#ede9fe; color:#5b21b6; } .p-activo2.on  { background:#6d28d9; color:#fff; }
     .crm-grid { display:grid; grid-template-columns:340px 1fr; gap:16px; align-items:start; }
     @media(max-width:900px) { .crm-grid { grid-template-columns:1fr; } }
     .crm-list-wrap { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--surface); max-height:680px; overflow-y:auto; transition:background 0.3s,border-color 0.3s; }
@@ -301,7 +302,8 @@
     .eb-int    { background:#fef9c3; color:#a16207; }
     .eb-vend   { background:#f3e8ff; color:#7c3aed; }
     .eb-cerr   { background:#dcfce7; color:#15803d; }
-    .eb-activo { background:#fff7ed; color:#c2410c; }
+    .eb-activo  { background:#fff7ed; color:#c2410c; }
+    .eb-activo2 { background:#ede9fe; color:#5b21b6; }
     .crm-detalle-card { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); padding:20px; position:sticky; top:16px; max-height:85vh; overflow-y:auto; transition:background 0.3s,border-color 0.3s; }
     .det-nombre { font-size:20px; font-weight:800; color:var(--text); margin-bottom:8px; }
     .det-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; background:var(--surface-2); border-radius:var(--radius-sm); padding:14px; margin-bottom:16px; border:1px solid var(--border); transition:background 0.3s; }
@@ -318,7 +320,8 @@
     .e-int    { border-color:#fde68a; background:#fef9c3; color:#a16207; } .e-int.on    { background:#d97706; color:#fff; border-color:#d97706; }
     .e-vend   { border-color:#c084fc; background:#f3e8ff; color:#7c3aed; } .e-vend.on   { background:#7c3aed; color:#fff; border-color:#7c3aed; }
     .e-cerr   { border-color:#86efac; background:#dcfce7; color:#15803d; } .e-cerr.on   { background:#15803d; color:#fff; border-color:#15803d; }
-    .e-activo { border-color:#fdba74; background:#fff7ed; color:#c2410c; } .e-activo.on { background:#ea580c; color:#fff; border-color:#ea580c; }
+    .e-activo  { border-color:#fdba74; background:#fff7ed; color:#c2410c; } .e-activo.on  { background:#ea580c; color:#fff; border-color:#ea580c; }
+    .e-activo2 { border-color:#c4b5fd; background:#ede9fe; color:#5b21b6; } .e-activo2.on { background:#6d28d9; color:#fff; border-color:#6d28d9; }
 
     /* ============ STATS ============ */
     .stats-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
@@ -550,25 +553,29 @@
     body.dark .p-int   { background:rgba(161,98,7,0.22);    color:#fde68a; }
     body.dark .p-vend  { background:rgba(124,58,237,0.22);  color:#c4b5fd; }
     body.dark .p-cerr   { background:rgba(21,128,61,0.22);    color:#86efac; }
-    body.dark .p-activo { background:rgba(194,65,12,0.2);     color:#fb923c; }
+    body.dark .p-activo  { background:rgba(194,65,12,0.2);    color:#fb923c; }
+    body.dark .p-activo2 { background:rgba(109,40,217,0.2);   color:#c4b5fd; }
     body.dark .eb-sin    { background:rgba(153,27,27,0.22);   color:#fca5a5; }
     body.dark .eb-cont   { background:rgba(29,78,216,0.22);   color:#93c5fd; }
     body.dark .eb-int    { background:rgba(161,98,7,0.22);    color:#fde68a; }
     body.dark .eb-vend   { background:rgba(124,58,237,0.22);  color:#c4b5fd; }
     body.dark .eb-cerr   { background:rgba(21,128,61,0.22);   color:#86efac; }
-    body.dark .eb-activo { background:rgba(194,65,12,0.2);    color:#fb923c; }
+    body.dark .eb-activo  { background:rgba(194,65,12,0.2);   color:#fb923c; }
+    body.dark .eb-activo2 { background:rgba(109,40,217,0.2);  color:#c4b5fd; }
     body.dark .e-sin    { border-color:rgba(252,165,165,0.3); background:rgba(153,27,27,0.2);  color:#fca5a5; }
     body.dark .e-cont   { border-color:rgba(147,197,253,0.3); background:rgba(29,78,216,0.2);  color:#93c5fd; }
     body.dark .e-int    { border-color:rgba(253,230,138,0.3); background:rgba(161,98,7,0.2);   color:#fde68a; }
     body.dark .e-vend   { border-color:rgba(192,132,252,0.3); background:rgba(124,58,237,0.2); color:#c4b5fd; }
     body.dark .e-cerr   { border-color:rgba(134,239,172,0.3); background:rgba(21,128,61,0.2);  color:#86efac; }
-    body.dark .e-activo { border-color:rgba(251,146,60,0.3);  background:rgba(194,65,12,0.18); color:#fb923c; }
+    body.dark .e-activo  { border-color:rgba(251,146,60,0.3);  background:rgba(194,65,12,0.18);  color:#fb923c; }
+    body.dark .e-activo2 { border-color:rgba(196,181,253,0.3); background:rgba(109,40,217,0.18); color:#c4b5fd; }
     body.dark .e-sin.on    { background:#991b1b; color:#fff; border-color:#991b1b; }
     body.dark .e-cont.on   { background:#1d4ed8; color:#fff; border-color:#1d4ed8; }
     body.dark .e-int.on    { background:#d97706; color:#fff; border-color:#d97706; }
     body.dark .e-vend.on   { background:#7c3aed; color:#fff; border-color:#7c3aed; }
     body.dark .e-cerr.on   { background:#15803d; color:#fff; border-color:#15803d; }
-    body.dark .e-activo.on { background:#ea580c; color:#fff; border-color:#ea580c; }
+    body.dark .e-activo.on  { background:#ea580c; color:#fff; border-color:#ea580c; }
+    body.dark .e-activo2.on { background:#6d28d9; color:#fff; border-color:#6d28d9; }
     body.dark .info-box       { background:rgba(22,163,74,0.12); color:#86efac; }
     body.dark .script-cliente { background:rgba(245,158,11,0.12); border-color:#f59e0b; color:#fde68a; }
     body.dark .vend-asignado-box { background:rgba(253,230,138,0.08); border-color:rgba(253,230,138,0.3); }
@@ -4106,11 +4113,12 @@ async function confirmarPasarMultiple() {
 // CRM VENDEDORES
 // ============================================================
 const ESTADOS_VEND = [
-    { key: 'Cliente Activo', cls: 'e-activo', pill: 'p-activo', eb: 'eb-activo', icon: '⭐' },
-    { key: 'En proceso',     cls: 'e-cont',   pill: 'p-cont',   eb: 'eb-cont',   icon: '🔄' },
-    { key: 'Negociando',     cls: 'e-int',    pill: 'p-int',    eb: 'eb-int',    icon: '💬' },
-    { key: 'Cerrado',        cls: 'e-cerr',   pill: 'p-cerr',   eb: 'eb-cerr',   icon: '✅' },
-    { key: 'No interesado',  cls: 'e-sin',    pill: 'p-sin',    eb: 'eb-sin',    icon: '❌' },
+    { key: 'Cliente Activo',          cls: 'e-activo',  pill: 'p-activo',  eb: 'eb-activo',  icon: '⭐' },
+    { key: 'Cliente Activo No Asig.', cls: 'e-activo2', pill: 'p-activo2', eb: 'eb-activo2', icon: '🔓' },
+    { key: 'En proceso',              cls: 'e-cont',    pill: 'p-cont',    eb: 'eb-cont',    icon: '🔄' },
+    { key: 'Negociando',              cls: 'e-int',     pill: 'p-int',     eb: 'eb-int',     icon: '💬' },
+    { key: 'Cerrado',                 cls: 'e-cerr',    pill: 'p-cerr',    eb: 'eb-cerr',    icon: '✅' },
+    { key: 'No interesado',           cls: 'e-sin',     pill: 'p-sin',     eb: 'eb-sin',     icon: '❌' },
 ];
 function getEstVend(key) { return ESTADOS_VEND.find(e => e.key === key) || { key: key||'En proceso', cls:'e-cont', eb:'eb-cont', icon:'🔄' }; }
 
@@ -4139,25 +4147,14 @@ function renderCRMVendedores() {
     if (sinVend) sinVend.style.display = 'none';
     if (main)    main.style.display = 'block';
 
-    const KEY_ANS = '__activo_noasig__';
-
     // Clientes "en manos de" este vendedor
     const todos = getClientesAsignados().filter(c =>
         c.estado === 'En manos de vendedor' && c.vendedorVenta === crmVendActivo
     );
 
-    // Clientes Activos No Asignados = todos los "Cliente Activo" de TODOS los vendedores
-    const activosNoAsig = getClientesAsignados().filter(c =>
-        c.estado === 'En manos de vendedor' && (c.estadoVend||'') === 'Cliente Activo'
-    );
-
-    // Pool según filtro activo
-    const pool = crmVFiltroEstado === KEY_ANS ? activosNoAsig : todos;
-
     const busq = (document.getElementById('f-crmvend')?.value||'').toLowerCase();
-    const filtrados = pool.filter(c => {
-        const okEst  = crmVFiltroEstado === 'todos' || crmVFiltroEstado === KEY_ANS
-            || (c.estadoVend||'En proceso') === crmVFiltroEstado;
+    const filtrados = todos.filter(c => {
+        const okEst  = crmVFiltroEstado === 'todos' || (c.estadoVend||'En proceso') === crmVFiltroEstado;
         const okBusq = !busq ||
             c.nombre.toLowerCase().includes(busq) ||
             (c.telefono||'').includes(busq) ||
@@ -4170,7 +4167,6 @@ function renderCRMVendedores() {
     if (pb) {
         pb.innerHTML =
             `<span class="pill p-todos ${crmVFiltroEstado==='todos'?'on':''}" onclick="crmVFiltroEstado='todos';renderCRMVendedores()">Todos <strong>${todos.length}</strong></span>` +
-            `<span class="pill p-activo ${crmVFiltroEstado===KEY_ANS?'on':''}" onclick="crmVFiltroEstado='${KEY_ANS}';renderCRMVendedores()" title="Todos los clientes activos del equipo">⭐ Activos No Asig. <strong>${activosNoAsig.length}</strong></span>` +
             ESTADOS_VEND.map(e => {
                 const n = todos.filter(c => (c.estadoVend||'En proceso') === e.key).length;
                 return `<span class="pill ${e.pill} ${crmVFiltroEstado===e.key?'on':''}" onclick="crmVFiltroEstado='${e.key}';renderCRMVendedores()">${e.icon} ${e.key} <strong>${n}</strong></span>`;
@@ -4199,11 +4195,8 @@ function renderCRMVendedores() {
         const badge = c.tipo==='Credifin' ? '<span class="badge-cred">CRE</span>'
                    : c.tipo==='Retail'    ? '<span class="badge-retail">RET</span>'
                                           : '<span class="badge-sin">SIN</span>';
-        const vendTag = crmVFiltroEstado === KEY_ANS && c.vendedorVenta
-            ? `<span style="font-size:9px;color:#ea580c;font-weight:700;background:#fff7ed;padding:1px 6px;border-radius:4px;margin-left:4px;">👤 ${c.vendedorVenta}</span>`
-            : '';
         return `<div class="crm-item ${sel}" onclick="seleccionarClienteCRMV('${c.id}')">
-            <div class="crm-nombre">${badge} ${c.nombre}${vendTag}</div>
+            <div class="crm-nombre">${badge} ${c.nombre}</div>
             <div class="crm-datos">${c.ciudad||''}${c.provincia?' — '+c.provincia:''} · ${c.telefono||'—'}</div>
             <div style="margin-top:3px;"><span class="eb ${ev.eb}">${ev.icon} ${ev.key}</span></div>
         </div>`;
