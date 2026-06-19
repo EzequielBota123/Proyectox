@@ -456,6 +456,7 @@
     .nota-texto { font-size:12px; color:var(--text); line-height:1.6; white-space:pre-wrap; word-wrap:break-word; }
     .nota-vacia { color:var(--text-muted); font-size:12px; padding:6px 0; font-style:italic; }
     .vend-asignado-box { background:#fef9c3; border:1.5px solid #fde68a; border-radius:var(--radius-sm); padding:12px; margin-bottom:12px; }
+    .vend-cerrado-box { background:#dcfce7; border:1.5px solid #86efac; border-radius:var(--radius-sm); padding:12px; margin-bottom:12px; }
     .btn-pasar-vendedor { background:#7c3aed; color:white; }
     .btn-pasar-vendedor:hover { background:#6d28d9; }
 
@@ -579,6 +580,7 @@
     body.dark .info-box       { background:rgba(22,163,74,0.12); color:#86efac; }
     body.dark .script-cliente { background:rgba(245,158,11,0.12); border-color:#f59e0b; color:#fde68a; }
     body.dark .vend-asignado-box { background:rgba(253,230,138,0.08); border-color:rgba(253,230,138,0.3); }
+    body.dark .vend-cerrado-box { background:rgba(134,239,172,0.08); border-color:rgba(134,239,172,0.3); }
 
     /* ============ DARK — SCROLLBAR ============ */
     body.dark ::-webkit-scrollbar { width:6px; height:6px; }
@@ -946,9 +948,8 @@
         .adm2-header { flex-direction: column; gap: 4px; }
         .adm2-bar-lbl { min-width: 110px; font-size: 10px; }
 
-        /* Buscador de provincias en top de Asignar */
-        #g-prov-buscar { font-size: 16px !important; }
-        #g-prov-dropdown { font-size: 14px; }
+        /* Selector de provincias en top de Asignar */
+        #g-prov-select { font-size: 16px !important; }
 
     }
 
@@ -1016,16 +1017,16 @@
             <span>📌 <strong>Cómo asignar:</strong></span>
             <span>① Hacé clic en una tarjeta de vendedor</span>
             <span>→</span>
-            <span>② Se marcan todos los clientes automáticamente</span>
+            <span>② Marcá los clientes que quieras con los ✓</span>
             <span>→</span>
             <span>③ Hacé clic en <strong>✅ Asignar</strong></span>
         </div>
-        <!-- Buscador de provincias / listas -->
-        <div style="position:relative;margin-bottom:12px;max-width:380px;">
-            <input type="text" id="g-prov-buscar" placeholder="🔍 Ir a una provincia o lista..."
-                   style="width:100%;font-size:13px;box-sizing:border-box;"
-                   oninput="buscarProvincia(this.value)" onkeydown="navProvBuscar(event)" autocomplete="off">
-            <div id="g-prov-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.18);z-index:200;max-height:220px;overflow-y:auto;margin-top:3px;"></div>
+        <!-- Selector de provincia / lista -->
+        <div style="margin-bottom:12px;max-width:380px;">
+            <select id="g-prov-select" onchange="irASeccion(this.value); this.selectedIndex=0;"
+                    style="width:100%;font-size:13px;box-sizing:border-box;font-weight:700;">
+                <option value="">🔍 Ir a una provincia o lista...</option>
+            </select>
         </div>
         <div class="grid2">
             <!-- Vendedores -->
@@ -1046,7 +1047,7 @@
             <!-- Tablas -->
             <div>
                 <!-- CREDIFIN -->
-                <div class="seccion-tipo">
+                <div class="seccion-tipo" id="sec-tipo-cred">
                     <div class="tipo-header-cred"><span>🟢 CREDIFIN — <span id="count-cred">0</span> clientes</span><button class="btn-add-tipo" onclick="abrirModalClienteTipo('Credifin')">➕ Agregar</button></div>
                     <div class="filtros">
                         <input type="text" placeholder="Nombre"    id="f-cred-nombre"    onkeyup="filtrarCredifin()" autocomplete="off">
@@ -1074,7 +1075,7 @@
                 </div>
 
                 <!-- SIN CREDIFIN -->
-                <div class="seccion-tipo">
+                <div class="seccion-tipo" id="sec-tipo-sin">
                     <div class="tipo-header-sin"><span>🟡 SIN CREDIFIN — <span id="count-sin">0</span> clientes</span><button class="btn-add-tipo" onclick="abrirModalClienteTipo('Sin Credifin')">➕ Agregar</button></div>
                     <div class="filtros">
                         <input type="text" placeholder="Nombre"    id="f-sin-nombre"    onkeyup="filtrarSin()" autocomplete="off">
@@ -1102,7 +1103,7 @@
                 </div>
 
                 <!-- RETAIL -->
-                <div class="seccion-tipo">
+                <div class="seccion-tipo" id="sec-tipo-retail">
                     <div class="tipo-header-retail"><span>🟣 RETAIL — <span id="count-retail">0</span> clientes</span><button class="btn-add-tipo" onclick="abrirModalClienteTipo('Retail')">➕ Agregar</button></div>
                     <div class="filtros">
                         <input type="text" placeholder="Nombre"    id="f-retail-nombre"    onkeyup="filtrarRetail()" autocomplete="off">
@@ -1132,12 +1133,17 @@
                 <!-- PROVINCIAS DINÁMICAS -->
                 <div id="secciones-provincias"></div>
                 <div class="btn-nueva-provincia" onclick="abrirModalNuevaProvincia()">➕ Nueva Provincia / Lista</div>
+                <div class="btn-nueva-provincia" style="border-color:#16a34a;color:#16a34a;" onclick="crearListaNuevosClientes()">🆕 Nuevos Clientes</div>
 
                 <!-- Asignar box -->
                 <div class="asignar-box">
                     <label>👤 Asignar seleccionados a:</label>
-                    <select id="sel-vendedor-asignar" onchange="vendedorActivo=this.value||null; filtrarCredifin(); filtrarSin(); filtrarRetail(); if(vendedorActivo) selTodosLosClientes();">
+                    <select id="sel-vendedor-asignar" onchange="vendedorActivo=this.value||null; filtrarCredifin(); filtrarSin(); filtrarRetail();">
                         <option value="">— Elegí un vendedor —</option>
+                    </select>
+                    <select id="sel-destino-asignar" title="¿A qué CRM van los seleccionados?" style="flex:0 0 auto;min-width:180px;font-size:13px;font-weight:700;border:2px solid var(--accent);">
+                        <option value="telemarketer">📊 CRM Telemarketers</option>
+                        <option value="vendedor">🤝 CRM Vendedores</option>
                     </select>
                     <span id="contador-sel" style="font-size:13px;color:#555;white-space:nowrap;">0 seleccionados</span>
                     <button class="btn btn-green" id="btn-asignar" style="padding:10px 24px;font-size:14px;" onclick="asignarClientes()">
@@ -1684,10 +1690,15 @@ async function refreshFromSupabase() {
         setClientesAsignados((aData||[]).filter(a => a.clientes).map(a => {
             const { fecha, texto, notas: notasHistorial, vendedorVenta, estadoVend } = fcExtraer(a.notas || '');
             // Si tiene vendedorVenta (_vv) y el DB estado es 'Interesado', en realidad
-            // es 'En manos de vendedor' (se guarda así para no violar el CHECK constraint)
-            const estadoReal = (vendedorVenta && a.estado === 'Interesado')
-                ? 'En manos de vendedor'
-                : (a.estado || 'Sin contactar');
+            // es 'En manos de vendedor' (se guarda así para no violar el CHECK constraint).
+            // Si además el vendedor ya lo marcó 'Cerrado' (_ev), reflejarlo como Cerrado
+            // para el telemarketer que se lo pasó.
+            let estadoReal;
+            if (vendedorVenta && a.estado === 'Interesado') {
+                estadoReal = (estadoVend === 'Cerrado') ? 'Cerrado' : 'En manos de vendedor';
+            } else {
+                estadoReal = a.estado || 'Sin contactar';
+            }
             return {
                 ...mapClienteFromDB(a.clientes),
                 vendedorId: a.vendedor_nombre,
@@ -1812,7 +1823,7 @@ async function inicializarDB() {
         // Auto-routing: si el nombre del usuario coincide con un vendedorVenta existente → CRM Vendedores
         const miNombre = (CURRENT_USER.nombre || CURRENT_USER.username || '').toLowerCase();
         const esVendedor = getClientesAsignados().some(c =>
-            c.estado === 'En manos de vendedor' && (c.vendedorVenta||'').toLowerCase() === miNombre
+            (c.vendedorVenta||'').toLowerCase() === miNombre
         );
         if (esVendedor) {
             crmVendActivo = CURRENT_USER.nombre || CURRENT_USER.username;
@@ -2090,7 +2101,7 @@ function seleccionarVendedor(nombre) {
     filtrarRetail();
     const sel = document.getElementById('sel-vendedor-asignar');
     if (sel) sel.value = nombre;
-    selTodosLosClientes();
+    actualizarContadorSel();
 }
 
 function selTodosLosClientes() {
@@ -2229,6 +2240,10 @@ async function asignarClientes() {
     const btnAsignar = document.getElementById('btn-asignar');
     if (btnAsignar) { btnAsignar.disabled = true; btnAsignar.textContent = 'Guardando...'; }
 
+    // Destino: CRM Telemarketers (Sin contactar) o CRM Vendedores (En manos de vendedor)
+    const destino    = (document.getElementById('sel-destino-asignar')?.value) || 'telemarketer';
+    const esVendedor = destino === 'vendedor';
+
     // Construir payload de upsert batch
     const asignadosActuales = getClientesAsignados();
     const payload = [];
@@ -2237,13 +2252,23 @@ async function asignarClientes() {
         try { cliente = JSON.parse(decodeURIComponent(chk.dataset.c)); } catch(e) { return; }
         if (!cliente || !cliente.id) return;
         const existente = asignadosActuales.find(a => String(a.id) === String(cliente.id));
-        const estExistente = existente?.estado || 'Sin contactar';
-        payload.push({
-            cliente_id: cliente.id,
-            vendedor_nombre: vendedor,
-            estado: estExistente === 'En manos de vendedor' ? 'Interesado' : estExistente,
-            notas:  existente?.notas  || ''
-        });
+        if (esVendedor) {
+            // Se guarda como 'Interesado' + _vv en notas → el CRM lo muestra como "En manos de vendedor"
+            payload.push({
+                cliente_id: cliente.id,
+                vendedor_nombre: vendedor,
+                estado: 'Interesado',
+                notas: fcSerializar(existente?.fecha_contacto || null, existente?.notasHistorial || [], vendedor)
+            });
+        } else {
+            const estExistente = existente?.estado || 'Sin contactar';
+            payload.push({
+                cliente_id: cliente.id,
+                vendedor_nombre: vendedor,
+                estado: estExistente === 'En manos de vendedor' ? 'Interesado' : estExistente,
+                notas:  existente?.notas  || ''
+            });
+        }
     });
 
     if (!payload.length) {
@@ -2263,15 +2288,18 @@ async function asignarClientes() {
         deselCred(); deselSin(); deselRetail();
         actualizarContadorSel();
 
-        // Ir al CRM directamente
+        // Ir al CRM correspondiente según el destino elegido
+        const tabId = esVendedor ? 'crmvend' : 'crm';
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('tab-crm').classList.add('active');
+        document.getElementById('tab-' + tabId).classList.add('active');
         document.querySelectorAll('.tab-btn').forEach(b => {
-            if ((b.getAttribute('onclick')||'').includes("'crm'")) b.classList.add('active');
+            if ((b.getAttribute('onclick')||'').includes("'" + tabId + "'")) b.classList.add('active');
         });
-        seleccionarVendedorCRM(vendedor);
-        mostrarToast(`✅ ${payload.length} cliente(s) asignados a ${vendedor}`);
+        if (esVendedor) { crmVendActivo = vendedor; seleccionarVendedorVendedores(vendedor); }
+        else            { seleccionarVendedorCRM(vendedor); }
+        const destLabel = esVendedor ? 'CRM Vendedores' : 'CRM Telemarketers';
+        mostrarToast(`✅ ${payload.length} cliente(s) asignados a ${vendedor} (${destLabel})`);
     } catch (err) {
         mostrarToast(`❌ Error al asignar: ${err.message}`, '#dc2626');
         console.error('[CRM] asignarClientes:', err);
@@ -2376,8 +2404,9 @@ function renderCRM() {
         const fechaTag = c.fecha_contacto
             ? `<span style="font-size:9px;color:#0066cc;font-weight:700;background:#e0f2fe;padding:1px 6px;border-radius:4px;margin-left:4px;">📅 ${formatFechaContacto(c.fecha_contacto)}</span>`
             : '';
-        const vendedorTag = c.estado === 'En manos de vendedor' && c.vendedorVenta
-            ? `<span style="font-size:9px;color:#7c3aed;font-weight:700;background:#f3e8ff;padding:1px 6px;border-radius:4px;margin-left:4px;">👤 ${c.vendedorVenta}</span>`
+        const cerradoPorVend = c.estado === 'Cerrado' && c.estadoVend === 'Cerrado' && c.vendedorVenta;
+        const vendedorTag = c.vendedorVenta && (c.estado === 'En manos de vendedor' || cerradoPorVend)
+            ? `<span style="font-size:9px;color:#7c3aed;font-weight:700;background:#f3e8ff;padding:1px 6px;border-radius:4px;margin-left:4px;">👤 ${c.vendedorVenta}${cerradoPorVend ? ' ✅ cerró' : ''}</span>`
             : '';
         const chk = c.estado === 'Interesado'
             ? `<input type="checkbox" class="crm-bulk-chk" style="width:auto;margin-right:6px;flex-shrink:0;" ${crmCheckeados.has(String(c.id))?'checked':''} onclick="event.stopPropagation()" onchange="toggleCRMCheck('${c.id}',this.checked)" title="Seleccionar para pasar en masa">`
@@ -2422,6 +2451,13 @@ function mostrarDetalleCRM() {
                 <button class="est-btn e-int" onclick="cambiarEstadoCRM('Interesado')">⭐ Mantener como Interesado</button>
             </div>`;
     } else {
+        const cerradoPorVend = c.estado === 'Cerrado' && c.estadoVend === 'Cerrado' && c.vendedorVenta;
+        const cerradoBox = cerradoPorVend
+            ? `<div class="vend-cerrado-box">
+                   <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px;">✅ Cerrado por el vendedor</div>
+                   <div style="font-size:14px;font-weight:800;color:#1a1a2e;">👤 ${c.vendedorVenta}</div>
+               </div>`
+            : '';
         const btnEstados = ESTADOS
             .filter(e => e.key !== 'En manos de vendedor')
             .map(e => `<button class="est-btn ${e.cls} ${c.estado===e.key?'on':''}" onclick="cambiarEstadoCRM('${e.key}')">${e.icon} ${e.key}</button>`)
@@ -2430,6 +2466,7 @@ function mostrarDetalleCRM() {
             ? `<button class="btn btn-pasar-vendedor" style="width:100%;margin-top:10px;padding:11px;font-size:13px;font-weight:700;border:none;border-radius:8px;cursor:pointer;" onclick="abrirSelectorVendedorVenta()">🤝 Pasar a vendedor</button>`
             : '';
         estadoHTML = `
+            ${cerradoBox}
             <div class="est-section-title">Cambiar estado</div>
             <div class="est-btns">${btnEstados}</div>
             ${btnPasar}`;
@@ -2547,7 +2584,7 @@ async function guardarNuevaNota() {
         u: CURRENT_USER.nombre || CURRENT_USER.username
     };
     const notas = [...(crmClienteSel.notasHistorial || []), nuevaNota];
-    const notasStr = fcSerializar(crmClienteSel.fecha_contacto || null, notas, crmClienteSel.vendedorVenta || '');
+    const notasStr = fcSerializarVend(crmClienteSel.fecha_contacto || null, notas, crmClienteSel.vendedorVenta || '', crmClienteSel.estadoVend || '');
 
     try {
         if (!sbDisponible) throw new Error('Sin conexión con Supabase');
@@ -2570,7 +2607,7 @@ async function editarNotaAdmin(idx) {
     if (nuevo === null || nuevo === nota.t) return;
     const notas = [...(crmClienteSel.notasHistorial || [])];
     notas[idx] = { ...nota, t: nuevo };
-    const notasStr = fcSerializar(crmClienteSel.fecha_contacto || null, notas, crmClienteSel.vendedorVenta || '');
+    const notasStr = fcSerializarVend(crmClienteSel.fecha_contacto || null, notas, crmClienteSel.vendedorVenta || '', crmClienteSel.estadoVend || '');
     try {
         if (!sbDisponible) throw new Error('Sin conexión con Supabase');
         const { error } = await db.from('asignaciones').update({ notas: notasStr }).eq('cliente_id', crmClienteSel.id);
@@ -2586,7 +2623,7 @@ async function eliminarNotaAdmin(idx) {
     if (CURRENT_USER.rol !== 'admin') return;
     if (!confirm('¿Eliminar esta nota?')) return;
     const notas = (crmClienteSel.notasHistorial || []).filter((_, i) => i !== idx);
-    const notasStr = fcSerializar(crmClienteSel.fecha_contacto || null, notas, crmClienteSel.vendedorVenta || '');
+    const notasStr = fcSerializarVend(crmClienteSel.fecha_contacto || null, notas, crmClienteSel.vendedorVenta || '', crmClienteSel.estadoVend || '');
     try {
         if (!sbDisponible) throw new Error('Sin conexión con Supabase');
         const { error } = await db.from('asignaciones').update({ notas: notasStr }).eq('cliente_id', crmClienteSel.id);
@@ -2675,6 +2712,7 @@ function cambiarTab(id, btn) {
     if (id==='usuarios')   { cargarListaUsuarios(); }
     if (id==='calendario') { renderCalendario(); renderCalVisitas(); }
     if (id==='admin')      { renderAdminPanel(); }
+    actualizarFabAsignar();
 }
 
 function actualizarDebug() {
@@ -3429,7 +3467,7 @@ async function guardarFechaContacto() {
     const input = document.getElementById('fecha-contacto-crm');
     if (!input) return;
     const fc = input.value ? new Date(input.value).toISOString() : null;
-    const notasStr = fcSerializar(fc, crmClienteSel.notasHistorial || [], crmClienteSel.vendedorVenta || '');
+    const notasStr = fcSerializarVend(fc, crmClienteSel.notasHistorial || [], crmClienteSel.vendedorVenta || '', crmClienteSel.estadoVend || '');
     try {
         if (!sbDisponible) throw new Error('Sin conexión con Supabase');
         const { error } = await db.from('asignaciones').update({ notas: notasStr }).eq('cliente_id', crmClienteSel.id);
@@ -3923,8 +3961,31 @@ function crearProvincia() {
     mostrarToast(`✅ Lista "${nombre}" creada`);
 }
 
+// Crea (o reutiliza) la lista fija "Nuevos Clientes" y hace scroll hacia ella.
+// Dentro de esa lista podés agregar a mano o importar Excel, y luego asignar
+// los seleccionados a cualquier vendedor o telemarketer desde el cuadro de abajo.
+function crearListaNuevosClientes() {
+    const NOMBRE = 'Nuevos Clientes';
+    const listas = getListasProvincias();
+    const yaExiste = listas.find(p => p.nombre.toLowerCase() === NOMBRE.toLowerCase());
+    if (!yaExiste) {
+        listas.push({ id: 'prov_'+Date.now(), nombre: NOMBRE });
+        setListasProvincias(listas);
+        renderSeccionesProvincias();
+        mostrarToast(`✅ Lista "${NOMBRE}" creada — agregá a mano o importá Excel`);
+    } else {
+        mostrarToast(`ℹ️ La lista "${NOMBRE}" ya existe`);
+    }
+    const lista = getListasProvincias().find(p => p.nombre.toLowerCase() === NOMBRE.toLowerCase());
+    if (lista) {
+        const el = document.getElementById('sec-prov-' + lista.id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
 function renderSeccionesProvincias() {
     migrarDatosProvinciasCRM2();
+    poblarSelectorSecciones();
     const cont = document.getElementById('secciones-provincias');
     if (!cont) return;
     const listas = getListasProvincias();
@@ -4295,9 +4356,11 @@ function renderCRMVendedores() {
     if (sinVend) sinVend.style.display = 'none';
     if (main)    main.style.display = 'block';
 
-    // Clientes "en manos de" este vendedor
+    // Clientes "en manos de" este vendedor (incluye los que el propio vendedor ya cerró,
+    // que para el telemarketer figuran como 'Cerrado' pero siguen siendo de este vendedor)
     const todos = getClientesAsignados().filter(c =>
-        c.estado === 'En manos de vendedor' && c.vendedorVenta === crmVendActivo
+        c.vendedorVenta === crmVendActivo &&
+        (c.estado === 'En manos de vendedor' || (c.estado === 'Cerrado' && c.estadoVend === 'Cerrado'))
     );
 
     const busq = (document.getElementById('f-crmvend')?.value||'').toLowerCase();
@@ -4508,48 +4571,76 @@ function waTel(num, display) {
     return `<span class="wa-link" onclick="abrirWhatsApp('${safe}')" title="Abrir en WhatsApp">📱 ${txt}</span>`;
 }
 
-// ── Buscador de provincia / lista con scroll ──
-function buscarProvincia(val) {
-    var dd = document.getElementById('g-prov-dropdown');
-    if (!dd) return;
-    val = val.trim().toLowerCase();
-    if (!val) { dd.style.display = 'none'; return; }
-    var matches = getListasProvincias().filter(function(p) {
-        return p.nombre.toLowerCase().includes(val);
+// ── Selector de provincia / lista: salta (scroll) a la sección elegida ──
+// Llena el <select> con TODAS las secciones de Asignar Clientes (fijas + listas dinámicas).
+function poblarSelectorSecciones() {
+    var sel = document.getElementById('g-prov-select');
+    if (!sel) return;
+    var fijas = [
+        { id: 'sec-tipo-cred',   label: '🟢 Credifin' },
+        { id: 'sec-tipo-sin',    label: '🟡 Sin Credifin' },
+        { id: 'sec-tipo-retail', label: '🟣 Retail' }
+    ];
+    var listas = getListasProvincias().map(function(p) {
+        return { id: 'sec-prov-' + p.id, label: '📍 ' + p.nombre };
     });
-    if (!matches.length) {
-        dd.innerHTML = '<div style="padding:9px 14px;color:#888;font-size:12px;">Sin resultados</div>';
-        dd.style.display = 'block';
-        return;
+    var opts = '<option value="">🔍 Ir a una provincia o lista...</option>';
+    opts += fijas.map(function(s){ return '<option value="' + s.id + '">' + s.label + '</option>'; }).join('');
+    if (listas.length) {
+        opts += '<optgroup label="── Listas ──">' +
+                listas.map(function(s){ return '<option value="' + s.id + '">' + s.label + '</option>'; }).join('') +
+                '</optgroup>';
     }
-    dd.innerHTML = matches.map(function(p) {
-        return '<div onclick="irAProvincia(\'' + p.id + '\')" style="padding:9px 14px;cursor:pointer;font-size:13px;font-weight:600;transition:background .12s;" onmouseover="this.style.background=\'var(--hover)\'" onmouseout="this.style.background=\'\'">📍 ' + p.nombre + '</div>';
-    }).join('');
-    dd.style.display = 'block';
+    sel.innerHTML = opts;
 }
-function irAProvincia(id) {
-    var el = document.getElementById('sec-prov-' + id);
-    var dd = document.getElementById('g-prov-dropdown');
-    var inp = document.getElementById('g-prov-buscar');
-    if (dd) dd.style.display = 'none';
-    if (inp) inp.value = '';
+// Hace scroll y resalta la sección con ese id de elemento.
+function irASeccion(elId) {
+    if (!elId) return;
+    var el = document.getElementById(elId);
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     el.style.outline = '3px solid #0066cc';
     el.style.outlineOffset = '3px';
     setTimeout(function() { el.style.outline = ''; el.style.outlineOffset = ''; }, 1600);
 }
-function navProvBuscar(e) {
-    if (e.key === 'Escape') {
-        var dd = document.getElementById('g-prov-dropdown');
-        if (dd) dd.style.display = 'none';
+
+// ── Botón flotante de navegación en Asignar Clientes ──
+function fabScrollTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    var menu = document.getElementById('fab-asignar-menu');
+    if (menu) menu.style.display = 'none';
+}
+function toggleFabMenu() {
+    var menu = document.getElementById('fab-asignar-menu');
+    if (!menu) return;
+    if (menu.style.display === 'block') { menu.style.display = 'none'; return; }
+    var secciones = [
+        { id: 'sec-tipo-cred',   label: '🟢 Credifin' },
+        { id: 'sec-tipo-sin',    label: '🟡 Sin Credifin' },
+        { id: 'sec-tipo-retail', label: '🟣 Retail' }
+    ].concat(getListasProvincias().map(function(p) {
+        return { id: 'sec-prov-' + p.id, label: '📍 ' + p.nombre };
+    }));
+    menu.innerHTML = secciones.map(function(s) {
+        return '<div onclick="irASeccion(\'' + s.id + '\'); toggleFabMenu();" style="padding:9px 14px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text);transition:background .12s;" onmouseover="this.style.background=\'var(--hover)\'" onmouseout="this.style.background=\'\'">' + s.label + '</div>';
+    }).join('');
+    menu.style.display = 'block';
+}
+// Muestra el FAB solo en Asignar Clientes y al scrollear hacia abajo
+function actualizarFabAsignar() {
+    var fab = document.getElementById('fab-asignar');
+    if (!fab) return;
+    var enAsignar = document.getElementById('tab-asignar') &&
+                    document.getElementById('tab-asignar').classList.contains('active');
+    if (enAsignar && window.scrollY > 320) {
+        fab.style.display = 'flex';
+    } else {
+        fab.style.display = 'none';
+        var menu = document.getElementById('fab-asignar-menu');
+        if (menu) menu.style.display = 'none';
     }
 }
-document.addEventListener('click', function(e) {
-    var inp = document.getElementById('g-prov-buscar');
-    var dd  = document.getElementById('g-prov-dropdown');
-    if (dd && inp && !inp.contains(e.target) && !dd.contains(e.target)) dd.style.display = 'none';
-});
+window.addEventListener('scroll', actualizarFabAsignar, { passive: true });
 
 // ── Importar Excel y asignar a usuario ──
 async function cargarExcelYAsignar(input) {
@@ -4982,6 +5073,17 @@ function escHtml(s) {
             <button class="btn btn-gray" onclick="cerrarModalPasarMultiple()">Cancelar</button>
             <button class="btn btn-green" onclick="confirmarPasarMultiple()">✅ Confirmar</button>
         </div>
+    </div>
+</div>
+
+<!-- Botón flotante de navegación en Asignar Clientes -->
+<div id="fab-asignar" style="display:none;position:fixed;right:22px;bottom:24px;z-index:9998;flex-direction:column;align-items:flex-end;gap:10px;">
+    <div id="fab-asignar-menu" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,0.25);padding:6px;max-height:300px;overflow-y:auto;min-width:210px;"></div>
+    <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;">
+        <button onclick="toggleFabMenu()" title="Ir a otra lista"
+                style="width:48px;height:48px;border-radius:50%;border:none;background:#0066cc;color:#fff;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">📋</button>
+        <button onclick="fabScrollTop()" title="Volver arriba"
+                style="width:48px;height:48px;border-radius:50%;border:none;background:#1a1a2e;color:#fff;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">⬆</button>
     </div>
 </div>
 
