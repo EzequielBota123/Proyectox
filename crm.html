@@ -1487,6 +1487,9 @@
         <div class="stock-topbar">
             <div style="font-size:15px;font-weight:800;color:var(--text);">📦 Stock</div>
             <input type="text" id="f-stock" placeholder="🔍 Buscar por nombre o código..." style="max-width:280px;" onkeyup="renderStock()" autocomplete="off">
+            <select id="f-stock-cat" onchange="renderStock()" style="max-width:200px;font-size:13px;font-weight:700;">
+                <option value="">📂 Todas las categorías</option>
+            </select>
             <span id="stock-count" style="font-size:12px;color:var(--text-muted);white-space:nowrap;"></span>
             <span id="stock-status" style="font-size:11px;color:var(--text-muted);white-space:nowrap;margin-left:auto;"></span>
         </div>
@@ -1846,6 +1849,7 @@ async function cargarStock() {
         _stockData = data || [];
         _stockCargado = true;
         if (status) status.textContent = '';
+        poblarCategoriasStock();
         renderStock();
     } catch (err) {
         if (status) status.textContent = '';
@@ -1863,12 +1867,39 @@ function fmtFechaStock(iso) {
     return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
+// Categoría de un producto, derivada del nombre (modelo de bici).
+// Ojo: las "Gozen" se llaman "SAMURAI GOZEN" → se chequea GOZEN antes que SAMURAI.
+function categoriaStock(s) {
+    const n = (s.nombre || '').toUpperCase();
+    if (n.startsWith('BIC')) {
+        const modelos = ['BOWIE', 'GOZEN', 'SHONEN', 'FIREBIRD', 'SAMURAI'];
+        for (const m of modelos) {
+            if (n.includes(m)) return m.charAt(0) + m.slice(1).toLowerCase(); // "Samurai"
+        }
+        return 'Otras bicis';
+    }
+    return 'Otros';
+}
+
+// Llena el selector de categorías con las que existan en los datos (preserva la elegida).
+function poblarCategoriasStock() {
+    const sel = document.getElementById('f-stock-cat');
+    if (!sel) return;
+    const prev = sel.value;
+    const cats = [...new Set(_stockData.map(categoriaStock))].sort((a, b) => a.localeCompare(b));
+    sel.innerHTML = '<option value="">📂 Todas las categorías</option>' +
+        cats.map(c => `<option value="${c}">${c}</option>`).join('');
+    if (prev && cats.includes(prev)) sel.value = prev;
+}
+
 function renderStock() {
     const cont = document.getElementById('stock-list');
     if (!cont) return;
     const q = document.getElementById('f-stock')?.value || '';
+    const cat = document.getElementById('f-stock-cat')?.value || '';
     // Reusa clienteCoincide: mapea "codigo" a campos que la función ya normaliza/busca
     const filtrados = _stockData.filter(s =>
+        (!cat || categoriaStock(s) === cat) &&
         clienteCoincide({ nombre: s.nombre || '', rubro: s.codigo || '', cuit: s.codigo || '' }, q)
     );
     const countEl = document.getElementById('stock-count');
