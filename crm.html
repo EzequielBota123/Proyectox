@@ -953,6 +953,19 @@
 
     }
 
+    /* ===== STOCK (solo lectura, lee public.stock) ===== */
+    .stock-topbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+    .stock-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px; }
+    .stock-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; transition:background .3s,border-color .3s; }
+    .stock-card .sk-nombre { font-size:14px; font-weight:800; color:var(--text); line-height:1.2; word-break:break-word; }
+    .stock-card .sk-codigo { font-size:11px; color:var(--text-muted); font-family:'Courier New',monospace; margin:2px 0 10px; word-break:break-all; }
+    .stock-card .sk-disp-lbl { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); }
+    .stock-card .sk-disp { font-size:30px; font-weight:800; line-height:1.05; }
+    .stock-card .sk-sec { display:flex; gap:16px; font-size:12px; color:var(--text-muted); margin-top:8px; }
+    .stock-card .sk-sec b { color:var(--text); font-weight:700; }
+    .stock-card .sk-upd { font-size:10px; color:var(--text-muted); margin-top:10px; }
+    .stock-vacio { padding:30px; text-align:center; color:var(--text-muted); font-size:13px; }
+
 </style>
 </head>
 <body>
@@ -993,6 +1006,7 @@
         <button class="tab-btn" onclick="cambiarTab('calendario',this)">📅 Calendario</button>
         <button class="tab-btn admin-only" onclick="cambiarTab('usuarios',this)" style="display:none;">👥 Usuarios</button>
         <button class="tab-btn admin-only" onclick="cambiarTab('admin',this)" style="display:none;">📊 Panel Admin</button>
+        <button class="tab-btn" onclick="cambiarTab('stock',this)">📦 Stock</button>
     </div>
 
     <!-- ===== SCRIPTS ===== -->
@@ -1468,6 +1482,17 @@
         </div>
     </div>
 
+    <!-- ===== STOCK (solo lectura: lee public.stock) ===== -->
+    <div id="tab-stock" class="tab-content">
+        <div class="stock-topbar">
+            <div style="font-size:15px;font-weight:800;color:var(--text);">📦 Stock</div>
+            <input type="text" id="f-stock" placeholder="🔍 Buscar por nombre o código..." style="max-width:280px;" onkeyup="renderStock()" autocomplete="off">
+            <span id="stock-count" style="font-size:12px;color:var(--text-muted);white-space:nowrap;"></span>
+            <span id="stock-status" style="font-size:11px;color:var(--text-muted);white-space:nowrap;margin-left:auto;"></span>
+        </div>
+        <div id="stock-list"></div>
+    </div>
+
 <!-- Modal Visita -->
 <div class="modal" id="modal-visita">
     <div class="modal-box" style="max-width:520px;">
@@ -1803,6 +1828,90 @@ function subscribeRealtime() {
         });
 }
 
+// ============================================================
+// STOCK — SOLO LECTURA desde public.stock (la llena FEPA/Contabilium aparte)
+// El CRM nunca escribe/borra/modifica esta tabla.
+// ============================================================
+let _stockData = [];
+let _stockCargado = false;
+let _stockTimer = null;
+
+async function cargarStock() {
+    const status = document.getElementById('stock-status');
+    if (status) status.textContent = 'Cargando…';
+    try {
+        if (!sbDisponible) throw new Error('Sin conexión con Supabase');
+        const { data, error } = await db.from('stock').select('*').order('nombre', { nullsFirst: false });
+        if (error) throw new Error(error.message);
+        _stockData = data || [];
+        _stockCargado = true;
+        if (status) status.textContent = '';
+        renderStock();
+    } catch (err) {
+        if (status) status.textContent = '';
+        const cont = document.getElementById('stock-list');
+        if (cont) cont.innerHTML = `<div class="stock-vacio">No se pudo cargar el stock: ${err.message}</div>`;
+        console.error('[CRM] cargarStock:', err);
+    }
+}
+
+function fmtFechaStock(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '—';
+    const p = n => String(n).padStart(2, '0');
+    return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+function renderStock() {
+    const cont = document.getElementById('stock-list');
+    if (!cont) return;
+    const q = document.getElementById('f-stock')?.value || '';
+    // Reusa clienteCoincide: mapea "codigo" a campos que la función ya normaliza/busca
+    const filtrados = _stockData.filter(s =>
+        clienteCoincide({ nombre: s.nombre || '', rubro: s.codigo || '', cuit: s.codigo || '' }, q)
+    );
+    const countEl = document.getElementById('stock-count');
+    if (countEl) countEl.textContent = `${filtrados.length} de ${_stockData.length} producto(s)`;
+
+    if (!filtrados.length) {
+        cont.innerHTML = `<div class="stock-vacio">${_stockData.length ? 'Sin resultados para la búsqueda' : 'No hay productos en stock todavía'}</div>`;
+        return;
+    }
+    const esc = x => String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    cont.innerHTML = '<div class="stock-grid">' + filtrados.map(s => {
+        const disp   = Number(s.stock_con_reservas || 0);
+        const color  = disp > 0 ? '#15803d' : '#dc2626';
+        const nombre = (s.nombre && String(s.nombre).trim()) ? s.nombre : (s.codigo || '—');
+        return `
+        <div class="stock-card">
+            <div class="sk-nombre">${esc(nombre)}</div>
+            <div class="sk-codigo">${esc(s.codigo || '—')}</div>
+            <div class="sk-disp-lbl">Disponible</div>
+            <div class="sk-disp" style="color:${color};">${disp}</div>
+            <div class="sk-sec">
+                <span>Stock: <b>${Number(s.stock_actual||0)}</b></span>
+                <span>Reservado: <b>${Number(s.stock_reservado||0)}</b></span>
+            </div>
+            <div class="sk-upd">🕓 ${fmtFechaStock(s.updated_at)}</div>
+        </div>`;
+    }).join('') + '</div>';
+}
+
+// Realtime AISLADO: canal propio para public.stock (NO toca el canal crm-realtime).
+// Cuando FEPA/Contabilium actualice un stock, los números cambian solos en la vista.
+function subscribeStockRealtime() {
+    if (!sbDisponible) return;
+    db.channel('stock-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'stock' }, (p) => {
+            console.log('[CRM] realtime stock:', p.eventType);
+            if (!_stockCargado) return; // solo refresca si el usuario ya abrió Stock
+            clearTimeout(_stockTimer);
+            _stockTimer = setTimeout(cargarStock, 300);
+        })
+        .subscribe(status => console.log('[CRM] Realtime stock status:', status));
+}
+
 async function inicializarDB() {
     document.getElementById('loading-overlay').style.display = 'flex';
     try {
@@ -1820,6 +1929,7 @@ async function inicializarDB() {
             }
         } catch(e) { console.warn('[CRM] No se pudieron cargar usuarios:', e.message); }
         subscribeRealtime();
+        subscribeStockRealtime();
         // Auto-routing: si el nombre del usuario coincide con un vendedorVenta existente → CRM Vendedores
         const miNombre = (CURRENT_USER.nombre || CURRENT_USER.username || '').toLowerCase();
         const esVendedor = getClientesAsignados().some(c =>
@@ -2162,13 +2272,15 @@ function _filtrarPorTipo(tipo, prefijo, tbodyId, countId) {
     const prov     = (document.getElementById(`f-${prefijo}-prov`)    ||{}).value||'';
     const ciudad   = (document.getElementById(`f-${prefijo}-ciudad`)  ||{}).value||'';
     const rubro    = (document.getElementById(`f-${prefijo}-rubro`)   ||{}).value||'';
+    const cuitDig = soloDigitos(cuit);
+    const telDig  = soloDigitos(telefono);
     const filtrados = todos.filter(c =>
-        (!nombre   || c.nombre.toLowerCase().includes(nombre.toLowerCase())) &&
-        (!cuit     || (c.cuit||'').toLowerCase().includes(cuit.toLowerCase())) &&
-        (!telefono || (c.telefono||'').includes(telefono) || (c.telefono2||'').includes(telefono)) &&
+        (!nombre   || normTxt(c.nombre).includes(normTxt(nombre))) &&
+        (!cuit     || (cuitDig ? soloDigitos(c.cuit).includes(cuitDig) : normTxt(c.cuit).includes(normTxt(cuit)))) &&
+        (!telefono || (!telDig  || soloDigitos(c.telefono).includes(telDig) || soloDigitos(c.telefono2).includes(telDig))) &&
         (!prov     || c.provincia===prov) &&
-        (!ciudad   || (c.ciudad||'').toLowerCase().includes(ciudad.toLowerCase())) &&
-        (!rubro    || (c.rubro||'').toLowerCase().includes(rubro.toLowerCase()))
+        (!ciudad   || normTxt(c.ciudad).includes(normTxt(ciudad))) &&
+        (!rubro    || normTxt(c.rubro).includes(normTxt(rubro)))
     );
     const el = document.getElementById(countId); if(el) el.textContent = todos.length;
     renderTabla(tbodyId, filtrados, asignados, tipo);
@@ -2344,17 +2456,10 @@ function renderCRM() {
     main.style.display    = 'block';
 
     const todos  = getClientesAsignados().filter(c => c.vendedorId === vendedorActivo);
-    const busq   = (document.getElementById('f-crm')?.value||'').toLowerCase();
+    const busq   = document.getElementById('f-crm')?.value || '';
     const filtrados = todos.filter(c => {
         const okEst   = crmFiltroEstado === 'todos' || c.estado === crmFiltroEstado;
-        const okBusq  = !busq ||
-            c.nombre.toLowerCase().includes(busq) ||
-            (c.telefono||'').includes(busq) ||
-            (c.telefono2||'').includes(busq) ||
-            (c.ciudad||'').toLowerCase().includes(busq) ||
-            (c.provincia||'').toLowerCase().includes(busq) ||
-            (c.rubro||'').toLowerCase().includes(busq) ||
-            (c.cuit||'').includes(busq);
+        const okBusq  = clienteCoincide(c, busq);
         const okFecha = !crmFiltroFecha || (c.fecha_contacto && mismodia(c.fecha_contacto, crmFiltroFecha));
         return okEst && okBusq && okFecha;
     });
@@ -2712,6 +2817,7 @@ function cambiarTab(id, btn) {
     if (id==='usuarios')   { cargarListaUsuarios(); }
     if (id==='calendario') { renderCalendario(); renderCalVisitas(); }
     if (id==='admin')      { renderAdminPanel(); }
+    if (id==='stock')      { cargarStock(); }
     actualizarFabAsignar();
 }
 
@@ -2767,6 +2873,29 @@ function normalizeKey(s) {
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quita acentos: "Teléfono" → "telefono"
         .replace(/[\s_\-\.\(\)\/]/g,'');
 }
+// ── Búsqueda precisa (acentos/mayúsculas/formato de números) ──
+// Texto en minúsculas y SIN acentos, conservando espacios.
+function normTxt(s) {
+    return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+// Solo dígitos (para teléfono y CUIT): ignora +54, espacios, guiones, paréntesis.
+function soloDigitos(s) { return String(s||'').replace(/\D/g, ''); }
+
+// ¿El cliente coincide con el texto buscado? Insensible a acentos/mayúsculas,
+// teléfono/CUIT por dígitos, multi-palabra (todas deben aparecer), todos los campos.
+function clienteCoincide(c, query) {
+    const q = normTxt(query).trim();
+    if (!q) return true;
+    const texto = normTxt([c.nombre, c.ciudad, c.provincia, c.rubro, c.cuit, c.email, c.telefono, c.telefono2]
+        .filter(Boolean).join(' '));
+    const digitos = soloDigitos([c.telefono, c.telefono2, c.cuit].filter(Boolean).join(' '));
+    return q.split(/\s+/).every(tok => {
+        if (!tok) return true;
+        const tokDig = soloDigitos(tok);
+        return texto.includes(tok) || (tokDig.length >= 2 && digitos.includes(tokDig));
+    });
+}
+
 function normalizarTipo(raw) {
     const v = normalizeKey(raw);
     if (v.includes('retail')) return 'Retail';
@@ -4060,13 +4189,8 @@ function filtrarProv(tipo, provId) {
     const cargados  = getClientesCargados().filter(c => c.tipo === tipo);
     const asignados = getClientesAsignados();
     const busqEl    = document.getElementById(`f-prov-${provId}`);
-    const busq      = (busqEl?.value || '').toLowerCase().trim();
-    const filtrados = busq ? cargados.filter(c =>
-        c.nombre.toLowerCase().includes(busq) ||
-        (c.rubro||'').toLowerCase().includes(busq) ||
-        (c.ciudad||'').toLowerCase().includes(busq) ||
-        (c.telefono||'').includes(busq)
-    ) : cargados;
+    const busq      = (busqEl?.value || '').trim();
+    const filtrados = busq ? cargados.filter(c => clienteCoincide(c, busq)) : cargados;
 
     const countEl = document.getElementById(`count-prov-${provId}`);
     if (countEl) countEl.textContent = cargados.length;
@@ -4363,13 +4487,10 @@ function renderCRMVendedores() {
         (c.estado === 'En manos de vendedor' || (c.estado === 'Cerrado' && c.estadoVend === 'Cerrado'))
     );
 
-    const busq = (document.getElementById('f-crmvend')?.value||'').toLowerCase();
+    const busq = document.getElementById('f-crmvend')?.value || '';
     const filtrados = todos.filter(c => {
         const okEst  = crmVFiltroEstado === 'todos' || (c.estadoVend||'En proceso') === crmVFiltroEstado;
-        const okBusq = !busq ||
-            c.nombre.toLowerCase().includes(busq) ||
-            (c.telefono||'').includes(busq) ||
-            (c.ciudad||'').toLowerCase().includes(busq);
+        const okBusq = clienteCoincide(c, busq);
         return okEst && okBusq;
     });
 
