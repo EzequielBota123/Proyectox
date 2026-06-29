@@ -53,17 +53,18 @@ async function getStock(token: string, deposito: string) {
   return items;
 }
 
-// 3) Nombre de un producto (concepto) por Id
-async function getNombre(token: string, id: number): Promise<string> {
+// 3) Nombre y precio de un producto (concepto) por Id
+async function getConcepto(token: string, id: number): Promise<{ nombre: string; precio: number | null }> {
   try {
     const r = await fetch(`${CONTA_BASE}/api/conceptos/getConcepto?id=${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!r.ok) return "";
+    if (!r.ok) return { nombre: "", precio: null };
     const j = await r.json();
-    return (j?.Nombre ?? "").toString();
+    const precio = j?.PrecioFinal != null ? Number(j.PrecioFinal) : null;
+    return { nombre: (j?.Nombre ?? "").toString(), precio };
   } catch {
-    return "";
+    return { nombre: "", precio: null };
   }
 }
 
@@ -74,7 +75,7 @@ function sbHeaders() {
 }
 
 async function leerStockActual(): Promise<Map<string, any>> {
-  const url = `${env("SUPABASE_URL")}/rest/v1/stock?select=codigo,nombre,stock_actual`;
+  const url = `${env("SUPABASE_URL")}/rest/v1/stock?select=codigo,nombre,stock_actual,precio`;
   const r = await fetch(url, { headers: sbHeaders() });
   const map = new Map<string, any>();
   if (r.ok) for (const row of await r.json()) map.set(row.codigo, row);
@@ -122,9 +123,15 @@ Deno.serve(async () => {
       if (!codigo) continue;
       const prev = previo.get(codigo);
 
-      // Nombre: reusar el guardado; si no hay, pedirlo a Contabilium
+      // Nombre y precio: reusar lo guardado; si falta alguno, pedirlo a Contabilium
+      // (una sola llamada trae los dos). Se cachea para no recargar la API.
       let nombre = prev?.nombre ?? "";
-      if (!nombre) nombre = await getNombre(token, it.Id);
+      let precio: number | null = prev?.precio ?? null;
+      if (!nombre || precio == null) {
+        const c = await getConcepto(token, it.Id);
+        if (!nombre) nombre = c.nombre;
+        if (precio == null) precio = c.precio;
+      }
 
       const stockActual = Number(it.StockActual ?? 0);
       const reservado = Number(it.StockReservado ?? 0);
@@ -144,6 +151,7 @@ Deno.serve(async () => {
         id: it.Id ?? null,
         codigo,
         nombre: nombre || null,
+        precio: precio,
         deposito_id: Number(deposito),
         stock_actual: stockActual,
         stock_reservado: reservado,

@@ -961,6 +961,7 @@
     .stock-card .sk-codigo { font-size:11px; color:var(--text-muted); font-family:'Courier New',monospace; margin:2px 0 10px; word-break:break-all; }
     .stock-card .sk-disp-lbl { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); }
     .stock-card .sk-disp { font-size:30px; font-weight:800; line-height:1.05; }
+    .stock-card .sk-precio { font-size:15px; font-weight:800; color:#0066cc; margin-top:6px; }
     .stock-card .sk-sec { display:flex; gap:16px; font-size:12px; color:var(--text-muted); margin-top:8px; }
     .stock-card .sk-sec b { color:var(--text); font-weight:700; }
     .stock-card .sk-upd { font-size:10px; color:var(--text-muted); margin-top:10px; }
@@ -1914,12 +1915,16 @@ function renderStock() {
         const disp   = Number(s.stock_con_reservas || 0);
         const color  = disp > 0 ? '#15803d' : '#dc2626';
         const nombre = (s.nombre && String(s.nombre).trim()) ? s.nombre : (s.codigo || '—');
+        const precioHTML = (s.precio != null && Number(s.precio) > 0)
+            ? `<div class="sk-precio">💲 ${Number(s.precio).toLocaleString('es-AR')}</div>`
+            : '';
         return `
         <div class="stock-card">
             <div class="sk-nombre">${esc(nombre)}</div>
             <div class="sk-codigo">${esc(s.codigo || '—')}</div>
             <div class="sk-disp-lbl">Disponible</div>
             <div class="sk-disp" style="color:${color};">${disp}</div>
+            ${precioHTML}
             <div class="sk-sec">
                 <span>Stock: <b>${Number(s.stock_actual||0)}</b></span>
                 <span>Reservado: <b>${Number(s.stock_reservado||0)}</b></span>
